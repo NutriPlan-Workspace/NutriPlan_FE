@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "allowUmdGlobalAccess": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/configs": ["configs"],
+      "@/configs/*": ["configs/*"],
+      "@/assets": ["assets"],
+      "@/assets/*": ["assets/*"],
+      "@/utils": ["utils"],
+      "@/utils/*": ["utils/*"],
+      "@/atoms/*": ["components/atoms/*"],
+      "@/molecules/*": ["components/molecules/*"],
+      "@/organisms/*": ["components/organisms/*"],
+      "@/templates/*": ["components/templates/*"],
+      "@/pages/*": ["pages/*"],
+      "@/types": ["types"],
+      "@/types/*": ["types/*"],
+      "@/constants": ["constants"],
+      "@/constants/*": ["constants/*"],
+      "@/hooks": ["hooks"],
+      "@/hooks/*": ["hooks/*"],
+      "@/redux": ["providers/redux"],
+      "@/redux/*": ["providers/redux/*"],
+      "@/apis": ["apis"],
+      "@/apis/*": ["apis/*"],
+      "@/contexts": ["contexts"],
+      "@/contexts/*": ["contexts/*"]
+    }
+  },
+  "include": ["src"],
+}
