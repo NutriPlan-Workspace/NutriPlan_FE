@@ -44,7 +44,13 @@
       "@/apis": ["apis"],
       "@/apis/*": ["apis/*"],
       "@/contexts": ["contexts"],
-      "@/contexts/*": ["contexts/*"]
+      "@/contexts/*": ["contexts/*"],
+      "@/helper": ["helper"],
+      "@/helper/*": ["helper/*"],
+      "@/schemas": ["schemas"],
+      "@/schemas/*": ["schemas/*"],
+      "@/services": ["services"],
+      "@/services/*": ["services/*"]
     }
   },
   "include": ["src"],

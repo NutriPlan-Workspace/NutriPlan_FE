@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+:root {
+    /* These properties cannot be overridden using Tailwind */
+    /* Override css variable React-Toastify : [https://fkhadra.github.io/react-toastify/how-to-style/#override-css-variables] */
+    --toastify-color-progress-success: linear-gradient(to right, #97f8ae, #3ebc5b);
+    --toastify-color-progress-error: linear-gradient(to right, #f6a3ab, #da3243);
+    --toastify-color-progress-warning: linear-gradient(to right, #ffe28c, #d4ad38);
+    --toastify-color-progress-info: linear-gradient(to right, #87e3f1, #3fa6b6);
+    --toastify-spinner-color: #33d638;
+    --toastify-icon-color-success: #5ddd7b;
+    --toastify-icon-color-error: #f16f7c;  
+    --toastify-icon-color-warning: #e7c971; 
+    --toastify-icon-color-info: #3fa6b6;    
+}
