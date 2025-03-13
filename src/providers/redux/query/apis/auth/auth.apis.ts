@@ -1,28 +1,30 @@
+import {
+  AUTH_ME_ENDPOINT,
+  LOGIN_ENDPOINT,
+  LOGOUT_ENDPOINT,
+} from '@/constants/endpoints';
 import { baseApi } from '@/redux/query/apis/base.api';
-import { AuthResponse } from '@/types/auth.types';
+import type { LoginData } from '@/types/auth.types';
+import type { AuthResponse } from '@/types/auth.types';
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // TODO: Refine this endpoint in Login task
-    loginRequest: builder.mutation<
-      AuthResponse,
-      { email: string; password: string }
-    >({
+    loginRequest: builder.mutation<AuthResponse, LoginData>({
       query: (data) => ({
-        url: '/auth/login',
+        url: LOGIN_ENDPOINT,
         method: 'POST',
         body: data,
       }),
     }),
     getUser: builder.query<AuthResponse, void>({
       query: () => ({
-        url: '/auth/me',
+        url: AUTH_ME_ENDPOINT,
       }),
-      keepUnusedDataFor: 15, // Cache 15s
+      keepUnusedDataFor: 15,
     }),
     logoutRequest: builder.mutation<void, void>({
       query: () => ({
-        url: '/auth/logout',
+        url: LOGOUT_ENDPOINT,
         method: 'POST',
       }),
     }),

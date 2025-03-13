@@ -1,32 +1,31 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { Roles, User } from '@/types/user.types';
+import type { User } from '@/types/user.types';
+import { Role } from '@/types/user.types';
 
 export type UserState = {
   id: string;
   fullName: string;
   email: string;
-  role: Roles;
+  role: Role;
 };
 
 export const userInitialState: UserState = {
   id: '',
   fullName: '',
   email: '',
-  role: Roles.GUEST,
+  role: Role.GUEST,
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState: userInitialState,
   reducers: {
-    // TODO: Refine this reducer in Login task
     setUser: (state, action: PayloadAction<User>) => {
-      const { id, fullName, email, role } = action.payload;
+      const { id, fullName, email } = action.payload;
       state.id = id;
       state.fullName = fullName;
       state.email = email;
-      state.role = role as Roles;
     },
   },
 });

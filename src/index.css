@@ -1,15 +1,49 @@
+@layer theme, base, antd, components, utilities;
+@import url('https://fonts.cdnfonts.com/css/tt-norms');
 @import 'tailwindcss';
 
+@theme {
+  --font-display: 'TT Norms', sans-serif;
+  --color-primary: #ffc84e;
+  --color-primary-50: #fff9eb;
+  --color-primary-100: #fff0c6;
+  --color-primary-200: #ffde88;
+  --color-primary-300: #ffc84e;
+  --color-primary-400: #ffb020;
+  --color-primary-500: #f98c07;
+  --color-primary-600: #dd6602;
+  --color-primary-700: #b74506;
+  --color-primary-800: #94350c;
+  --color-primary-900: #7a2d0d;
+  --color-primary-950: #461502;
+  --color-error: #ef4444;
+  --color-gray-9: #1c1c1c;
+}
+
 :root {
-    /* These properties cannot be overridden using Tailwind */
-    /* Override css variable React-Toastify : [https://fkhadra.github.io/react-toastify/how-to-style/#override-css-variables] */
-    --toastify-color-progress-success: linear-gradient(to right, #97f8ae, #3ebc5b);
-    --toastify-color-progress-error: linear-gradient(to right, #f6a3ab, #da3243);
-    --toastify-color-progress-warning: linear-gradient(to right, #ffe28c, #d4ad38);
-    --toastify-color-progress-info: linear-gradient(to right, #87e3f1, #3fa6b6);
-    --toastify-spinner-color: #33d638;
-    --toastify-icon-color-success: #5ddd7b;
-    --toastify-icon-color-error: #f16f7c;  
-    --toastify-icon-color-warning: #e7c971; 
-    --toastify-icon-color-info: #3fa6b6;    
+  font-family: var(--font-display);
+  /* These properties cannot be overridden using Tailwind */
+  /* Override css variable React-Toastify : [https://fkhadra.github.io/react-toastify/how-to-style/#override-css-variables] */
+  --toastify-color-progress-success: linear-gradient(
+    to right,
+    #97f8ae,
+    #3ebc5b
+  );
+  --toastify-color-progress-error: linear-gradient(to right, #f6a3ab, #da3243);
+  --toastify-color-progress-warning: linear-gradient(
+    to right,
+    #ffe28c,
+    #d4ad38
+  );
+  --toastify-color-progress-info: linear-gradient(to right, #87e3f1, #3fa6b6);
+  --toastify-spinner-color: #33d638;
+  --toastify-icon-color-success: #5ddd7b;
+  --toastify-icon-color-error: #f16f7c;
+  --toastify-icon-color-warning: #e7c971;
+  --toastify-icon-color-info: #3fa6b6;
+}
+
+.ant-card-body {
+  width: 73%;
+  padding: 0;
 }

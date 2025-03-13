@@ -1,7 +1,9 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { StyleProvider } from '@ant-design/cssinjs';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { ConfigProvider } from 'antd';
 
 import ToastProvider from '@/contexts/ToastContext';
 import { store } from '@/redux/store';
@@ -18,16 +20,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
-import './index.css';
-
 const rootElement = document.getElementById('root') as HTMLElement;
 
 ReactDOM.createRoot(rootElement).render(
   <StrictMode>
-    <Provider store={store}>
-      <ToastProvider>
-        <RouterProvider router={router} />
-      </ToastProvider>
-    </Provider>
+    <StyleProvider layer>
+      <Provider store={store}>
+        <ToastProvider>
+          <ConfigProvider
+            theme={{
+              token: {
+                fontFamily: '"TT Norms", sans-serif',
+              },
+            }}
+          >
+            <RouterProvider router={router} />
+          </ConfigProvider>
+        </ToastProvider>
+      </Provider>
+    </StyleProvider>
   </StrictMode>,
 );

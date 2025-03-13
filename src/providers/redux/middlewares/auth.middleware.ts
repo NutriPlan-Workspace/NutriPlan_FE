@@ -7,7 +7,7 @@ export const authMiddleware: Middleware =
   (storeAPI) => (next) => async (action) => {
     if (authApi.endpoints.getUser.matchFulfilled(action)) {
       try {
-        storeAPI.dispatch(setUser(action.payload.data));
+        storeAPI.dispatch(setUser(action.payload.data.payload));
       } catch {
         storeAPI.dispatch(setUser(userInitialState));
       }

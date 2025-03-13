@@ -1,10 +1,16 @@
-import { User } from './user.types';
+import type { User } from './user.types';
 
 export interface AuthResponse {
-  // TODO: Refine this
   success: boolean;
-  total: number;
-  data: User;
   message: string;
-  additionalData: object;
+  code: number;
+  data: {
+    payload: User;
+    accessToken: string;
+  };
+}
+
+export interface LoginData {
+  email: string;
+  password: string;
 }
