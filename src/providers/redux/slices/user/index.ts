@@ -1,3 +1,3 @@
-export { default as userReducer } from './user.reducer';
-export * from './user.reducer';
-export * from './user.selector';
+export { default as userReducer } from './userReducer';
+export * from './userReducer';
+export * from './userSelector';

@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { authMiddleware } from '@/redux/middlewares/auth.middleware';
-import { baseApi } from '@/redux/query/apis/base.api';
+import { authMiddleware } from '@/redux/middlewares/authMiddleware';
+import { baseApi } from '@/redux/query/apis/baseApi';
 import { userReducer } from '@/redux/slices/user';
 
 export const store = configureStore({

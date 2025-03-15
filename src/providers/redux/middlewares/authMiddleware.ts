@@ -1,6 +1,6 @@
 import { Middleware } from '@reduxjs/toolkit';
 
-import { authApi } from '@/redux/query/apis/auth/auth.apis';
+import { authApi } from '@/redux/query/apis/auth/authApi';
 import { setUser, userInitialState } from '@/redux/slices/user';
 
 export const authMiddleware: Middleware =

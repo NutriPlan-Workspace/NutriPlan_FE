@@ -3,9 +3,9 @@ import {
   LOGIN_ENDPOINT,
   LOGOUT_ENDPOINT,
 } from '@/constants/endpoints';
-import { baseApi } from '@/redux/query/apis/base.api';
-import type { LoginData } from '@/types/auth.types';
-import type { AuthResponse } from '@/types/auth.types';
+import { baseApi } from '@/redux/query/apis/baseApi';
+import type { LoginData } from '@/types/auth';
+import type { AuthResponse } from '@/types/auth';
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

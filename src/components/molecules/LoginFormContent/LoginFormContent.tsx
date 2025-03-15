@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { Button } from '@/atoms/Button';
 import { InputField } from '@/atoms/Input';
 import { useLogin } from '@/hooks/useAuth';
-import { loginSchema } from '@/schemas/login.schema';
+import { loginSchema } from '@/schemas/loginSchema';
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
 

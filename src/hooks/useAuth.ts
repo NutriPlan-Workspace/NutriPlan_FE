@@ -3,11 +3,11 @@ import { useRouter } from '@tanstack/react-router';
 import { HTTP_STATUS } from '@/constants/httpStatus';
 import { ERROR_MESSAGES } from '@/constants/message';
 import { PATH } from '@/constants/path';
+import { Role } from '@/constants/role';
 import { useToast } from '@/contexts/ToastContext';
-import { useLoginRequestMutation } from '@/redux/query/apis/auth/auth.apis';
-import type { ApiResponse } from '@/types/apiResponse.type';
-import type { LoginData } from '@/types/auth.types';
-import { Role } from '@/types/user.types';
+import { useLoginRequestMutation } from '@/redux/query/apis/auth/authApi';
+import type { ApiResponse } from '@/types/apiResponse';
+import type { LoginData } from '@/types/auth';
 import { saveAuthToken, saveUserToStorage } from '@/utils/localStorage';
 
 export const useLogin = () => {

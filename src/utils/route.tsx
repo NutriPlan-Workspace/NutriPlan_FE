@@ -1,14 +1,10 @@
 import { redirect } from '@tanstack/react-router';
 
 import { PATH } from '@/constants/path';
-import type { User } from '@/types/user.types';
-import { Role } from '@/types/user.types';
-// TODO: Implement API RTK Query then uncomment this line
-// import { authApi } from '@/store/authApi'; // API RTK Query để gọi /auth/me
+import { Role } from '@/constants/role';
+import type { User } from '@/types/user';
 
 async function getUserData(): Promise<User | null> {
-  // TODO: Implement API RTK Query then uncomment this line and remove the next line
-  // const response = await authApi.endpoints.getUser.initiate();
   const response = {
     data: {
       id: '67c735126ba125117749e574',
