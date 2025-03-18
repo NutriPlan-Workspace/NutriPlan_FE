@@ -25,6 +25,11 @@
   --color-primary-950: #461502;
   --color-error: #ef4444;
   --color-gray-9: #1c1c1c;
+  --color-borderGray: #d9d9d9;
+  --color-textGray: #999;
+  --color-carbsYellow: #fcb524;
+  --color-fatsBlue: #52c0bc;
+  --color-proteinsPurple: #976fe8;
 }
 
 :root {

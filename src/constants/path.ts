@@ -20,4 +20,5 @@ export const PATH = {
   SUPPORTED_DIETS: '/supported-diets',
   FOR_PROFESSIONALS: '/for-professionals',
   ABOUT_US: '/about-us',
+  MEAL_PLAN: '/meal-plan',
 } as const;
