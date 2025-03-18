@@ -1,11 +1,21 @@
 export const ERROR_MESSAGES = {
-  emailRequired: 'Please enter your email!',
-  invalidEmail: 'Invalid email format!',
-  passwordMinLength: 'Password must be at least 8 characters long!',
-  passwordUppercase: 'Password must contain at least one uppercase letter!',
-  passwordLowercase: 'Password must contain at least one lowercase letter!',
-  passwordNumber: 'Password must contain at least one number!',
-  passwordSpecialChar: 'Password must contain at least one special character!',
-  loginFailed: 'Login failed!',
-  unexpectedError: 'Unexpected error',
+  EMAIL_REQUIRED: 'Please enter your email!',
+  INVALID_EMAIL: 'Invalid email format!',
+  PASSWORD_MIN_LENGTH: 'Password must be at least 8 characters long!',
+  PASSWORD_UPPERCASE: 'Password must contain at least one uppercase letter!',
+  PASSWORD_LOWERCASE: 'Password must contain at least one lowercase letter!',
+  PASSWORD_NUMBER: 'Password must contain at least one number!',
+  PASSWORD_SPECIAL_CHAR:
+    'Password must contain at least one special character!',
+  LOGIN_FAILED: 'Login failed!',
+  UNEXPECTED_ERROR: 'Unexpected error',
+  REGISTER_FAILED: 'Registration failed!',
+  FULLNAME_MIN_LENGTH: 'Fullname must be at least 3 characters long!',
+  CONFIRM_PASSWORD_REQUIRED: 'Please confirm your password!',
+  PASSWORDS_DO_NOT_MATCH: 'Passwords do not match!',
+  TERMS_NOT_ACCEPTED: 'You must accept the Terms of Service!',
+};
+
+export const SUCCESS_MESSAGES = {
+  REGISTRATION_SUCCESS: 'Registration successful! Redirecting to login...',
 };

@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { Input, InputProps as AntdInputProps, InputRef } from 'antd';
 
+import { ErrorMessage } from '@/atoms/ErrorMessage';
 import { cn } from '@/helpers/helpers';
 
 interface InputFieldProps extends AntdInputProps {
@@ -30,12 +30,7 @@ const InputField = forwardRef<InputRef, InputFieldProps>(
           {...props}
         />
 
-        {error && (
-          <p className='flex-start text-error mt-1 flex items-start gap-1 text-[15px]'>
-            <ExclamationCircleIcon className='h-6 w-6 overflow-visible' />
-            <span className='overflow-visible whitespace-nowrap'>{error}</span>
-          </p>
-        )}
+        {error && <ErrorMessage message={error} />}
       </div>
     );
   },
