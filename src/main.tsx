@@ -5,6 +5,7 @@ import { StyleProvider } from '@ant-design/cssinjs';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { ConfigProvider } from 'antd';
 
+import { DateProvider } from '@/contexts/DateContext';
 import ToastProvider from '@/contexts/ToastContext';
 import { store } from '@/redux/store';
 
@@ -27,15 +28,17 @@ ReactDOM.createRoot(rootElement).render(
     <StyleProvider layer>
       <Provider store={store}>
         <ToastProvider>
-          <ConfigProvider
-            theme={{
-              token: {
-                fontFamily: '"TT Norms", sans-serif',
-              },
-            }}
-          >
-            <RouterProvider router={router} />
-          </ConfigProvider>
+          <DateProvider>
+            <ConfigProvider
+              theme={{
+                token: {
+                  fontFamily: '"TT Norms", sans-serif',
+                },
+              }}
+            >
+              <RouterProvider router={router} />
+            </ConfigProvider>
+          </DateProvider>
         </ToastProvider>
       </Provider>
     </StyleProvider>
