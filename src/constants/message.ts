@@ -14,6 +14,9 @@ export const ERROR_MESSAGES = {
   CONFIRM_PASSWORD_REQUIRED: 'Please confirm your password!',
   PASSWORDS_DO_NOT_MATCH: 'Passwords do not match!',
   TERMS_NOT_ACCEPTED: 'You must accept the Terms of Service!',
+  CALORIES_MUST_BE_NUMBER: 'Calories must be a number',
+  CALORIES_MIN: 'Calories must be at least 100',
+  SELECT_MEALS_COUNT: 'Select meals count',
 };
 
 export const SUCCESS_MESSAGES = {

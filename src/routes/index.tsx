@@ -1,13 +1,18 @@
+import { useRef } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/')({
-  component: HomePage,
-});
+import { LandingContent } from '@/organisms/LandingContent';
+import { LayoutGuest } from '@/templates/LayoutGuest';
 
-function HomePage() {
+const LandingPage = () => {
+  const mealPlanRef = useRef<HTMLDivElement | null>(null);
   return (
-    <div>
-      <h1>Home</h1>
-    </div>
+    <LayoutGuest mealPlanRef={mealPlanRef}>
+      <LandingContent mealPlanRef={mealPlanRef} />
+    </LayoutGuest>
   );
-}
+};
+
+export const Route = createFileRoute('/')({
+  component: LandingPage,
+});
