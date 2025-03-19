@@ -21,4 +21,35 @@ export const PATH = {
   FOR_PROFESSIONALS: '/for-professionals',
   ABOUT_US: '/about-us',
   MEAL_PLAN: '/meal-plan',
+  LOGINED: '/logined',
+
+  GROCERIES: '/groceries',
+  DISCOVER: '/discover',
+  CUSTOM_RECIPES: '/custom-recipes',
+  COLLECTIONS: '/collections',
+  SAVED_PLANS: '/saved-plans',
+
+  DIET_NUTRITION: '/diet-nutrition',
+  NUTRITION_TARGETS: '/diet-nutrition/nutrition-targets',
+  PRIMARY_DIET: '/diet-nutrition/primary-diet',
+  FOOD_EXCLUSIONS: '/diet-nutrition/food-exclusions',
+  RATED_FOODS: '/diet-nutrition/rated-foods',
+
+  MEALS_SCHEDULE: '/meals-schedule',
+  MEAL_SETTINGS: '/meals-schedule/meal-settings',
+  LEFTOVERS: '/meals-schedule/leftovers',
+
+  PHYSICAL_STATS: '/physical-stats',
+  WEIGHT_GOAL: '/weight-goal',
+  GENERATOR_SETTINGS: '/generator-settings',
+
+  ACCOUNT: '/account',
+  CREDENTIALS: '/account/credentials',
+  FAMILY_MEMBERS: '/account/family-members',
+  NOTIFICATIONS: '/account/notifications',
+  SUBSCRIPTION: '/account/subscription',
+
+  INVITE_FRIENDS: '/invite-friends',
+  HELP: '/help',
+  LOGOUT: '/logout',
 } as const;

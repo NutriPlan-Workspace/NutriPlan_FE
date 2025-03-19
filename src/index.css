@@ -6,6 +6,10 @@
 @import 'tailwindcss';
 @import 'react-day-picker/dist/style.css';
 
+@plugin 'tailwind-scrollbar' {
+  nocompatible: true;
+}
+
 @theme {
   --font-display: 'TT Norms', sans-serif;
   --font-secondary: 'Poppins', sans-serif;
@@ -58,4 +62,17 @@
 .ant-card-body {
   width: 73%;
   padding: 0;
+}
+
+.ant-menu-item{
+  padding-right: 24px;
+}
+
+.ant-menu-item-selected {
+  @apply bg-primary-100 text-primary-400;
+}
+
+:where(.css-dev-only-do-not-override-1xtxwrz).ant-menu-light .ant-menu-submenu-selected > .ant-menu-submenu-title, 
+:where(.css-dev-only-do-not-override-1xtxwrz).ant-menu-light > .ant-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
+    color: theme('colors.primary.400') !important;
 }

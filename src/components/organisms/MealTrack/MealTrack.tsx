@@ -30,7 +30,7 @@ const MealTrack = () => {
   };
 
   return (
-    <Slider {...settings}>
+    <Slider {...settings} className='h-full w-full overflow-hidden'>
       {MealPlanDays.map((mealPlanDay: MealPlanDay, index: number) => (
         <div key={index}>
           <DayBox mealPlanDay={mealPlanDay} isLoading={false} />
