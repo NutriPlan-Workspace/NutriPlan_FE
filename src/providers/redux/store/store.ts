@@ -4,9 +4,12 @@ import { authMiddleware } from '@/redux/middlewares/authMiddleware';
 import { baseApi } from '@/redux/query/apis/baseApi';
 import { userReducer } from '@/redux/slices/user';
 
+import { mealPlanReducer } from '../slices/mealPlan';
+
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    mealPlan: mealPlanReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

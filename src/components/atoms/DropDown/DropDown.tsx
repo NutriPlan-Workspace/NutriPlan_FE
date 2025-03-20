@@ -41,20 +41,7 @@ const menuItems: MenuProps['items'] = [
 ];
 
 const DropDown: React.FC = () => (
-  <Dropdown
-    menu={{ items: menuItems }}
-    trigger={['click']}
-    dropdownRender={(menu) => (
-      <div className='overflow-hidden rounded-md bg-white shadow-lg'>
-        {React.cloneElement(
-          menu as React.ReactElement<{
-            style: React.CSSProperties;
-          }>,
-          { style: { borderRadius: '2px' } },
-        )}
-      </div>
-    )}
-  >
+  <Dropdown menu={{ items: menuItems }} trigger={['click']}>
     <Button
       onClick={(e) => e.preventDefault()}
       type='text'

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 
 import { DayBoxHeader } from '@/molecules/DayBoxHeader';
 import { DayBoxMeals } from '@/molecules/DayBoxMeals';
@@ -37,11 +38,27 @@ const DayBox: React.FC<DayBoxProps> = ({ mealPlanDay, isLoading }) => {
         isHovered={isHovered}
       />
 
-      {/* Calories Summary */}
-      <DayBoxSummary allDayMealItems={allDayMealItems} isLoading={isLoading} />
+      {/* Motion for smooth fade-in effect */}
+      <motion.div
+        key={isLoading ? 'loading' : 'content'}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        {/* Calories Summary */}
+        <DayBoxSummary
+          allDayMealItems={allDayMealItems}
+          isLoading={isLoading}
+        />
 
-      {/* Meal Boxes */}
-      <DayBoxMeals mealItems={mealItems} isLoading={isLoading} />
+        {/* Meal Boxes */}
+        <DayBoxMeals
+          mealItems={mealItems}
+          mealDate={mealDate}
+          isLoading={isLoading}
+        />
+      </motion.div>
     </div>
   );
 };
