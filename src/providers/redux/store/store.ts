@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import { authMiddleware } from '@/redux/middlewares/authMiddleware';
 import { baseApi } from '@/redux/query/apis/baseApi';
+import { foodReducer } from '@/redux/slices/food';
 import { userReducer } from '@/redux/slices/user';
 
 import { mealPlanReducer } from '../slices/mealPlan';
@@ -9,6 +10,7 @@ import { mealPlanReducer } from '../slices/mealPlan';
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    food: foodReducer,
     mealPlan: mealPlanReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },

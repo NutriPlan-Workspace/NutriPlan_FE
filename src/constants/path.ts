@@ -16,7 +16,7 @@ export const PATH = {
   SPECIAL_LINES: '/special-lines',
   CLEAN_LINE: '/clean-line',
   BLOG: '/blog',
-  BROWSE_FOODS: '/browser-foods',
+  BROWSE_FOODS: '/browse-foods',
   SUPPORTED_DIETS: '/supported-diets',
   FOR_PROFESSIONALS: '/for-professionals',
   ABOUT_US: '/about-us',

@@ -29,7 +29,9 @@ const MealCard: React.FC<MealCardProps> = ({ mealItem }) => {
           overflow: 'hidden',
         },
       }}
-      content={<NutritionPopoverFood mealItem={mealItem} />}
+      content={
+        <NutritionPopoverFood mealItem={mealItem} showIngredient={true} />
+      }
     >
       <div
         className='hover:border-primary-400 flex rounded-[5px] border-2 border-transparent p-[3px_3px] transition-all duration-200 hover:border-2 hover:shadow-md'

@@ -16,6 +16,7 @@ import { Route as UnauthorizedIndexImport } from './routes/unauthorized/index'
 import { Route as RegisterIndexImport } from './routes/register/index'
 import { Route as MealPlanIndexImport } from './routes/meal-plan/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
 
 // Create/Update Routes
@@ -50,6 +51,12 @@ const LoginIndexRoute = LoginIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const BrowseFoodsIndexRoute = BrowseFoodsIndexImport.update({
+  id: '/browse-foods/',
+  path: '/browse-foods/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AdminIndexRoute = AdminIndexImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -72,6 +79,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/browse-foods/': {
+      id: '/browse-foods/'
+      path: '/browse-foods'
+      fullPath: '/browse-foods'
+      preLoaderRoute: typeof BrowseFoodsIndexImport
       parentRoute: typeof rootRoute
     }
     '/login/': {
@@ -110,6 +124,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminIndexRoute
+  '/browse-foods': typeof BrowseFoodsIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/register': typeof RegisterIndexRoute
@@ -119,6 +134,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminIndexRoute
+  '/browse-foods': typeof BrowseFoodsIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/register': typeof RegisterIndexRoute
@@ -129,6 +145,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/browse-foods/': typeof BrowseFoodsIndexRoute
   '/login/': typeof LoginIndexRoute
   '/meal-plan/': typeof MealPlanIndexRoute
   '/register/': typeof RegisterIndexRoute
@@ -140,16 +157,25 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/browse-foods'
     | '/login'
     | '/meal-plan'
     | '/register'
     | '/unauthorized'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/login' | '/meal-plan' | '/register' | '/unauthorized'
+  to:
+    | '/'
+    | '/admin'
+    | '/browse-foods'
+    | '/login'
+    | '/meal-plan'
+    | '/register'
+    | '/unauthorized'
   id:
     | '__root__'
     | '/'
     | '/admin/'
+    | '/browse-foods/'
     | '/login/'
     | '/meal-plan/'
     | '/register/'
@@ -160,6 +186,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   MealPlanIndexRoute: typeof MealPlanIndexRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
@@ -169,6 +196,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminIndexRoute: AdminIndexRoute,
+  BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   MealPlanIndexRoute: MealPlanIndexRoute,
   RegisterIndexRoute: RegisterIndexRoute,
@@ -187,6 +215,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/admin/",
+        "/browse-foods/",
         "/login/",
         "/meal-plan/",
         "/register/",
@@ -198,6 +227,9 @@ export const routeTree = rootRoute
     },
     "/admin/": {
       "filePath": "admin/index.tsx"
+    },
+    "/browse-foods/": {
+      "filePath": "browse-foods/index.tsx"
     },
     "/login/": {
       "filePath": "login/index.tsx"

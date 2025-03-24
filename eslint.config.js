@@ -39,7 +39,6 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       ...tsPlugin.configs.recommended.rules,
-      
       'prettier/prettier': 'warn',
       'arrow-body-style': [2, 'as-needed'],
       'class-methods-use-this': 0,

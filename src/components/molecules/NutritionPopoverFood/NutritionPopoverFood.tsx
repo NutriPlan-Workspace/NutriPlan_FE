@@ -3,15 +3,18 @@ import { Divider, Typography } from 'antd';
 
 import { nutritionFormat } from '@/constants/nutritionFormat';
 import type { Food, NutritionFields } from '@/types/food';
+import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
 
 interface NutritionPopoverFoodProps {
   mealItem: Food;
+  showIngredient: boolean;
 }
 
 const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
   mealItem,
+  showIngredient,
 }) => {
   // TODO: FIX THIS WHEN HAVE REAL DATA
   const currentUnit = mealItem.units[mealItem.defaultUnit];
@@ -43,25 +46,32 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
             <div className='mr-[20%] flex justify-between'>
               <Typography className={item.color}>{item.label}: </Typography>
               <Typography className={item.color}>
-                {mealItem.nutrition[item.key as keyof NutritionFields]}
+                {roundNumber(
+                  mealItem.nutrition[item.key as keyof NutritionFields],
+                  2,
+                )}
                 {item.unit}
               </Typography>
             </div>
           </div>
         ))}
-        <Divider className='mx-0 my-2.5 border-[#ddd]' />
-        <div className='ingredients'>
-          {mealItem.ingredients.map((ingredient) => (
-            <Typography
-              key={ingredient.ingredientFoodId}
-              className='text-black'
-            >
-              {/* TODO: FIX THIS WHEN HAVE REAL DATA */}
-              {ingredient.amount} {ingredient.preparation} {ingredient.unit} of{' '}
-              {ingredient.ingredientFoodId}
-            </Typography>
-          ))}
-        </div>
+        {showIngredient && (
+          <>
+            <Divider className='mx-0 my-2.5 border-[#ddd]' />
+            <div className='ingredients'>
+              {mealItem.ingredients.map((ingredient) => (
+                <Typography
+                  key={ingredient.ingredientFoodId}
+                  className='text-black'
+                >
+                  {/* TODO: FIX THIS WHEN HAVE REAL DATA */}
+                  {ingredient.amount} {ingredient.preparation} {ingredient.unit}{' '}
+                  of {ingredient.ingredientFoodId}
+                </Typography>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
