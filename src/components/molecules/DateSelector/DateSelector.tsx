@@ -65,7 +65,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({
       </Button>
 
       {showDatePicker && (
-        <div className='absolute my-2 rounded-md'>
+        <div className='absolute z-20 my-2 rounded-md'>
           {isRange ? (
             <>
               <WeekSelector

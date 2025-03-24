@@ -1,6 +1,5 @@
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { FaChevronLeft } from 'react-icons/fa6';
 import { HiMiniArrowTopRightOnSquare } from 'react-icons/hi2';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from '@tanstack/react-router';
@@ -61,16 +60,10 @@ const RegisterFormContent: React.FC = () => {
 
   return (
     <>
-      <Button
-        type='text'
-        className='font-display mb-1 -ml-2 flex items-center gap-0 self-start rounded-full p-0 py-1 pr-3 text-[rgb(77,77,79)] hover:bg-gray-100 disabled:cursor-not-allowed'
-      >
-        <FaChevronLeft className='color-black font-tt-norms ml-1 h-3.5 w-3.5 font-bold' />
-        <div className='font-display p-0 text-[16px] font-thin'>Back</div>
-      </Button>
-
       <form onSubmit={handleSubmit(onSubmit)} className='flex w-full flex-col'>
-        <p className='mb-3 text-left font-bold'>Register with your email</p>
+        <p className='mb-3 text-left text-[16px] font-bold'>
+          Register with your email
+        </p>
 
         {formFields.map(
           ({ name, type, placeholder, showPasswordToggle = true }) => (

@@ -1,11 +1,12 @@
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { FaChevronLeft } from 'react-icons/fa6';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { Button } from '@/atoms/Button';
 import { InputField } from '@/atoms/Input';
+import { PATH } from '@/constants/path';
 import { useLogin } from '@/hooks/useAuth';
 import { loginSchema } from '@/schemas/loginSchema';
 
@@ -33,13 +34,6 @@ const LoginFormContent: React.FC = () => {
 
   return (
     <>
-      <Button
-        type='text'
-        className='font-display mb-4 -ml-2 flex items-center gap-0 self-start rounded-full p-0 py-1 pr-3 text-[rgb(77,77,79)] hover:bg-gray-100 disabled:cursor-not-allowed'
-      >
-        <FaChevronLeft className='color-black font-tt-norms ml-1 h-3.5 w-3.5 font-bold' />
-        <div className='font-display p-0 text-[16px] font-thin'>Back</div>
-      </Button>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className='flex w-full flex-col gap-4'
@@ -83,8 +77,13 @@ const LoginFormContent: React.FC = () => {
           {isLoading ? 'Loading...' : 'Log In'}
         </Button>
       </form>
-      <div className='font-display mt-3 cursor-pointer text-[16px] font-bold underline hover:text-gray-900 hover:opacity-80'>
-        Forgot password?
+      <div className='mt-3 cursor-pointer'>
+        <Link
+          className='font-display text-[16px] font-bold text-black underline hover:text-gray-900 hover:opacity-80'
+          to={PATH.REGISTER}
+        >
+          Create new account ?
+        </Link>
       </div>
     </>
   );

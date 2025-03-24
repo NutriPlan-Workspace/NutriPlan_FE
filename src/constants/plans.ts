@@ -8,8 +8,8 @@ export const PLAN_TYPES = {
 } as const;
 
 export const PLAN_MENU_ITEMS: MenuItem[] = [
-  { key: PLAN_TYPES.SINGLE_DAY, label: 'Single-Day' },
-  { key: PLAN_TYPES.MULTI_DAY, label: 'Multi-Day' },
+  { key: PLAN_TYPES.SINGLE_DAY, label: 'Single Day' },
+  { key: PLAN_TYPES.MULTI_DAY, label: 'Multi Day' },
   { key: PLAN_TYPES.WEEKLY_VIEW, label: 'Weekly View' },
 ];
 

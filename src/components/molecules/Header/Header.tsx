@@ -13,7 +13,7 @@ const Header: React.FC<{
     mealPlanRef?.current?.scrollIntoView({ behavior: 'smooth' });
   };
   return (
-    <header className='flex w-full items-center justify-center border-b border-black/8 px-0 lg:px-4 xl:px-24'>
+    <header className='flex w-full items-center justify-center border-b border-black/8 px-0 lg:px-4 xl:px-28'>
       <div className='m-auto flex h-20 w-full items-center justify-between'>
         <div className='text-lg font-bold text-gray-800'>Nutri X Plan</div>
 

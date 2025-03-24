@@ -26,7 +26,7 @@ const SingleDatePicker: React.FC<SingleDatePickerProps> = ({ onSelect }) => {
   };
 
   return (
-    <div className='absolute top-full left-full z-50 translate-x-[-15%] translate-y-[-15%] scale-[0.7] rounded-md border border-[#dedede] p-2 shadow-lg'>
+    <div className='absolute top-full left-full z-50 translate-x-[-15%] translate-y-[-15%] scale-[0.7] rounded-md border border-[#dedede] bg-white p-2 shadow-lg'>
       <DayPicker
         mode='single'
         selected={selected}
