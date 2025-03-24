@@ -12,7 +12,7 @@ const MealPlanContent: React.FC<MealPlanContentProps> = ({
   width,
   children,
 }) => (
-  <div className='flex h-full w-full flex-col overflow-hidden'>
+  <div className='flex h-full w-full flex-col'>
     <HeaderLeftMealPlan />
     <motion.div
       animate={{ width }}

@@ -13,7 +13,7 @@ interface EmptyMealDayProps {
 }
 
 const EmptyMealDay: React.FC<EmptyMealDayProps> = ({ dayOfWeek }) => (
-  <div className='w-full rounded-sm bg-white px-4 pt-[15px] pb-[60px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]'>
+  <div className='w-full rounded-sm bg-white px-4 pt-[15px] pb-[60px] shadow-[0_2px_2px_0_rgba(0,0,0,0.15),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]'>
     <p className='mt-2 text-center'>
       This meal plan will be automatically generated and emailed to you the
       prior Friday

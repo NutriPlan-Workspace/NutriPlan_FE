@@ -12,7 +12,7 @@ const LayoutLogined: React.FC<LayoutLoginedProps> = ({ children }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className='flex min-h-screen'>
+    <div className='flex'>
       <motion.div
         animate={{
           width: isSidebarOpen ? SIDEBAR_WIDTH.OPEN : SIDEBAR_WIDTH.COLLAPSED,
@@ -26,7 +26,7 @@ const LayoutLogined: React.FC<LayoutLoginedProps> = ({ children }) => {
         />
       </motion.div>
 
-      <motion.div className='h-screen flex-1'>
+      <motion.div className='flex-1'>
         <main className='h-full w-full'>{children(isSidebarOpen)}</main>
       </motion.div>
     </div>

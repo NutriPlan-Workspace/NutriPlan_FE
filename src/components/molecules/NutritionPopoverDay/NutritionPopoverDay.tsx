@@ -8,6 +8,7 @@ import {
 import { Button, Col, Row, Tooltip, Typography } from 'antd';
 
 import { nutritionFormat } from '@/constants/nutritionFormat';
+import { cn } from '@/helpers/helpers';
 import { PieChart } from '@/molecules/PieChart';
 import type { NutritionFields } from '@/types/food';
 import { roundNumber } from '@/utils/roundNumber';
@@ -18,23 +19,38 @@ interface NutritionPopoverDayProps {
   title: string;
   nutritionData: NutritionFields;
   onClick?: () => void;
+  isSingleDay?: boolean;
 }
 
 const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
   title,
   nutritionData,
   onClick,
+  isSingleDay = false,
 }) => (
-  <div className='flex w-[400px] flex-col items-center'>
-    <div className='relative w-full bg-[url("https://res.cloudinary.com/dtwrwvffl/image/upload/v1742271174/qr8amnrc7vkbcy04ftty.jpg")] bg-cover bg-center'>
+  <div
+    className={cn('flex flex-col items-center', { 'w-[400px]': !isSingleDay })}
+  >
+    <div
+      className={cn(
+        'relative w-full',
+        isSingleDay
+          ? 'bg-transparent'
+          : 'bg-[url("https://res.cloudinary.com/dtwrwvffl/image/upload/v1742271174/qr8amnrc7vkbcy04ftty.jpg")] bg-cover bg-center',
+      )}
+    >
       <div className='flex w-full flex-col items-center gap-2 bg-white/85 pt-3.5 pb-2'>
-        <HiOutlineX
-          className='absolute top-[8px] right-[8px] text-xl text-black'
-          onClick={onClick}
-        />
+        {!isSingleDay && (
+          <HiOutlineX
+            className='absolute top-[8px] right-[8px] text-xl text-black'
+            onClick={onClick}
+          />
+        )}
         <div className='bg-white shadow-[0_0_10px_10px_white]'>
           <Title
-            className='m-0 text-center text-base leading-none text-black'
+            className={cn('m-0 text-center text-base leading-none text-black', {
+              'text-[12px] font-thin': isSingleDay,
+            })}
             level={5}
           >
             {title}
@@ -43,7 +59,7 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
         <PieChart
           className='rounded-[75px] bg-white shadow-[0_0_8px_8px_white]'
           nutritionData={nutritionData}
-          size={150}
+          size={isSingleDay ? 200 : 150}
           label={true}
         />
       </div>
@@ -54,7 +70,10 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
         <Col span={14} className='w-full'>
           <div className='align-center flex justify-center'>
             <Title
-              className='mb-0 text-center text-[14px] leading-[24px] text-black'
+              className={cn(
+                'mb-0 text-center text-[14px] leading-[24px] text-black',
+                { 'text-[12px] font-thin': isSingleDay },
+              )}
               level={5}
             >
               CURRENT TOTALS
@@ -65,7 +84,10 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
         <Col span={10}>
           <div className='align-center flex justify-center gap-1'>
             <Title
-              className='mb-0 flex items-center gap-1 text-[14px] text-black'
+              className={cn(
+                'mb-0 flex items-center gap-1 text-[14px] text-black',
+                { 'text-[12px] font-thin': isSingleDay },
+              )}
               level={5}
             >
               TARGETS
@@ -91,7 +113,11 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
           <Row className='w-full'>
             <Col span={14} className='px-2'>
               <div className='flex justify-between'>
-                <Typography className={item.color}>{item.label}:</Typography>
+                <Typography
+                  className={cn({ 'text-[16px]': isSingleDay }, item.color)}
+                >
+                  {item.label}:
+                </Typography>
                 <Typography className={item.color}>
                   {roundNumber(nutritionData[item.key], 2)}
                   {item.unit}
