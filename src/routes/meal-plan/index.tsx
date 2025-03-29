@@ -9,6 +9,7 @@ import { MealPlanContent } from '@/organisms/MealPlanContent';
 import { MealTrack } from '@/organisms/MealTrack';
 import { MealTrackMultiple } from '@/organisms/MealTrackMultiple';
 import { LayoutLogined } from '@/templates/LayoutLogined';
+import { handleUserRoute } from '@/utils/route';
 
 const PLAN_COMPONENTS: Record<string, React.FC> = {
   [PLAN_TYPES.SINGLE_DAY]: MealTrack,
@@ -42,4 +43,5 @@ const MealPlanPage: React.FC = () => (
 
 export const Route = createFileRoute(PATH.MEAL_PLAN as keyof FileRoutesByPath)({
   component: MealPlanPage,
+  beforeLoad: handleUserRoute,
 });
