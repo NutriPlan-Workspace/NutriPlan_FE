@@ -4,22 +4,27 @@ import { ConfigProvider, InputNumber, Select } from 'antd';
 const { Option } = Select;
 
 interface AmountSelectorProps {
-  defaultOptionValue: string;
+  currentUnit: number;
+  currentAmount: number;
   options: {
-    value: string;
     amount: number;
-    label: string;
+    description: string;
   }[];
+  onAmountChange: (newAmount: number, newUnit: number) => void;
 }
 
 const AmountSelector: React.FC<AmountSelectorProps> = ({
-  defaultOptionValue,
+  onAmountChange,
+  currentUnit,
+  currentAmount,
   options,
 }) => {
   const [selectedOption, setSelectedOption] = useState(
-    options.find(({ value }) => value === defaultOptionValue) || options[0],
+    options[currentUnit] || options[0],
   );
-  const [value, setValue] = useState<number>(selectedOption.amount);
+  const [value, setValue] = useState<number>(currentAmount);
+  const [initialValue, setInitialValue] = useState(currentAmount);
+  const [initialUnit, setInitialUnit] = useState(selectedOption.description);
   const [inputWidth, setInputWidth] = useState(105);
   const [status, setStatus] = useState<'' | 'error' | 'warning'>('');
   const [isFocused, setIsFocused] = useState(false);
@@ -41,7 +46,6 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
     setStatus(value <= 0 ? 'warning' : '');
   }, [value]);
 
-  // TODO: If value is Error, don't call API to update meal plan
   const handleValueChange = (val: number | null) => {
     const newVal = val || 0;
     if (newVal < 0) return;
@@ -49,17 +53,28 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
   };
 
   const handleOptionChange = (newValue: string) => {
-    const newOption = options.find(({ value }) => value === newValue);
+    const newOption = options.find(
+      ({ description }) => description === newValue,
+    );
     if (!newOption || !selectedOption) return;
+
     const newValueCalculated =
       (value / selectedOption.amount) * newOption.amount;
     setValue(newValueCalculated);
     setSelectedOption(newOption);
   };
 
+  const handleBlur = () => {
+    setIsFocused(false);
+    if (value !== initialValue || selectedOption.description !== initialUnit) {
+      onAmountChange(value, 1);
+      setInitialValue(value);
+      setInitialUnit(selectedOption.description);
+    }
+  };
+
   return (
     <div className='align-center relative flex flex-col justify-evenly'>
-      {/* Real Input */}
       <div
         className='relative'
         onMouseEnter={() => setIsHovered(true)}
@@ -83,13 +98,8 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
         >
           <InputNumber
             size='small'
-            onFocus={() => {
-              setIsFocused(true);
-            }}
-            onBlur={() => {
-              setIsFocused(false);
-              // TODO: call API to update meal plan
-            }}
+            onFocus={() => setIsFocused(true)}
+            onBlur={handleBlur}
             controls={true}
             variant='filled'
             className='ease bg-white transition-all duration-100'
@@ -97,19 +107,19 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
             status={status}
             addonAfter={
               <Select
-                value={selectedOption.value}
+                value={selectedOption.description}
                 onChange={handleOptionChange}
-                defaultValue={defaultOptionValue}
+                defaultValue={selectedOption.description}
                 onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
+                onBlur={handleBlur}
               >
                 {options.map((option) => (
                   <Option
-                    key={option.value}
-                    value={option.value}
+                    key={option.description}
+                    value={option.description}
                     className='text-black'
                   >
-                    {option.label}
+                    {option.description}
                   </Option>
                 ))}
               </Select>
@@ -119,12 +129,11 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
           />
         </ConfigProvider>
       </div>
-      {/* Span to get the size of the Input */}
       <span
         ref={spanRef}
         className='invisible absolute text-[14px] whitespace-pre'
       >
-        {value} {selectedOption.label}
+        {value} {selectedOption.description}
       </span>
     </div>
   );

@@ -23,6 +23,8 @@ export interface Food {
   userId: string | null;
   categoryId: string;
   secondaryCategoryId: string;
+  unit: number;
+  amount: number;
 }
 
 export interface NutritionFields {

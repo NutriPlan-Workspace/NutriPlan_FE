@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as UnauthorizedIndexImport } from './routes/unauthorized/index'
+import { Route as ThisWeekIndexImport } from './routes/this-week/index'
 import { Route as RegisterIndexImport } from './routes/register/index'
 import { Route as MealPlanIndexImport } from './routes/meal-plan/index'
 import { Route as LoginIndexImport } from './routes/login/index'
@@ -30,6 +31,12 @@ const IndexRoute = IndexImport.update({
 const UnauthorizedIndexRoute = UnauthorizedIndexImport.update({
   id: '/unauthorized/',
   path: '/unauthorized/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ThisWeekIndexRoute = ThisWeekIndexImport.update({
+  id: '/this-week/',
+  path: '/this-week/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -109,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterIndexImport
       parentRoute: typeof rootRoute
     }
+    '/this-week/': {
+      id: '/this-week/'
+      path: '/this-week'
+      fullPath: '/this-week'
+      preLoaderRoute: typeof ThisWeekIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/unauthorized/': {
       id: '/unauthorized/'
       path: '/unauthorized'
@@ -128,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/register': typeof RegisterIndexRoute
+  '/this-week': typeof ThisWeekIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
 }
 
@@ -138,6 +153,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/register': typeof RegisterIndexRoute
+  '/this-week': typeof ThisWeekIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
 }
 
@@ -149,6 +165,7 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexRoute
   '/meal-plan/': typeof MealPlanIndexRoute
   '/register/': typeof RegisterIndexRoute
+  '/this-week/': typeof ThisWeekIndexRoute
   '/unauthorized/': typeof UnauthorizedIndexRoute
 }
 
@@ -161,6 +178,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/meal-plan'
     | '/register'
+    | '/this-week'
     | '/unauthorized'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -170,6 +188,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/meal-plan'
     | '/register'
+    | '/this-week'
     | '/unauthorized'
   id:
     | '__root__'
@@ -179,6 +198,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/meal-plan/'
     | '/register/'
+    | '/this-week/'
     | '/unauthorized/'
   fileRoutesById: FileRoutesById
 }
@@ -190,6 +210,7 @@ export interface RootRouteChildren {
   LoginIndexRoute: typeof LoginIndexRoute
   MealPlanIndexRoute: typeof MealPlanIndexRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
+  ThisWeekIndexRoute: typeof ThisWeekIndexRoute
   UnauthorizedIndexRoute: typeof UnauthorizedIndexRoute
 }
 
@@ -200,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginIndexRoute: LoginIndexRoute,
   MealPlanIndexRoute: MealPlanIndexRoute,
   RegisterIndexRoute: RegisterIndexRoute,
+  ThisWeekIndexRoute: ThisWeekIndexRoute,
   UnauthorizedIndexRoute: UnauthorizedIndexRoute,
 }
 
@@ -219,6 +241,7 @@ export const routeTree = rootRoute
         "/login/",
         "/meal-plan/",
         "/register/",
+        "/this-week/",
         "/unauthorized/"
       ]
     },
@@ -239,6 +262,9 @@ export const routeTree = rootRoute
     },
     "/register/": {
       "filePath": "register/index.tsx"
+    },
+    "/this-week/": {
+      "filePath": "this-week/index.tsx"
     },
     "/unauthorized/": {
       "filePath": "unauthorized/index.tsx"

@@ -1,10 +1,14 @@
-import type { Food, NutritionFields } from '@/types/food';
+import type { NutritionFields } from '@/types/food';
+import { MealItem } from '@/types/mealPlan';
 
-export function getTotalCalories(mealItems: Food[]): number {
-  return mealItems.reduce((total, food) => total + food.nutrition.calories, 0);
+export function getTotalCalories(mealItems: MealItem[]): number {
+  return mealItems.reduce(
+    (total, food) => total + food.foodId?.nutrition.calories,
+    0,
+  );
 }
 
-export function getTotalNutrition(mealItems: Food[]) {
+export function getTotalNutrition(mealItems: MealItem[]) {
   type NutritionKeys = keyof NutritionFields;
 
   const totalNutrition: NutritionFields = {
@@ -94,8 +98,8 @@ export function getTotalNutrition(mealItems: Food[]) {
   for (const food of mealItems) {
     for (const key in totalNutrition) {
       const nutritionKey = key as NutritionKeys;
-      if (food.nutrition[nutritionKey] !== undefined) {
-        totalNutrition[nutritionKey] += food.nutrition[nutritionKey];
+      if (food.foodId?.nutrition[nutritionKey] !== undefined) {
+        totalNutrition[nutritionKey] += food.foodId.nutrition[nutritionKey];
       }
     }
   }

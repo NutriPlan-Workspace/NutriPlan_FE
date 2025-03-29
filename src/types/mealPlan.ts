@@ -5,10 +5,17 @@ export interface MealPlanDay {
   userId: string;
   mealDate: Date;
   mealItems: {
-    breakfast: Food[];
-    lunch: Food[];
-    dinner: Food[];
+    breakfast: MealItem[];
+    lunch: MealItem[];
+    dinner: MealItem[];
   };
+}
+
+export interface MealItem {
+  id: string;
+  foodId: Food;
+  amount: number;
+  unit: number;
 }
 
 export interface MealPlanResponse {

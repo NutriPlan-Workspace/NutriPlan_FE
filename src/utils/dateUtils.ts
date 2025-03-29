@@ -43,3 +43,13 @@ export const isSameDateRange = (
 ): boolean =>
   from?.toDateString() === start?.toDateString() &&
   to?.toDateString() === end?.toDateString();
+
+export const formatDate = (date: string) => {
+  const newDate = new Date(date);
+  return newDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+};
+
+export const getDayOfWeek = (date: string) => {
+  const newDate = new Date(date);
+  return newDate.toLocaleDateString('en-US', { weekday: 'long' });
+};

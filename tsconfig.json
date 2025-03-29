@@ -27,6 +27,7 @@
       "@/assets": ["assets"],
       "@/assets/*": ["assets/*"],
       "@/utils": ["utils"],
+      "@/routes/*": ["routes/*"],
       "@/utils/*": ["utils/*"],
       "@/atoms/*": ["components/atoms/*"],
       "@/molecules/*": ["components/molecules/*"],

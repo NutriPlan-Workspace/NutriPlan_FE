@@ -4,14 +4,24 @@ import { motion } from 'motion/react';
 import { MealBoxContent } from '@/molecules/MealBoxContent';
 import { MealBoxHeader } from '@/molecules/MealBoxHeader';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
-import type { Food, NutritionFields } from '@/types/food';
+import type { NutritionFields } from '@/types/food';
+import type { MealItem, MealPlanDay } from '@/types/mealPlan';
 
 interface MealBoxProps {
   title: string;
   calories: number;
   nutritionData: NutritionFields;
-  mealItems: Food[];
+  mealItems: MealItem[];
   isLoading?: boolean;
+  mealDate: Date;
+  mealType: keyof MealPlanDay['mealItems'];
+  onAmountChange: (
+    mealDate: Date,
+    mealType: keyof MealPlanDay['mealItems'],
+    mealItemId: string,
+    newAmount: number,
+    newUnit: number,
+  ) => void;
 }
 
 const MealBox: React.FC<MealBoxProps> = ({
@@ -20,6 +30,9 @@ const MealBox: React.FC<MealBoxProps> = ({
   nutritionData,
   mealItems,
   isLoading,
+  mealDate,
+  mealType,
+  onAmountChange,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -48,7 +61,12 @@ const MealBox: React.FC<MealBoxProps> = ({
               mealItems={mealItems}
               isHovered={isHovered}
             />
-            <MealBoxContent mealItems={mealItems} />
+            <MealBoxContent
+              mealItems={mealItems}
+              mealDate={mealDate}
+              mealType={mealType}
+              onAmountChange={onAmountChange}
+            />
           </>
         )}
       </motion.div>

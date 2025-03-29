@@ -3,13 +3,27 @@ import { HiOutlineArrowPath } from 'react-icons/hi2';
 import { Typography } from 'antd';
 
 import { MealCard } from '@/organisms/MealCard';
-import type { Food } from '@/types/food';
+import type { MealItem, MealPlanDay } from '@/types/mealPlan';
 
 interface MealBoxContentProps {
-  mealItems: Food[];
+  mealItems: MealItem[];
+  mealDate: Date;
+  mealType: keyof MealPlanDay['mealItems'];
+  onAmountChange: (
+    mealDate: Date,
+    mealType: keyof MealPlanDay['mealItems'],
+    mealItemId: string,
+    newAmount: number,
+    newUnit: number,
+  ) => void;
 }
 
-const MealBoxContent: React.FC<MealBoxContentProps> = ({ mealItems }) => (
+const MealBoxContent: React.FC<MealBoxContentProps> = ({
+  mealItems,
+  mealDate,
+  mealType,
+  onAmountChange,
+}) => (
   <>
     {mealItems.length === 0 && (
       <Typography className='mt-2 text-gray-500'>
@@ -22,7 +36,13 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({ mealItems }) => (
     )}
     <div>
       {mealItems.map((mealItem) => (
-        <MealCard key={mealItem.id} mealItem={mealItem} />
+        <MealCard
+          key={mealItem.foodId?.id}
+          mealItem={mealItem}
+          mealDate={mealDate}
+          mealType={mealType}
+          onAmountChange={onAmountChange}
+        />
       ))}
     </div>
   </>

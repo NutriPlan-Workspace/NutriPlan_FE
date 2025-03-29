@@ -9,9 +9,18 @@ export const mealPlanApi = baseApi.injectEndpoints({
         method: 'GET',
       }),
     }),
+    getMealPlanWeekly: builder.mutation<
+      MealPlanResponse,
+      { date: string; userId: string }
+    >({
+      query: ({ date, userId }) => ({
+        url: `/planner/week/${date}/${userId}`,
+        method: 'GET',
+      }),
+    }),
     updateMealPlan: builder.mutation<MealPlanResponse, MealPlanDay>({
       query: (mealPlan) => ({
-        url: `/mealplan/${mealPlan.id}`,
+        url: `/planner/edit`,
         method: 'PUT',
         body: mealPlan,
       }),
@@ -19,5 +28,8 @@ export const mealPlanApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetMealPlanMutation, useUpdateMealPlanMutation } =
-  mealPlanApi;
+export const {
+  useGetMealPlanMutation,
+  useGetMealPlanWeeklyMutation,
+  useUpdateMealPlanMutation,
+} = mealPlanApi;
