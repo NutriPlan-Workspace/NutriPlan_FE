@@ -30,7 +30,7 @@ export const PATH = {
   SAVED_PLANS: '/saved-plans',
 
   DIET_NUTRITION: '/diet-nutrition',
-  NUTRITION_TARGETS: '/diet-nutrition/nutrition-targets',
+  NUTRITION_TARGETS: '/nutrition-targets',
   PRIMARY_DIET: '/diet-nutrition/primary-diet',
   FOOD_EXCLUSIONS: '/diet-nutrition/food-exclusions',
   RATED_FOODS: '/diet-nutrition/rated-foods',

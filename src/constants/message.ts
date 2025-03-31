@@ -19,8 +19,13 @@ export const ERROR_MESSAGES = {
   SELECT_MEALS_COUNT: 'Select meals count',
   NEW_PASSWORD_MUST_BE_DIFFERENT:
     'New password must be different from current password',
+  UPDATE_NUTRITION_FAILED: 'Update nutrition target failure!',
+  TITLE_REQUIRED: 'Title is required!',
+  CALORIES_MAX: 'Calories must be at most 5000!',
+  NUTRIENT_MIN: 'Value must be a non-negative number!',
 };
 
 export const SUCCESS_MESSAGES = {
   REGISTRATION_SUCCESS: 'Registration successful! Redirecting to login...',
+  UPDATE_NUTRITION_SUCCESS: 'Update nutrition target success!',
 };
