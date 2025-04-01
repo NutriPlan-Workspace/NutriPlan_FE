@@ -1,5 +1,14 @@
 import { DateRange } from 'react-day-picker';
-import { addDays, addWeeks, endOfWeek, format, startOfWeek } from 'date-fns';
+import {
+  addDays,
+  addWeeks,
+  endOfWeek,
+  format,
+  isSameDay as isSameDayDateFns,
+  isWithinInterval,
+  startOfDay,
+  startOfWeek,
+} from 'date-fns';
 
 export const getWeekRange = (date: Date, offset: number = 0): DateRange => {
   const from = startOfWeek(addWeeks(date, offset), { weekStartsOn: 1 });
@@ -49,7 +58,44 @@ export const formatDate = (date: string) => {
   return newDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 };
 
-export const getDayOfWeek = (date: string) => {
-  const newDate = new Date(date);
-  return newDate.toLocaleDateString('en-US', { weekday: 'long' });
+export const isSameDay = (date1: Date, date2: Date) =>
+  isSameDayDateFns(date1, date2);
+
+export const getDayOfWeek = (date: Date) => format(date, 'EEEE');
+
+export const getDateOfMonth = (date: Date) => format(date, 'd');
+
+export const isSameDayAsToday = (date: Date) =>
+  isSameDayDateFns(date, new Date());
+
+export const isBetweenOfRange = (date: Date, startDate: Date, endDate: Date) =>
+  isWithinInterval(startOfDay(date), {
+    start: startOfDay(startDate),
+    end: startOfDay(endDate),
+  });
+
+export const getDayRangeFromCenter = (
+  centerDate: Date,
+  range: number,
+): Date[] =>
+  Array.from({ length: range * 2 + 1 }, (_, i) =>
+    addDays(centerDate, i - range),
+  );
+
+export const getDayRangeFromTo = (from: string, to: string): Date[] => {
+  const startDate = new Date(from);
+  const endDate = new Date(to);
+  const dates: Date[] = [];
+
+  for (
+    let date = startDate;
+    date <= endDate;
+    date.setDate(date.getDate() + 1)
+  ) {
+    dates.push(new Date(date));
+  }
+
+  return dates;
 };
+
+export const getMealDate = (date: Date): string => format(date, 'yyyy-MM-dd');

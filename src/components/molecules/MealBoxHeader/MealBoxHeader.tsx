@@ -1,36 +1,59 @@
 import React from 'react';
-import { Flex, Popover, Typography } from 'antd';
+import {
+  HiOutlineAdjustmentsVertical,
+  HiOutlineArchiveBoxXMark,
+  HiOutlineDocumentDuplicate,
+} from 'react-icons/hi2';
+import { MenuProps, Popover, Typography } from 'antd';
 
 import { PairButton } from '@/atoms/PairButton';
 import { NutritionPopoverMeal } from '@/molecules/NutritionPopoverMeal';
 import type { NutritionFields } from '@/types/food';
-import type { MealItem } from '@/types/mealPlan';
-import { roundNumber } from '@/utils/roundNumber';
+import type { MealPlanFood } from '@/types/mealPlan';
 
 interface MealBoxHeaderProps {
-  title: string;
+  mealType: string;
   calories: number;
   nutritionData: NutritionFields;
-  mealItems: MealItem[];
+  mealItems: MealPlanFood[];
   isHovered: boolean;
 }
 
 const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
-  title,
+  mealType,
   calories,
   nutritionData,
   mealItems,
   isHovered,
 }) => {
-  const totalCalories =
-    mealItems.length > 0
-      ? (calories * mealItems[0]?.amount) /
-        mealItems[0].foodId?.units?.[mealItems[0]?.unit]?.amount
-      : 0;
+  // TODO: Implement onClick for each menu item
+  const menuItems: MenuProps['items'] = [
+    {
+      label: 'Copy to another Meal Plan',
+      icon: <HiOutlineDocumentDuplicate />,
+      key: '0',
+    },
+    {
+      label: 'Clear Foods',
+      icon: <HiOutlineArchiveBoxXMark />,
+      key: '1',
+    },
+    {
+      type: 'divider',
+    },
+    {
+      label: 'Edit Meal Setting',
+      icon: <HiOutlineAdjustmentsVertical />,
+      key: '2',
+    },
+  ];
+
   return (
-    <Flex justify='space-between' align='center'>
+    <div className='flex items-center justify-between'>
       <div>
-        <Typography className='text-[18px] font-bold'>{title}</Typography>
+        <Typography className='text-[18px] font-bold capitalize'>
+          {mealType}
+        </Typography>
         {!mealItems.length ? (
           <Typography className='text-[13px] text-gray-500'>
             EMPTY MEAL
@@ -50,18 +73,18 @@ const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
             content={
               <NutritionPopoverMeal
                 nutritionData={nutritionData}
-                title={title}
+                mealType={mealType}
               />
             }
           >
             <Typography className='text-gray-500'>
-              {roundNumber(totalCalories, 1)} Calories
+              {calories} Calories
             </Typography>
           </Popover>
         )}
       </div>
-      <PairButton isHovered={isHovered} />
-    </Flex>
+      <PairButton isHovered={isHovered} menuItems={menuItems} />
+    </div>
   );
 };
 

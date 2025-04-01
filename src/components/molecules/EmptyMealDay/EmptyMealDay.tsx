@@ -7,13 +7,20 @@ import {
 import { HiOutlineArrowPath } from 'react-icons/hi2';
 
 import { Button } from '@/atoms/Button';
+import { getDayOfWeek } from '@/utils/dateUtils';
 
 interface EmptyMealDayProps {
-  dayOfWeek: string;
+  mealDate: string;
+  onCreateBlank: (mealDate: string) => void;
+  onCopyPreviousDay: (mealDate: string) => void;
 }
 
-const EmptyMealDay: React.FC<EmptyMealDayProps> = ({ dayOfWeek }) => (
-  <div className='w-full rounded-sm bg-white px-4 pt-[15px] pb-[60px] shadow-[0_2px_2px_0_rgba(0,0,0,0.15),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]'>
+const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
+  mealDate,
+  onCreateBlank,
+  onCopyPreviousDay,
+}) => (
+  <div className='w-full rounded-sm bg-white px-4 pt-[15px] pb-[60px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]'>
     <p className='mt-2 text-center'>
       This meal plan will be automatically generated and emailed to you the
       prior Friday
@@ -34,7 +41,7 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({ dayOfWeek }) => (
     <p className='text-center text-sm'>
       using
       <Button variant='link' color='gold' className='pl-1'>
-        {dayOfWeek}&apos;s preferences
+        {getDayOfWeek(new Date(mealDate))}&apos;s preferences
       </Button>
     </p>
     <div className='mt-4 grid grid-rows-1 justify-center gap-2'>
@@ -43,6 +50,7 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({ dayOfWeek }) => (
         color='gold'
         icon={<HiOutlineDocumentDuplicate size={18} />}
         className='border-borderGray mx-auto w-fit text-black'
+        onClick={() => onCopyPreviousDay(mealDate)}
       >
         Copy the previous meal plan
       </Button>
@@ -51,6 +59,7 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({ dayOfWeek }) => (
         color='gold'
         icon={<HiOutlineDocumentAdd size={18} />}
         className='border-borderGray mx-auto w-fit text-black'
+        onClick={() => onCreateBlank(mealDate)}
       >
         New blank plan
       </Button>

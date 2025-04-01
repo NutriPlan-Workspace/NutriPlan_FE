@@ -1,82 +1,47 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { ConfigProvider, InputNumber, Select } from 'antd';
+
+import { useAmountSelector } from '@/hooks/useAmountSelector';
 
 const { Option } = Select;
 
 interface AmountSelectorProps {
+  cardId: string;
   currentUnit: number;
   currentAmount: number;
   options: {
+    index: number;
     amount: number;
     description: string;
   }[];
-  onAmountChange: (newAmount: number, newUnit: number) => void;
+  onAmountChange: (amount: number, unit: number, cardId: string) => void;
 }
 
 const AmountSelector: React.FC<AmountSelectorProps> = ({
-  onAmountChange,
+  cardId,
   currentUnit,
   currentAmount,
   options,
+  onAmountChange,
 }) => {
-  const [selectedOption, setSelectedOption] = useState(
-    options[currentUnit] || options[0],
-  );
-  const [value, setValue] = useState<number>(currentAmount);
-  const [initialValue, setInitialValue] = useState(currentAmount);
-  const [initialUnit, setInitialUnit] = useState(selectedOption.description);
-  const [inputWidth, setInputWidth] = useState(105);
-  const [status, setStatus] = useState<'' | 'error' | 'warning'>('');
-  const [isFocused, setIsFocused] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const spanRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    if (spanRef.current) {
-      const newWidth =
-        spanRef.current.getBoundingClientRect().width +
-        55 +
-        (isHovered || isFocused ? 22 : 0);
-
-      setInputWidth(newWidth);
-    }
-  }, [value, selectedOption, isHovered, isFocused]);
-
-  useEffect(() => {
-    setStatus(value <= 0 ? 'warning' : '');
-  }, [value]);
-
-  const handleValueChange = (val: number | null) => {
-    const newVal = val || 0;
-    if (newVal < 0) return;
-    setValue(newVal);
-  };
-
-  const handleOptionChange = (newValue: string) => {
-    const newOption = options.find(
-      ({ description }) => description === newValue,
-    );
-    if (!newOption || !selectedOption) return;
-
-    const newValueCalculated =
-      (value / selectedOption.amount) * newOption.amount;
-    setValue(newValueCalculated);
-    setSelectedOption(newOption);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-    if (value !== initialValue || selectedOption.description !== initialUnit) {
-      onAmountChange(value, 1);
-      setInitialValue(value);
-      setInitialUnit(selectedOption.description);
-    }
-  };
+  const {
+    selectedOption,
+    value,
+    inputWidth,
+    status,
+    isFocused,
+    spanRef,
+    setIsFocused,
+    setIsHovered,
+    handleValueChange,
+    handleOptionChange,
+  } = useAmountSelector({ currentUnit, currentAmount, options });
 
   return (
-    <div className='align-center relative flex flex-col justify-evenly'>
+    <div className='align-center relative flex flex-col items-start justify-evenly'>
+      {/* Real Input */}
       <div
-        className='relative'
+        className='relative overflow-hidden'
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -98,8 +63,13 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
         >
           <InputNumber
             size='small'
-            onFocus={() => setIsFocused(true)}
-            onBlur={handleBlur}
+            onFocus={() => {
+              setIsFocused(true);
+            }}
+            onBlur={() => {
+              setIsFocused(false);
+              onAmountChange(value, selectedOption.index, cardId);
+            }}
             controls={true}
             variant='filled'
             className='ease bg-white transition-all duration-100'
@@ -109,9 +79,9 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
               <Select
                 value={selectedOption.description}
                 onChange={handleOptionChange}
-                defaultValue={selectedOption.description}
+                defaultValue={'0'}
                 onFocus={() => setIsFocused(true)}
-                onBlur={handleBlur}
+                onBlur={() => setIsFocused(false)}
               >
                 {options.map((option) => (
                   <Option

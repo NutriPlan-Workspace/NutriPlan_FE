@@ -69,7 +69,7 @@ export default [
       'require-yield': 0,
       'react/react-in-jsx-scope': 0,
       camelcase: [2, { ignoreDestructuring: true, properties: 'never' }],
-      'no-underscore-dangle': 'error',
+      'no-underscore-dangle': ['error', { allow: ['_id'] }],
       'simple-import-sort/imports': [
         'error',
         {

@@ -1,38 +1,27 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 
-import { MealBoxContent } from '@/molecules/MealBoxContent';
 import { MealBoxHeader } from '@/molecules/MealBoxHeader';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
-import type { NutritionFields } from '@/types/food';
-import type { MealItem, MealPlanDay } from '@/types/mealPlan';
+import { MealBoxContent } from '@/organisms/MealBoxContent';
+import type { MealItems, MealPlanDay, MealPlanFood } from '@/types/mealPlan';
+import {
+  getTotalCalories,
+  getTotalNutrition,
+} from '@/utils/calculateNutrition';
 
 interface MealBoxProps {
-  title: string;
-  calories: number;
-  nutritionData: NutritionFields;
-  mealItems: MealItem[];
+  mealItems: MealPlanFood[] | undefined;
   isLoading?: boolean;
-  mealDate: Date;
+  mealDate: string;
   mealType: keyof MealPlanDay['mealItems'];
-  onAmountChange: (
-    mealDate: Date,
-    mealType: keyof MealPlanDay['mealItems'],
-    mealItemId: string,
-    newAmount: number,
-    newUnit: number,
-  ) => void;
 }
 
 const MealBox: React.FC<MealBoxProps> = ({
-  title,
-  calories,
-  nutritionData,
   mealItems,
   isLoading,
   mealDate,
   mealType,
-  onAmountChange,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -53,21 +42,22 @@ const MealBox: React.FC<MealBoxProps> = ({
         {isLoading ? (
           <MealBoxSkeleton />
         ) : (
-          <>
-            <MealBoxHeader
-              title={title}
-              calories={calories}
-              nutritionData={nutritionData}
-              mealItems={mealItems}
-              isHovered={isHovered}
-            />
-            <MealBoxContent
-              mealItems={mealItems}
-              mealDate={mealDate}
-              mealType={mealType}
-              onAmountChange={onAmountChange}
-            />
-          </>
+          mealItems && (
+            <>
+              <MealBoxHeader
+                mealType={mealType}
+                calories={getTotalCalories(mealItems)}
+                nutritionData={getTotalNutrition(mealItems)}
+                mealItems={mealItems}
+                isHovered={isHovered}
+              />
+              <MealBoxContent
+                mealDate={mealDate}
+                mealType={mealType as keyof MealItems}
+                mealItems={mealItems}
+              />
+            </>
+          )
         )}
       </motion.div>
     </div>

@@ -3,13 +3,13 @@ import { Divider, Typography } from 'antd';
 
 import { nutritionFormat } from '@/constants/nutritionFormat';
 import type { NutritionFields } from '@/types/food';
-import { MealItem } from '@/types/mealPlan';
+import type { MealPlanFood } from '@/types/mealPlan';
 import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
 
 interface NutritionPopoverFoodProps {
-  mealItem: MealItem;
+  mealItem: MealPlanFood;
   showIngredient: boolean;
 }
 
@@ -58,18 +58,18 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
             </div>
           </div>
         ))}
+
         {showIngredient && (
           <>
             <Divider className='mx-0 my-2.5 border-[#ddd]' />
             <div className='ingredients'>
               {mealItem.foodId.ingredients.map((ingredient) => (
-                <Typography
-                  key={ingredient.ingredientFoodId.id}
-                  className='text-black'
-                >
-                  {/* TODO: FIX THIS WHEN HAVE REAL DATA */}
-                  {ingredient.amount} {ingredient.preparation} {ingredient.unit}{' '}
-                  of {ingredient.ingredientFoodId.name}
+                <Typography key={ingredient._id} className='text-black'>
+                  {ingredient.amount} {ingredient.unit} of{' '}
+                  {ingredient.ingredientFoodId.name}{' '}
+                  {ingredient.preparation &&
+                    ingredient.preparation !== 'NaN' &&
+                    `(${ingredient.preparation})`}
                 </Typography>
               ))}
             </div>

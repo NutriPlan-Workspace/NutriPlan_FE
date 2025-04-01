@@ -11,17 +11,17 @@ import { MealTrackMultiple } from '@/organisms/MealTrackMultiple';
 import { LayoutLogined } from '@/templates/LayoutLogined';
 import { handleUserRoute } from '@/utils/route';
 
-const PLAN_COMPONENTS: Record<string, React.FC> = {
+const PLAN_COMPONENTS: Record<string, React.FC<{ selectedDate: Date }>> = {
   [PLAN_TYPES.SINGLE_DAY]: MealTrack,
   [PLAN_TYPES.MULTI_DAY]: MealTrack,
   [PLAN_TYPES.WEEKLY_VIEW]: MealTrackMultiple,
 };
 
 const MealPlanPageContent: React.FC = () => {
-  const { selectedPlan } = useDate();
+  const { selectedPlan, selectedDate } = useDate();
   const SelectedComponent = PLAN_COMPONENTS[selectedPlan] || MealTrack;
 
-  return <SelectedComponent />;
+  return <SelectedComponent selectedDate={selectedDate} />;
 };
 
 const MealPlanPage: React.FC = () => (

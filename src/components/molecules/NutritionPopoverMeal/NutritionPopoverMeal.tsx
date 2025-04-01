@@ -4,24 +4,25 @@ import { Typography } from 'antd';
 import { nutritionFormat } from '@/constants/nutritionFormat';
 import { PieChart } from '@/molecules/PieChart';
 import type { NutritionFields } from '@/types/food';
+import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
 interface NutritionPopoverMealProps {
-  title: string;
+  mealType: string;
   nutritionData: NutritionFields;
 }
 const NutritionPopoverMeal: React.FC<NutritionPopoverMealProps> = ({
-  title,
+  mealType,
   nutritionData,
 }) => (
   <div className='popover-content flex w-[200px] flex-col items-center'>
     <div className='w-full bg-[url("https://res.cloudinary.com/dtwrwvffl/image/upload/v1742271174/qr8amnrc7vkbcy04ftty.jpg")] bg-cover bg-center'>
       <div className='relative flex w-full flex-col items-center gap-2 bg-white/85 pt-3.5 pb-2'>
         <Title
-          className='m-0 bg-white text-center text-lg leading-none text-black shadow-[0_0_10px_10px_white]'
+          className='m-0 bg-white text-center text-lg leading-none text-black capitalize shadow-[0_0_10px_10px_white]'
           level={5}
         >
-          {title} Nutrition
+          {mealType} Nutrition
         </Title>
         <PieChart
           className='rounded-[75px] bg-white shadow-[0_0_8px_8px_white]'
@@ -38,7 +39,7 @@ const NutritionPopoverMeal: React.FC<NutritionPopoverMealProps> = ({
           <div className='flex justify-between'>
             <Typography className={item.color}>{item.label}: </Typography>
             <Typography className={item.color}>
-              {nutritionData[item.key]}
+              {roundNumber(nutritionData[item.key], 2)}
               {item.unit}
             </Typography>
           </div>

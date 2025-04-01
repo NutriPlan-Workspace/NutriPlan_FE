@@ -1,27 +1,104 @@
 import { baseApi } from '@/redux/query/apis/baseApi';
-import type { MealPlanDay, MealPlanResponse } from '@/types/mealPlan';
+import {
+  addCacheMealPlans,
+  setViewingMealPlans,
+} from '@/redux/slices/mealPlan';
+import type {
+  GetMealPlanDayRangeQueryArgs,
+  GetMealPlanSingleDayQueryArgs,
+  MealPlanDayRangeResponse,
+  MealPlanSingleDayResponse,
+  PostMealPlanQueryArgs,
+  PostMealPlanResponse,
+  UpdateMealPlanQueryArgs,
+  UpdateMealPlanResponse,
+} from '@/types/mealPlan';
+import { getDayRangeFromTo, getMealDate, isSameDay } from '@/utils/dateUtils';
 
 export const mealPlanApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getMealPlan: builder.mutation<MealPlanResponse, string>({
-      query: (userId) => ({
-        url: `/mealplan/${userId}`,
-        method: 'GET',
-      }),
-    }),
-    getMealPlanWeekly: builder.mutation<
-      MealPlanResponse,
-      { date: string; userId: string }
+    getMealPlanSingleDay: builder.mutation<
+      MealPlanSingleDayResponse,
+      GetMealPlanSingleDayQueryArgs
     >({
-      query: ({ date, userId }) => ({
-        url: `/planner/week/${date}/${userId}`,
-        method: 'GET',
+      query: ({ date }) => {
+        const params = new URLSearchParams({ date }).toString();
+        return {
+          url: `/planner?${params}`,
+          method: 'GET',
+        };
+      },
+      async onQueryStarted({ date }, { dispatch, queryFulfilled }) {
+        const { data } = await queryFulfilled;
+        if (data.success) {
+          dispatch(
+            addCacheMealPlans({
+              mealPlanWithDates: [
+                {
+                  mealDate: date,
+                  mealPlanDay: data.data,
+                },
+              ],
+            }),
+          );
+        }
+      },
+    }),
+    getMealPlanDayRange: builder.mutation<
+      MealPlanDayRangeResponse,
+      GetMealPlanDayRangeQueryArgs
+    >({
+      query: ({ from, to }) => {
+        const params = new URLSearchParams({ from, to }).toString();
+        return {
+          url: `/planner?${params}`,
+          method: 'GET',
+        };
+      },
+      async onQueryStarted({ from, to }, { dispatch, queryFulfilled }) {
+        const { data } = await queryFulfilled;
+        if (data.success) {
+          const viewingMealPlans = [];
+          const dates = getDayRangeFromTo(from, to);
+
+          for (const date of dates) {
+            const mealPlan =
+              data.data.find((mealPlanDay) =>
+                isSameDay(new Date(mealPlanDay.mealDate), date),
+              ) || undefined;
+            viewingMealPlans.push({
+              mealDate: getMealDate(date),
+              mealPlanDay: mealPlan,
+            });
+          }
+          dispatch(
+            setViewingMealPlans({ mealPlanWithDates: viewingMealPlans }),
+          );
+          dispatch(
+            addCacheMealPlans({
+              mealPlanWithDates: viewingMealPlans,
+            }),
+          );
+        }
+      },
+    }),
+    updateMealPlan: builder.mutation<
+      UpdateMealPlanResponse,
+      UpdateMealPlanQueryArgs
+    >({
+      query: ({ mealPlan }) => ({
+        url: `/planner/${mealPlan._id}`,
+        method: 'PUT',
+        body: mealPlan,
       }),
     }),
-    updateMealPlan: builder.mutation<MealPlanResponse, MealPlanDay>({
-      query: (mealPlan) => ({
-        url: `/planner/edit`,
-        method: 'PUT',
+    createMealPlan: builder.mutation<
+      PostMealPlanResponse,
+      PostMealPlanQueryArgs
+    >({
+      query: ({ mealPlan }) => ({
+        url: '/planner/create',
+        method: 'POST',
         body: mealPlan,
       }),
     }),
@@ -29,7 +106,8 @@ export const mealPlanApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetMealPlanMutation,
-  useGetMealPlanWeeklyMutation,
+  useGetMealPlanSingleDayMutation,
+  useGetMealPlanDayRangeMutation,
   useUpdateMealPlanMutation,
+  useCreateMealPlanMutation,
 } = mealPlanApi;
