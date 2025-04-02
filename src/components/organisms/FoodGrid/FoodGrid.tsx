@@ -19,7 +19,7 @@ const FoodGrid: React.FC<FoodGridProps> = ({
   <div>
     <Row gutter={[20, 80]} className='justify-center p-4'>
       {foods.map((food) => (
-        <Col key={food.id} xs={24} sm={12} md={8} lg={6} xl={6}>
+        <Col key={food._id} xs={24} sm={12} md={8} lg={6} xl={6}>
           <FoodCard foodItem={food} />
         </Col>
       ))}

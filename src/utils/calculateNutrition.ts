@@ -111,3 +111,8 @@ export function getTotalNutrition(mealItems: MealPlanFood[]) {
 
   return totalNutrition;
 }
+export const calculateNutrition = (
+  value: number,
+  amount: number,
+  conversionFactor: number,
+) => roundNumber((value * amount) / conversionFactor, 1);

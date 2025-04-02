@@ -1,6 +1,6 @@
 import { baseApi } from '@/redux/query/apis/baseApi';
 import type { ApiResponse } from '@/types/apiResponse';
-import type { Food } from '@/types/food';
+import type { DetailedFoodResponse, Food } from '@/types/food';
 
 export const foodsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -11,7 +11,12 @@ export const foodsApi = baseApi.injectEndpoints({
       query: ({ page, limit = 8 }) => `/foods?page=${page}&limit=${limit}`,
       keepUnusedDataFor: 15,
     }),
+    getFoodById: builder.query<DetailedFoodResponse, string>({
+      query: (idFood) => ({
+        url: `/get-food?idFood=${idFood}`,
+      }),
+    }),
   }),
 });
 
-export const { useGetFoodsQuery } = foodsApi;
+export const { useGetFoodsQuery, useGetFoodByIdQuery } = foodsApi;

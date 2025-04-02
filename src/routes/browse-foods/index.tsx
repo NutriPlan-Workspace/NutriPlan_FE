@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, FileRoutesByPath } from '@tanstack/react-router';
 
+import { PATH } from '@/constants/path';
+import { ScaleProvider } from '@/contexts/ScaleContext';
 import { useGetFoodsQuery } from '@/redux/query/apis/food/foodApis';
 import BrowseFoodTemplate from '@/templates/BrowseFoodTemplate/BrowseFoodTemplate';
 import type { Food } from '@/types/food';
@@ -12,20 +14,28 @@ const BrowseFoodPage = () => {
   const { data, isFetching } = useGetFoodsQuery({ page, limit: 8 });
 
   useEffect(() => {
-    if (data?.data) {
-      setFoods((prevFoods) => [...prevFoods, ...data.data]);
+    if (Array.isArray(data?.data)) {
+      setFoods((prevFoods) => [
+        ...prevFoods,
+        // eslint-disable-next-line no-unsafe-optional-chaining
+        ...(Array.isArray(data?.data) ? data?.data : []),
+      ]);
     }
   }, [data]);
 
   return (
-    <BrowseFoodTemplate
-      foods={foods}
-      isFetching={isFetching}
-      onLoadMore={() => setPage((prev) => prev + 1)}
-    />
+    <ScaleProvider>
+      <BrowseFoodTemplate
+        foods={foods}
+        isFetching={isFetching}
+        onLoadMore={() => setPage((prev) => prev + 1)}
+      />
+    </ScaleProvider>
   );
 };
 
-export const Route = createFileRoute('/browse-foods/')({
+export const Route = createFileRoute(
+  PATH.BROWSE_FOODS as keyof FileRoutesByPath,
+)({
   component: BrowseFoodPage,
 });

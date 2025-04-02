@@ -9,7 +9,7 @@ interface PieChartProps {
   className?: string;
   nutritionData: NutritionFields;
   size?: number;
-  label: boolean;
+  label?: boolean;
 }
 
 const PieChart: React.FC<PieChartProps> = ({

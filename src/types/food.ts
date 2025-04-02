@@ -1,5 +1,5 @@
 export interface Food {
-  id: string;
+  _id: string;
   name: string;
   imgUrls: string[];
   nutrition: NutritionFields;
@@ -25,6 +25,13 @@ export interface Food {
   secondaryCategoryId: string;
   unit: number;
   amount: number;
+}
+
+export interface DetailedFoodResponse {
+  data: {
+    mainFood: Food;
+    ingredientList: Food[];
+  };
 }
 
 export interface NutritionFields {
