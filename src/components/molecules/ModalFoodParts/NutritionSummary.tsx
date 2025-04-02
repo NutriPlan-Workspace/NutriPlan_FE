@@ -1,8 +1,9 @@
-import { FC } from 'react';
-import { Button } from 'antd';
+import { FC, useState } from 'react';
+import { Button, Modal } from 'antd';
 
 import { useScale } from '@/contexts/ScaleContext';
-import { NutritionFields } from '@/types/food';
+import DetailedNutriTable from '@/organisms/ModalsContent/DetailedNutriTable';
+import type { NutritionFields } from '@/types/food';
 import { calculateNutrition } from '@/utils/calculateNutrition';
 
 import NutritionChart from './NutritionChart';
@@ -34,7 +35,19 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition }) => {
       colorRounded: 'h-3 w-3 rounded-full bg-purple-500',
     },
   ];
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   return (
     <div className='mt-4'>
       <h3 className='mb-2 text-lg font-semibold'>Nutrition Info</h3>
@@ -56,9 +69,20 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition }) => {
             </span>
           </div>
         ))}
-        <Button className='border-gray-400 text-gray-600 hover:border-gray-400 hover:bg-gray-200 hover:text-black'>
+        <Button
+          className='border-gray-400 text-gray-600 hover:border-gray-400 hover:bg-gray-200 hover:text-black'
+          onClick={showModal}
+        >
           Detailed Nutrition Information
         </Button>
+        <Modal
+          open={isModalOpen}
+          onOk={handleOk}
+          closable={false}
+          onCancel={handleCancel}
+        >
+          <DetailedNutriTable nutrition={nutrition} />
+        </Modal>
       </div>
     </div>
   );

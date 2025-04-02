@@ -52,7 +52,15 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem }) => {
           },
         }}
         content={
-          <NutritionPopoverFood mealItem={foodItem} showIngredient={false} />
+          <NutritionPopoverFood
+            mealItem={{
+              _id: foodItem._id,
+              foodId: foodItem,
+              amount: 1,
+              unit: 1,
+            }}
+            showIngredient={false}
+          />
         }
       >
         <div
