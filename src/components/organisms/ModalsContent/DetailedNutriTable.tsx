@@ -1,15 +1,19 @@
 import { FC } from 'react';
 
-import NutritionDetailedTable from '@/molecules/ModalDetailedNutriParts/nutritionDetailedTable';
+import NutritionDetailedTable from '@/molecules/ModalDetailedNutriParts/NutritionDetailedTable';
 import type { NutritionFields } from '@/types/food';
 
 interface NutritionDetailedTableProps {
   nutrition: NutritionFields;
+  type: string;
 }
 
-const DetailedNutriTable: FC<NutritionDetailedTableProps> = ({ nutrition }) => (
+const DetailedNutriTable: FC<NutritionDetailedTableProps> = ({
+  nutrition,
+  type,
+}) => (
   <table className='mt-5 w-full border-none'>
-    <NutritionDetailedTable nutrition={nutrition} />
+    <NutritionDetailedTable nutrition={nutrition} type={type} />
   </table>
 );
 

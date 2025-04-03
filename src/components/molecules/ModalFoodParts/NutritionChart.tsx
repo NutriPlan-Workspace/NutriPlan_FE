@@ -1,38 +1,37 @@
 import { FC } from 'react';
 import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
-import { NUTRITION_HEX_COLOR } from '@/constants/nutritionFormat';
+import { nutritionChart } from '@/constants/nutritionFormat';
 import { useScale } from '@/contexts/ScaleContext';
+import { useScaleIngre } from '@/contexts/ScaleIngreContext';
 import { NutritionFields } from '@/types/food';
+import { roundNumber } from '@/utils/roundNumber';
 
 import CustomizedLabelChart from './CustomizedLabelChart';
 
 interface NutritionChartProps {
   nutrition: NutritionFields;
+  type: string;
 }
 
-const NutritionChart: FC<NutritionChartProps> = ({ nutrition }) => {
+const NutritionChart: FC<NutritionChartProps> = ({ nutrition, type }) => {
   const { amount, conversionFactor } = useScale();
+  const { amountIngre, conversionFactorIngre } = useScaleIngre();
+  const data = nutritionChart.map(({ key, label, color }) => {
+    const value =
+      type === 'food'
+        ? roundNumber((nutrition[key] * amount) / conversionFactor, 3)
+        : roundNumber(
+            (nutrition[key] * amountIngre) / conversionFactorIngre,
+            3,
+          );
 
-  const data = [
-    {
-      name: 'Carbs',
-      value: Number(((nutrition.carbs * amount) / conversionFactor).toFixed(3)),
-      color: NUTRITION_HEX_COLOR.CARBS,
-    },
-    {
-      name: 'Fats',
-      value: Number(((nutrition.fats * amount) / conversionFactor).toFixed(3)),
-      color: NUTRITION_HEX_COLOR.FATS,
-    },
-    {
-      name: 'Proteins',
-      value: Number(
-        ((nutrition.proteins * amount) / conversionFactor).toFixed(3),
-      ),
-      color: NUTRITION_HEX_COLOR.PROTEINS,
-    },
-  ];
+    return {
+      name: label,
+      value,
+      color,
+    };
+  });
 
   return (
     <PieChart width={300} height={300}>

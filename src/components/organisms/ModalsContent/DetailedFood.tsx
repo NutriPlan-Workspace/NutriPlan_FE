@@ -40,7 +40,10 @@ const DetailedFood: React.FC<DetailedFoodProp> = ({ detailedFood }) => (
           <p>No Image Available</p>
         )}
         {detailedFood?.data.mainFood.nutrition ? (
-          <NutritionSummary nutrition={detailedFood?.data.mainFood.nutrition} />
+          <NutritionSummary
+            nutrition={detailedFood?.data.mainFood.nutrition}
+            type='food'
+          />
         ) : (
           <p>No Nutrition Info</p>
         )}

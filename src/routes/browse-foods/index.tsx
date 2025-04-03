@@ -3,6 +3,7 @@ import { createFileRoute, FileRoutesByPath } from '@tanstack/react-router';
 
 import { PATH } from '@/constants/path';
 import { ScaleProvider } from '@/contexts/ScaleContext';
+import { ScaleProviderIngre } from '@/contexts/ScaleIngreContext';
 import { useGetFoodsQuery } from '@/redux/query/apis/food/foodApis';
 import BrowseFoodTemplate from '@/templates/BrowseFoodTemplate/BrowseFoodTemplate';
 import type { Food } from '@/types/food';
@@ -25,11 +26,13 @@ const BrowseFoodPage = () => {
 
   return (
     <ScaleProvider>
-      <BrowseFoodTemplate
-        foods={foods}
-        isFetching={isFetching}
-        onLoadMore={() => setPage((prev) => prev + 1)}
-      />
+      <ScaleProviderIngre>
+        <BrowseFoodTemplate
+          foods={foods}
+          isFetching={isFetching}
+          onLoadMore={() => setPage((prev) => prev + 1)}
+        />
+      </ScaleProviderIngre>
     </ScaleProvider>
   );
 };

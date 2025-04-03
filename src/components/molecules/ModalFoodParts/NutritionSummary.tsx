@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { Button, Modal } from 'antd';
 
 import { useScale } from '@/contexts/ScaleContext';
+import { useScaleIngre } from '@/contexts/ScaleIngreContext';
 import DetailedNutriTable from '@/organisms/ModalsContent/DetailedNutriTable';
 import type { NutritionFields } from '@/types/food';
 import { calculateNutrition } from '@/utils/calculateNutrition';
@@ -10,10 +11,12 @@ import NutritionChart from './NutritionChart';
 
 interface NutritionSummaryProp {
   nutrition: NutritionFields;
+  type: string;
 }
 
-const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition }) => {
+const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition, type }) => {
   const { amount, unit, conversionFactor } = useScale();
+  const { amountIngre, unitIngre, conversionFactorIngre } = useScaleIngre();
   const dataNutriSummary = [
     {
       title: 'Calories',
@@ -51,11 +54,13 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition }) => {
   return (
     <div className='mt-4'>
       <h3 className='mb-2 text-lg font-semibold'>Nutrition Info</h3>
-      <NutritionChart nutrition={nutrition} />
+      <NutritionChart nutrition={nutrition} type={type} />
       <div className='flex flex-col space-y-4'>
         <div className='flex justify-between'>
           <h1>
-            For {amount} {unit}
+            {type === 'food'
+              ? `For${' '}${amount}${' '}${unit}`
+              : `For${' '}${amountIngre}${' '}${unitIngre}`}
           </h1>
         </div>
         {dataNutriSummary.map((item, index) => (
@@ -65,7 +70,13 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition }) => {
               <span>{item.title}</span>
             </div>
             <span>
-              {calculateNutrition(item.amountNutri, amount, conversionFactor)}g
+              {type === 'food'
+                ? calculateNutrition(item.amountNutri, amount, conversionFactor)
+                : calculateNutrition(
+                    item.amountNutri,
+                    amountIngre,
+                    conversionFactorIngre,
+                  )}
             </span>
           </div>
         ))}
@@ -81,7 +92,7 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition }) => {
           closable={false}
           onCancel={handleCancel}
         >
-          <DetailedNutriTable nutrition={nutrition} />
+          <DetailedNutriTable nutrition={nutrition} type={type} />
         </Modal>
       </div>
     </div>
