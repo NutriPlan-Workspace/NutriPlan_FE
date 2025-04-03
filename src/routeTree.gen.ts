@@ -15,6 +15,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as UnauthorizedIndexImport } from './routes/unauthorized/index'
 import { Route as ThisWeekIndexImport } from './routes/this-week/index'
 import { Route as RegisterIndexImport } from './routes/register/index'
+import { Route as ProfileIndexImport } from './routes/profile/index'
 import { Route as MealPlanIndexImport } from './routes/meal-plan/index'
 import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
@@ -43,6 +44,12 @@ const ThisWeekIndexRoute = ThisWeekIndexImport.update({
 const RegisterIndexRoute = RegisterIndexImport.update({
   id: '/register/',
   path: '/register/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileIndexRoute = ProfileIndexImport.update({
+  id: '/profile/',
+  path: '/profile/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -109,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MealPlanIndexImport
       parentRoute: typeof rootRoute
     }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/register/': {
       id: '/register/'
       path: '/register'
@@ -141,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
+  '/profile': typeof ProfileIndexRoute
   '/register': typeof RegisterIndexRoute
   '/this-week': typeof ThisWeekIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
@@ -152,6 +167,7 @@ export interface FileRoutesByTo {
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
+  '/profile': typeof ProfileIndexRoute
   '/register': typeof RegisterIndexRoute
   '/this-week': typeof ThisWeekIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
@@ -164,6 +180,7 @@ export interface FileRoutesById {
   '/browse-foods/': typeof BrowseFoodsIndexRoute
   '/login/': typeof LoginIndexRoute
   '/meal-plan/': typeof MealPlanIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/register/': typeof RegisterIndexRoute
   '/this-week/': typeof ThisWeekIndexRoute
   '/unauthorized/': typeof UnauthorizedIndexRoute
@@ -177,6 +194,7 @@ export interface FileRouteTypes {
     | '/browse-foods'
     | '/login'
     | '/meal-plan'
+    | '/profile'
     | '/register'
     | '/this-week'
     | '/unauthorized'
@@ -187,6 +205,7 @@ export interface FileRouteTypes {
     | '/browse-foods'
     | '/login'
     | '/meal-plan'
+    | '/profile'
     | '/register'
     | '/this-week'
     | '/unauthorized'
@@ -197,6 +216,7 @@ export interface FileRouteTypes {
     | '/browse-foods/'
     | '/login/'
     | '/meal-plan/'
+    | '/profile/'
     | '/register/'
     | '/this-week/'
     | '/unauthorized/'
@@ -209,6 +229,7 @@ export interface RootRouteChildren {
   BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   MealPlanIndexRoute: typeof MealPlanIndexRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
   ThisWeekIndexRoute: typeof ThisWeekIndexRoute
   UnauthorizedIndexRoute: typeof UnauthorizedIndexRoute
@@ -220,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   MealPlanIndexRoute: MealPlanIndexRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
   RegisterIndexRoute: RegisterIndexRoute,
   ThisWeekIndexRoute: ThisWeekIndexRoute,
   UnauthorizedIndexRoute: UnauthorizedIndexRoute,
@@ -240,6 +262,7 @@ export const routeTree = rootRoute
         "/browse-foods/",
         "/login/",
         "/meal-plan/",
+        "/profile/",
         "/register/",
         "/this-week/",
         "/unauthorized/"
@@ -259,6 +282,9 @@ export const routeTree = rootRoute
     },
     "/meal-plan/": {
       "filePath": "meal-plan/index.tsx"
+    },
+    "/profile/": {
+      "filePath": "profile/index.tsx"
     },
     "/register/": {
       "filePath": "register/index.tsx"

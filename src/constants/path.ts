@@ -44,7 +44,7 @@ export const PATH = {
   GENERATOR_SETTINGS: '/generator-settings',
 
   ACCOUNT: '/account',
-  CREDENTIALS: '/account/credentials',
+  CREDENTIALS: '/profile',
   FAMILY_MEMBERS: '/account/family-members',
   NOTIFICATIONS: '/account/notifications',
   SUBSCRIPTION: '/account/subscription',

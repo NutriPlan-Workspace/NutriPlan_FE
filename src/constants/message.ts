@@ -17,6 +17,8 @@ export const ERROR_MESSAGES = {
   CALORIES_MUST_BE_NUMBER: 'Calories must be a number',
   CALORIES_MIN: 'Calories must be at least 100',
   SELECT_MEALS_COUNT: 'Select meals count',
+  NEW_PASSWORD_MUST_BE_DIFFERENT:
+    'New password must be different from current password',
 };
 
 export const SUCCESS_MESSAGES = {

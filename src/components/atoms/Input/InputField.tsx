@@ -23,7 +23,7 @@ const InputField = forwardRef<InputRef, InputFieldProps>(
           type={type}
           {...inputProps}
           className={cn(
-            'min-h-[44px] rounded-full border text-[14px] leading-[20px] focus:border-2',
+            'min-h-[44px] min-w-[300px] rounded-full border text-[14px] leading-[20px] focus:border-2',
             error ? 'border-error' : 'border-gray-300',
             'shadow-none outline-none focus:shadow-none',
           )}

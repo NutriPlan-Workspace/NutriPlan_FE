@@ -1,10 +1,13 @@
 import {
   AUTH_ME_ENDPOINT,
+  CHANGE_PASSWORD_ENDPOINT,
   LOGIN_ENDPOINT,
   LOGOUT_ENDPOINT,
   REGISTER_ENDPOINT,
 } from '@/constants/endpoints';
 import { baseApi } from '@/redux/query/apis/baseApi';
+import type { ChangePasswordSchemaType } from '@/schemas/passwordSchema';
+import type { ApiResponse } from '@/types/apiResponse';
 import type { LoginData, RegisterData } from '@/types/auth';
 import type { AuthResponse } from '@/types/auth';
 
@@ -36,6 +39,16 @@ export const authApi = baseApi.injectEndpoints({
         method: 'POST',
       }),
     }),
+    changePasswordRequest: builder.mutation<
+      ApiResponse<void>,
+      ChangePasswordSchemaType
+    >({
+      query: (body) => ({
+        url: CHANGE_PASSWORD_ENDPOINT,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -44,4 +57,5 @@ export const {
   useGetUserQuery,
   useLogoutRequestMutation,
   useRegisterRequestMutation,
+  useChangePasswordRequestMutation,
 } = authApi;
