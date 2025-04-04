@@ -2,6 +2,7 @@ import React from 'react';
 import { InputNumber, InputNumberProps, Select } from 'antd';
 
 import { useScale } from '@/contexts/ScaleContext';
+import { roundNumber } from '@/utils/roundNumber';
 
 interface unitScaleProp {
   units: {
@@ -21,7 +22,7 @@ const ScaleRecipe: React.FC<unitScaleProp> = ({ units }) => {
     const targetUnit = value === 'grams' ? units[0] : units[1];
     const currentUnit = value === 'grams' ? units[1] : units[0];
     setAmount(
-      Number(((targetUnit.amount * amount) / currentUnit.amount).toFixed(3)),
+      roundNumber((targetUnit.amount * amount) / currentUnit.amount, 3),
     );
     setConversionFactor(targetUnit.amount);
   };
@@ -33,14 +34,13 @@ const ScaleRecipe: React.FC<unitScaleProp> = ({ units }) => {
   };
 
   return (
-    <div>
-      <h3 className='text-lg font-semibold'>Scale recipe</h3>
+    <div className='pb-3'>
+      <h3 className='pt-3 pb-3 text-xl font-semibold'>Scale recipe</h3>
       <InputNumber
         min={1}
         defaultValue={units[0].amount}
         value={amount}
         style={{ width: '80px', marginRight: '10px', textAlign: 'right' }}
-        controls={false}
         onChange={onChangeAmount}
       />
       <Select

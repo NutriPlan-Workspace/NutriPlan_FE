@@ -1,12 +1,13 @@
 import React from 'react';
 import { Content } from 'antd/es/layout/layout';
 
-import NutritionSummary from '@/molecules/ModalFoodParts/NutritionSummary';
-import ScaleIngredient from '@/molecules/ModalFoodParts/ScaleIngredient';
+import { NutritionSummary } from '@/molecules/NutritionSummary';
+import { ScaleIngredient } from '@/molecules/ScaleIngredient';
 import { Food } from '@/types/food';
 
 type ModalDetailedIngredientProp = {
   detailedIngredient: Food;
+  setDetailedIngredient: (detailedIngredient: Food | null) => void;
 };
 
 const DetailedIngredient: React.FC<ModalDetailedIngredientProp> = ({
@@ -14,16 +15,16 @@ const DetailedIngredient: React.FC<ModalDetailedIngredientProp> = ({
 }) => (
   <>
     <Content
-      className='flex-grow bg-gray-50 p-6'
+      className='flex-grow bg-gray-50'
       style={{ backgroundColor: 'white' }}
     >
-      <div className='mt-1 grid grid-cols-2 gap-8'>
+      <div className='grid grid-cols-2 gap-8'>
         <div>
           {detailedIngredient?.imgUrls[0] ? (
             <img
               src={detailedIngredient?.imgUrls[0]}
               alt={detailedIngredient?.name || 'No Image'}
-              className='h-[25%] w-full rounded-md object-cover'
+              className='h-[35%] w-full rounded-md object-cover'
             />
           ) : (
             <p>No Image Available</p>
@@ -37,7 +38,7 @@ const DetailedIngredient: React.FC<ModalDetailedIngredientProp> = ({
             <p>No Nutrition Info</p>
           )}
         </div>
-        <div className='p-6'>
+        <div>
           <ScaleIngredient units={detailedIngredient?.units} />
         </div>
       </div>

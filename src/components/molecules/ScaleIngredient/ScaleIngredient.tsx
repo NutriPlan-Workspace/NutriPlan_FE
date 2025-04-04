@@ -2,6 +2,7 @@ import React from 'react';
 import { InputNumber, InputNumberProps, Select } from 'antd';
 
 import { useScaleIngre } from '@/contexts/ScaleIngreContext';
+import { roundNumber } from '@/utils/roundNumber';
 
 interface unitScaleProp {
   units: {
@@ -18,9 +19,11 @@ const ScaleIngredient: React.FC<unitScaleProp> = ({ units }) => {
     setUnitIngre,
     setConversionFactorIngre,
   } = useScaleIngre();
+
   const onChangeAmount: InputNumberProps['onChange'] = (value) => {
     setAmountIngre(value as number);
   };
+
   const handleChangeUnit = (newUnit: string) => {
     if (unitIngre !== newUnit) {
       const currentUnitObj = units.find((u) => u.description === unitIngre);
@@ -29,15 +32,15 @@ const ScaleIngredient: React.FC<unitScaleProp> = ({ units }) => {
         const newAmount =
           (newUnitObj.amount * amountIngre) / currentUnitObj.amount;
 
-        setAmountIngre(Number(newAmount.toFixed(3)));
+        setAmountIngre(roundNumber(newAmount, 1));
         setConversionFactorIngre(newUnitObj.amount);
         setUnitIngre(newUnit);
       }
     }
   };
   return (
-    <div className='mt-5'>
-      <h3 className='text-lg font-semibold'>Scale recipe</h3>
+    <div>
+      <h3 className='pt-3 pb-3 text-xl font-semibold'>Scale recipe</h3>
       <InputNumber
         min={1}
         defaultValue={units[0].amount}

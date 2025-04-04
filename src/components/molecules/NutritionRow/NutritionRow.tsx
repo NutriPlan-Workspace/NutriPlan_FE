@@ -20,8 +20,19 @@ const NutritionRow: FC<NutritionRowProp> = ({ detailedNutrition, type }) => {
     <tbody>
       {detailedNutrition.map((item, index) => (
         <tr key={index}>
-          <td className='py-2'>{item.title}</td>
-          <td className='py-2 text-right'>
+          <td className='flex items-center gap-1'>
+            {item.title === 'Carbs' && (
+              <span className='h-3 w-3 rounded-full bg-yellow-500'></span>
+            )}
+            {item.title === 'Fat' && (
+              <span className='h-3 w-3 rounded-full bg-blue-500'></span>
+            )}
+            {item.title === 'Protein' && (
+              <span className='h-3 w-3 rounded-full bg-purple-500'></span>
+            )}
+            <span>{item.title}</span>
+          </td>
+          <td className='text-right'>
             {type === 'food'
               ? calculateNutrition(item.amount, amount, conversionFactor)
               : calculateNutrition(
@@ -29,8 +40,9 @@ const NutritionRow: FC<NutritionRowProp> = ({ detailedNutrition, type }) => {
                   amountIngre,
                   conversionFactorIngre,
                 )}{' '}
+            {item.unit}
           </td>
-          <td className='py-2 text-right'>--</td>
+          <td className='text-right'>--</td>
         </tr>
       ))}
     </tbody>

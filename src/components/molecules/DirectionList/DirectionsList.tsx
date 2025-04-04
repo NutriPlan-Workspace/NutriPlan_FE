@@ -7,14 +7,16 @@ interface DirectionsProps {
 
 const DirectionsList: FC<DirectionsProps> = ({ directions }) => (
   <List
-    header={<h3 className='text-lg font-semibold'>Directions</h3>}
+    header={<h3 className='text-xl font-semibold'>Directions</h3>}
+    size='small'
     dataSource={directions}
     renderItem={(item, index) => (
-      <List.Item>
+      <List.Item className='pt-0 pl-0'>
         {index + 1}. {item}
       </List.Item>
     )}
     split={false}
+    className='pt-3 text-justify'
   />
 );
 

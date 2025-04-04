@@ -7,7 +7,7 @@ import { useScaleIngre } from '@/contexts/ScaleIngreContext';
 import { NutritionFields } from '@/types/food';
 import { roundNumber } from '@/utils/roundNumber';
 
-import CustomizedLabelChart from './CustomizedLabelChart';
+import { CustomizedLabelChart } from '../CustomizedLabelChart';
 
 interface NutritionChartProps {
   nutrition: NutritionFields;
@@ -34,11 +34,9 @@ const NutritionChart: FC<NutritionChartProps> = ({ nutrition, type }) => {
   });
 
   return (
-    <PieChart width={300} height={300}>
+    <PieChart width={350} height={350}>
       <Pie
         data={data}
-        cx='50%'
-        cy='50%'
         labelLine={false}
         label={CustomizedLabelChart}
         outerRadius={90}

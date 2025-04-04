@@ -76,3 +76,26 @@
 :where(.css-dev-only-do-not-override-1xtxwrz).ant-menu-light > .ant-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
     color: theme('colors.primary.400') !important;
 }
+
+.ant-modal {
+  margin-top: -5%;
+  max-height: 90vh;
+}
+
+.ant-modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.ant-modal-header {
+  margin-bottom: 15px;
+}
+
+.ant-modal-title {
+  font-size: 25px;
+}
+
+.ant-popover-title {
+  font-size: 20px;
+  padding: 0px;
+}

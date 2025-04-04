@@ -3,11 +3,11 @@ import { Button, Modal } from 'antd';
 
 import { useScale } from '@/contexts/ScaleContext';
 import { useScaleIngre } from '@/contexts/ScaleIngreContext';
-import DetailedNutriTable from '@/organisms/ModalsContent/DetailedNutriTable';
+import { DetailedNutriTable } from '@/organisms/DetailedNutriTable';
 import type { NutritionFields } from '@/types/food';
 import { calculateNutrition } from '@/utils/calculateNutrition';
 
-import NutritionChart from './NutritionChart';
+import { NutritionChart } from '../NutritionChart';
 
 interface NutritionSummaryProp {
   nutrition: NutritionFields;
@@ -52,10 +52,10 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition, type }) => {
     setIsModalOpen(false);
   };
   return (
-    <div className='mt-4'>
-      <h3 className='mb-2 text-lg font-semibold'>Nutrition Info</h3>
+    <div className='mt-5'>
+      <span className='text-xl font-semibold'>Nutrition Info</span>
       <NutritionChart nutrition={nutrition} type={type} />
-      <div className='flex flex-col space-y-4'>
+      <div className='flex flex-col space-y-2'>
         <div className='flex justify-between'>
           <h1>
             {type === 'food'
@@ -87,10 +87,13 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition, type }) => {
           Detailed Nutrition Information
         </Button>
         <Modal
+          title='Detailed Nutrition'
           open={isModalOpen}
           onOk={handleOk}
-          closable={false}
+          closable={true}
+          footer={<></>}
           onCancel={handleCancel}
+          width={550}
         >
           <DetailedNutriTable nutrition={nutrition} type={type} />
         </Modal>
