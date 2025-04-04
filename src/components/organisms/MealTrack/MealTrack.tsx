@@ -5,6 +5,7 @@ import { SlideArrow } from '@/atoms/SlideArrow';
 import { PLAN_TYPES } from '@/constants/plans';
 import { useDate } from '@/contexts/DateContext';
 import { useMealTrack } from '@/hooks/useMealTrack';
+import { useMealTrackDragDrop } from '@/hooks/useMealTrackDragDrop';
 import { DayBox } from '@/organisms/DayBox';
 import { getSliderSettings } from '@/utils/sliderSettings';
 
@@ -29,6 +30,7 @@ const MealTrack: React.FC<MealTrackProps> = ({ selectedDate }) => {
     handleCreateBlank,
     handleCopyPreviousDay,
   } = useMealTrack(selectedDate);
+  useMealTrackDragDrop();
 
   const settings = getSliderSettings(
     selectedPlan,

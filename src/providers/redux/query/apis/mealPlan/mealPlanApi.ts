@@ -17,16 +17,13 @@ import { getDayRangeFromTo, getMealDate, isSameDay } from '@/utils/dateUtils';
 
 export const mealPlanApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getMealPlanSingleDay: builder.mutation<
+    getMealPlanSingleDay: builder.query<
       MealPlanSingleDayResponse,
       GetMealPlanSingleDayQueryArgs
     >({
       query: ({ date }) => {
         const params = new URLSearchParams({ date }).toString();
-        return {
-          url: `/planner?${params}`,
-          method: 'GET',
-        };
+        return `/planner?${params}`;
       },
       async onQueryStarted({ date }, { dispatch, queryFulfilled }) {
         const { data } = await queryFulfilled;
@@ -36,7 +33,7 @@ export const mealPlanApi = baseApi.injectEndpoints({
               mealPlanWithDates: [
                 {
                   mealDate: date,
-                  mealPlanDay: data.data,
+                  mealPlanDay: data.data[0],
                 },
               ],
             }),
@@ -44,16 +41,14 @@ export const mealPlanApi = baseApi.injectEndpoints({
         }
       },
     }),
-    getMealPlanDayRange: builder.mutation<
+
+    getMealPlanDayRange: builder.query<
       MealPlanDayRangeResponse,
       GetMealPlanDayRangeQueryArgs
     >({
       query: ({ from, to }) => {
         const params = new URLSearchParams({ from, to }).toString();
-        return {
-          url: `/planner?${params}`,
-          method: 'GET',
-        };
+        return `/planner?${params}`;
       },
       async onQueryStarted({ from, to }, { dispatch, queryFulfilled }) {
         const { data } = await queryFulfilled;
@@ -74,14 +69,11 @@ export const mealPlanApi = baseApi.injectEndpoints({
           dispatch(
             setViewingMealPlans({ mealPlanWithDates: viewingMealPlans }),
           );
-          dispatch(
-            addCacheMealPlans({
-              mealPlanWithDates: viewingMealPlans,
-            }),
-          );
+          dispatch(addCacheMealPlans({ mealPlanWithDates: viewingMealPlans }));
         }
       },
     }),
+
     updateMealPlan: builder.mutation<
       UpdateMealPlanResponse,
       UpdateMealPlanQueryArgs
@@ -92,6 +84,7 @@ export const mealPlanApi = baseApi.injectEndpoints({
         body: mealPlan,
       }),
     }),
+
     createMealPlan: builder.mutation<
       PostMealPlanResponse,
       PostMealPlanQueryArgs
@@ -106,8 +99,9 @@ export const mealPlanApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetMealPlanSingleDayMutation,
-  useGetMealPlanDayRangeMutation,
+  useGetMealPlanSingleDayQuery,
+  useLazyGetMealPlanSingleDayQuery,
+  useGetMealPlanDayRangeQuery,
   useUpdateMealPlanMutation,
   useCreateMealPlanMutation,
 } = mealPlanApi;

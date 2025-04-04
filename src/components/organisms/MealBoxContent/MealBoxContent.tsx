@@ -162,6 +162,8 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
         mealItems.map((mealItem) => (
           <MealCard
             key={mealItem._id}
+            mealDate={mealDate}
+            mealType={mealType}
             mealItem={mealItem}
             onAmountChange={handleAmountChange}
             onRemoveFood={handleRemoveFood}

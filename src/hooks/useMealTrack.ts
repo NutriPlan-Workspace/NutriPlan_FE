@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { ADJUST_DISTANCE, NUM_OF_SLIDES } from '@/constants/mealPlan';
 import {
-  useGetMealPlanDayRangeMutation,
-  useGetMealPlanSingleDayMutation,
+  useGetMealPlanDayRangeQuery,
+  useLazyGetMealPlanSingleDayQuery,
 } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import {
   mealPlanSelector,
@@ -23,38 +24,39 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
   const [isLoadingList, setIsLoadingList] = useState<boolean[]>(
     Array(NUM_OF_SLIDES).fill(true),
   );
+  const [getMealPlanSingleDay] = useLazyGetMealPlanSingleDayQuery();
 
-  const [getMealPlanDayRange] = useGetMealPlanDayRangeMutation();
-  const [getMealPlanSingleDay] = useGetMealPlanSingleDayMutation();
+  // Define day range for the selected date
+  const { from, to } = useMemo(() => {
+    if (!selectedDate) return {};
+    const from = new Date(selectedDate);
+    from.setDate(from.getDate() - ADJUST_DISTANCE);
+    const to = new Date(selectedDate);
+    to.setDate(to.getDate() + ADJUST_DISTANCE);
+    return {
+      from: getMealDate(from),
+      to: getMealDate(to),
+    };
+  }, [selectedDate]);
+
+  // Fetch meal plan data for the selected date range
+  const dayRangeArgs = from && to && userId ? { from, to, userId } : skipToken;
+
+  const {
+    refetch: refetchViewingMealPlans,
+    isFetching: isFetchingViewingMealPlans,
+  } = useGetMealPlanDayRangeQuery(dayRangeArgs);
 
   useEffect(() => {
-    const fetchMealPlans = async () => {
-      try {
-        const currentSelectedDate = selectedDate ?? new Date();
-        const fromDate = new Date(currentSelectedDate);
-        fromDate.setDate(fromDate.getDate() - ADJUST_DISTANCE);
-        const toDate = new Date(currentSelectedDate);
-        toDate.setDate(toDate.getDate() + ADJUST_DISTANCE);
-
-        setIsLoadingList(Array(NUM_OF_SLIDES).fill(true));
-
-        await getMealPlanDayRange({
-          from: getMealDate(fromDate),
-          to: getMealDate(toDate),
-          userId: userId,
-        }).unwrap();
-        isMounted.current = true;
-
-        setIsLoadingList(Array(NUM_OF_SLIDES).fill(false));
-      } catch (error) {
-        toast.error(`Failed to fetch meal plan: ${error}`);
-      }
-    };
-
-    if (!isMounted.current) {
-      fetchMealPlans();
+    if (from && to && userId) {
+      refetchViewingMealPlans();
     }
-  }, [dispatch, getMealPlanDayRange, userId, selectedDate]);
+  }, [from, to, userId, refetchViewingMealPlans]);
+
+  // Update loading state when fetching meal plans
+  useEffect(() => {
+    setIsLoadingList(Array(NUM_OF_SLIDES).fill(isFetchingViewingMealPlans));
+  }, [isFetchingViewingMealPlans]);
 
   const updateLastElement = useCallback(
     (current: number, next: number, isForward: boolean) => {
@@ -119,13 +121,13 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
         const mealPlan = await getMealPlanSingleDay({
           date: viewingMealPlans[getDataIndex].mealDate,
           userId,
-        }).unwrap();
-        if (mealPlan) {
+        });
+        if (mealPlan.data) {
           dispatch(
             updateViewingMealPlanByIndex({
               mealPlanWithDate: {
                 mealDate: viewingMealPlans[getDataIndex].mealDate,
-                mealPlanDay: mealPlan.data,
+                mealPlanDay: mealPlan.data.data[0],
               },
               index: getDataIndex,
             }),
@@ -150,7 +152,7 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
 
   const handleBeforeChange = useCallback(
     async (current: number, next: number) => {
-      if (!isMounted.current) return;
+      // if (!isMounted.current) return;
       const isForward = (current + 1) % NUM_OF_SLIDES === next;
 
       updateLastElement(current, next, isForward);

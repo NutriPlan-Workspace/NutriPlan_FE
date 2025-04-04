@@ -16,7 +16,7 @@ const MealPlanContent: React.FC<MealPlanContentProps> = ({
     <HeaderLeftMealPlan />
     <motion.div
       animate={{ width }}
-      transition={{ duration: 0.22, ease: 'easeInOut' }}
+      transition={{ duration: 0.12, ease: 'easeInOut' }}
       className='h-full'
     >
       {children}

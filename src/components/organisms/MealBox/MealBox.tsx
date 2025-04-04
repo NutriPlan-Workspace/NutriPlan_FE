@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 
+import useMealBoxDrop from '@/hooks/useMealBoxDrop';
 import { MealBoxHeader } from '@/molecules/MealBoxHeader';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
 import { MealBoxContent } from '@/organisms/MealBoxContent';
@@ -24,6 +25,7 @@ const MealBox: React.FC<MealBoxProps> = ({
   mealType,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const mealBoxRef = useMealBoxDrop({ mealDate, mealType, setIsHovered });
 
   return (
     <div
@@ -31,9 +33,8 @@ const MealBox: React.FC<MealBoxProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Framer Motion for fade-in effect */}
       <motion.div
-        key={isLoading ? 'loading' : 'content'}
+        key={`${isLoading}-${mealItems?.length}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -51,11 +52,13 @@ const MealBox: React.FC<MealBoxProps> = ({
                 mealItems={mealItems}
                 isHovered={isHovered}
               />
-              <MealBoxContent
-                mealDate={mealDate}
-                mealType={mealType as keyof MealItems}
-                mealItems={mealItems}
-              />
+              <div ref={mealBoxRef} className='rounded-lg bg-white'>
+                <MealBoxContent
+                  mealDate={mealDate}
+                  mealType={mealType as keyof MealItems}
+                  mealItems={mealItems}
+                />
+              </div>
             </>
           )
         )}

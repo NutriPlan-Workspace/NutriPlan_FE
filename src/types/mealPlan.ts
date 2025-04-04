@@ -117,7 +117,7 @@ export interface MealPlanDayRangeResponse {
 export interface MealPlanSingleDayResponse {
   success: boolean;
   total: number;
-  data: MealPlanDay;
+  data: MealPlanDay[];
   message: string;
   additionalData: object;
 }
