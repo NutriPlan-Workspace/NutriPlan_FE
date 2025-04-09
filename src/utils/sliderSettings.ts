@@ -7,37 +7,31 @@ export const getSliderSettings = (
   handleBeforeChange: (current: number, next: number) => void,
   prevArrow: React.ReactElement,
   nextArrow: React.ReactElement,
-) => ({
-  initialSlide: 3,
-  dots: false,
-  speed: 200,
-  slidesToShow: (() => {
-    switch (selectedPlan) {
-      case PLAN_TYPES.SINGLE_DAY:
-        return 1;
-      case PLAN_TYPES.MULTI_DAY:
-        return 3;
-      default:
-        return 1;
+  parentWidth: number,
+) => {
+  const slidesToShow = (() => {
+    if (selectedPlan === PLAN_TYPES.SINGLE_DAY) return 1;
+    if (selectedPlan === PLAN_TYPES.MULTI_DAY) {
+      if (parentWidth > 1150) return 3;
+      if (parentWidth > 700) return 2;
     }
-  })(),
-  arrows: true,
-  prevArrow,
-  nextArrow,
-  infinite: true,
-  swipe: false,
-  touchMove: false,
-  centerMode: true,
-  centerPadding: '30px',
-  responsive:
-    selectedPlan === PLAN_TYPES.MULTI_DAY
-      ? [
-          {
-            breakpoint: 1250,
-            settings: { slidesToShow: 2, slidesToScroll: 1 },
-          },
-          { breakpoint: 850, settings: { slidesToShow: 1, slidesToScroll: 1 } },
-        ]
-      : [],
-  beforeChange: handleBeforeChange,
-});
+    return 1;
+  })();
+
+  return {
+    initialSlide: 3,
+    dots: false,
+    speed: 200,
+    slidesToShow,
+    arrows: true,
+    prevArrow,
+    nextArrow,
+    infinite: true,
+    swipe: false,
+    touchMove: false,
+    centerMode: true,
+    centerPadding: '30px',
+    adaptiveHeight: true,
+    beforeChange: handleBeforeChange,
+  };
+};

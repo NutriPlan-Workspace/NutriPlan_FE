@@ -1,42 +1,9 @@
-import { NutritionFields, PropertyFields } from './food';
+import { Food } from './food';
+
 
 export interface MealPlanFood {
   _id: string;
-  foodId: {
-    _id: string;
-    name: string;
-    description: string;
-    isRecipe: boolean;
-    defaultUnit: number;
-    categoryId: string;
-    secondaryCategoryId: string;
-    imgUrls: string[];
-    nutrition: NutritionFields;
-    property: PropertyFields;
-    directions: string[];
-    units: {
-      _id: string;
-      amount: number;
-      description: string;
-    }[];
-    ingredients: {
-      _id: string;
-      ingredientFoodId: {
-        _id: string;
-        name: string;
-      };
-      amount: number;
-      unit: number;
-      preparation: string;
-    }[];
-    isCustom: boolean;
-    userId: string;
-    videoUrl: string;
-    deleted: boolean;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
-  };
+  foodId: Food;
   amount: number;
   unit: number;
 }

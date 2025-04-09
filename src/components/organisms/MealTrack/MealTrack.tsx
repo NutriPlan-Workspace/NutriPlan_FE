@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Slider from 'react-slick';
 
 import { SlideArrow } from '@/atoms/SlideArrow';
@@ -18,6 +18,23 @@ interface MealTrackProps {
 
 const MealTrack: React.FC<MealTrackProps> = ({ selectedDate }) => {
   const { selectedPlan } = useDate();
+  const sliderRef = useRef(null);
+  const [parentWidth, setParentWidth] = useState(0);
+
+  useEffect(() => {
+    if (!sliderRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setParentWidth(entry.contentRect.width);
+      }
+    });
+
+    resizeObserver.observe(sliderRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
   const isSingleDay = useMemo(
     () => selectedPlan === PLAN_TYPES.SINGLE_DAY,
     [selectedPlan],
@@ -37,22 +54,25 @@ const MealTrack: React.FC<MealTrackProps> = ({ selectedDate }) => {
     handleBeforeChange,
     <SlideArrow direction='prev' />,
     <SlideArrow direction='next' />,
+    parentWidth,
   );
 
   return (
-    <Slider {...settings} className='relative h-full w-full overflow-auto'>
-      {viewingMealPlans.map(({ mealDate, mealPlanDay }, index) => (
-        <DayBox
-          key={mealDate}
-          mealPlanDay={mealPlanDay}
-          mealDate={new Date(mealDate)}
-          isLoading={isLoadingList[index]}
-          isSingleDay={isSingleDay}
-          onCreateBlank={handleCreateBlank}
-          onCopyPreviousDay={handleCopyPreviousDay}
-        />
-      ))}
-    </Slider>
+    <div ref={sliderRef} className='h-full w-full'>
+      <Slider {...settings} className='h-full w-full'>
+        {viewingMealPlans.map(({ mealDate, mealPlanDay }, index) => (
+          <DayBox
+            key={mealDate}
+            mealPlanDay={mealPlanDay}
+            mealDate={new Date(mealDate)}
+            isLoading={isLoadingList[index]}
+            isSingleDay={isSingleDay}
+            onCreateBlank={handleCreateBlank}
+            onCopyPreviousDay={handleCopyPreviousDay}
+          />
+        ))}
+      </Slider>
+    </div>
   );
 };
 

@@ -1,30 +1,37 @@
 export interface Food {
   _id: string;
   name: string;
+  description: string;
+  isRecipe: boolean;
+  defaultUnit: number;
+  categoryId: string;
+  secondaryCategoryId: string;
   imgUrls: string[];
   nutrition: NutritionFields;
   property: PropertyFields;
-  videoUrl: string;
-  defaultUnit: number;
+  directions: string[];
   units: {
+    _id: string;
     amount: number;
     description: string;
   }[];
-  directions: string[];
   ingredients: {
-    ingredientFoodId: string;
+    _id: string;
+    ingredientFoodId: {
+      _id: string;
+      name: string;
+    };
     amount: number;
     unit: number;
     preparation: string;
   }[];
-  description: string;
-  isRecipe: boolean;
   isCustom: boolean;
-  userId: string | null;
-  categoryId: string;
-  secondaryCategoryId: string;
-  unit: number;
-  amount: number;
+  userId: string;
+  videoUrl: string;
+  deleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 export interface DetailedFoodResponse {
@@ -152,4 +159,11 @@ export interface PropertyFields {
   isSnack: boolean;
   isDessert: boolean;
   majorIngredients: string;
+}
+
+export interface FoodCategory {
+  [category: string]: {
+    foods: Food[];
+    total: number;
+  };
 }

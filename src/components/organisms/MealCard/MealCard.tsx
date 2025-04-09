@@ -1,29 +1,31 @@
 import React, { useState } from 'react';
-import {
-  HiOutlineArchiveBoxXMark,
-  HiOutlineDocumentDuplicate,
-  HiOutlineStar,
-} from 'react-icons/hi2';
-import { Image, MenuProps, Popover, Typography } from 'antd';
+import { Image, Popover, Typography } from 'antd';
 
 import { DropIndicator } from '@/atoms/DropIndicator';
-import PairButton from '@/atoms/PairButton/PairButton';
+import { PairButton } from '@/atoms/PairButton';
 import { cn } from '@/helpers/helpers';
 import { useMealCardDrag } from '@/hooks/useMealCardDrag';
 import { AmountSelector } from '@/molecules/AmountSelector';
 import { NutritionPopoverFood } from '@/molecules/NutritionPopoverFood';
+import { Food } from '@/types/food';
 import { MealPlanDay, MealPlanFood } from '@/types/mealPlan';
+
+import { getMenuItems } from './MenuItemMealCard';
 
 const { Link } = Typography;
 
 interface MealCardProps {
   mealDate: string;
   mealType: keyof MealPlanDay['mealItems'];
-  mealItem: MealPlanFood;
-  onAmountChange: (amount: number, unit: number, cardId: string) => void;
-  onRemoveFood: (cardId: string) => void;
-  onDuplicateFood: (cardId: string) => void;
+  mealItem: MealPlanFood | Food;
+  isAddFood?: boolean;
+  onAmountChange?: (amount: number, unit: number, cardId: string) => void;
+  onRemoveFood?: (cardId: string) => void;
+  onDuplicateFood?: (cardId: string) => void;
 }
+
+const isMealPlanFood = (item: MealPlanFood | Food): item is MealPlanFood =>
+  (item as MealPlanFood).foodId !== undefined;
 
 const MealCard: React.FC<MealCardProps> = ({
   mealDate,
@@ -32,6 +34,7 @@ const MealCard: React.FC<MealCardProps> = ({
   onAmountChange,
   onRemoveFood,
   onDuplicateFood,
+  isAddFood = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const handleEnterHover = () => setIsHovered(true);
@@ -43,29 +46,14 @@ const MealCard: React.FC<MealCardProps> = ({
     cardId: mealItem._id,
   });
 
-  // TODO: Implement onClick for each menu item
-  const menuItems: MenuProps['items'] = [
-    {
-      key: '0',
-      label: 'Add to Favorite',
-      icon: <HiOutlineStar />,
-    },
-    {
-      key: '1',
-      label: 'Remove Food',
-      icon: <HiOutlineArchiveBoxXMark />,
-      onClick: () => {
-        onRemoveFood(mealItem._id);
-      },
-    },
-    { type: 'divider' },
-    {
-      key: '2',
-      label: 'Duplicate this Food',
-      icon: <HiOutlineDocumentDuplicate />,
-      onClick: () => onDuplicateFood(mealItem._id),
-    },
-  ];
+  const food = isMealPlanFood(mealItem) ? mealItem.foodId : mealItem;
+
+  const menuItems = getMenuItems({
+    isAddFood,
+    onRemoveFood,
+    onDuplicateFood,
+    mealItem,
+  });
 
   return (
     <div
@@ -93,27 +81,31 @@ const MealCard: React.FC<MealCardProps> = ({
           onMouseLeave={handleLeaveHover}
         >
           <Image
-            src={mealItem.foodId.imgUrls ? mealItem.foodId.imgUrls[0] : ''}
+            src={food.imgUrls?.[0] || ''}
             className={`h-[50px] w-[50px] max-w-[50px] rounded-[10px] object-cover transition-all duration-200 ${isHovered ? 'border-primary-400 border-2' : 'border-2 border-transparent'}`}
           />
           <div className='ml-[10px] flex w-full flex-col justify-center gap-[3px] pr-[10px]'>
             {/* title */}
             <Link className='leading-4.5 font-bold text-black transition-all duration-200 hover:underline'>
-              {mealItem.foodId.name}
+              {food.name}
             </Link>
-            <AmountSelector
-              cardId={mealItem._id}
-              currentUnit={mealItem.unit}
-              currentAmount={mealItem.amount}
-              options={mealItem.foodId?.units.map((unit, index) => ({
-                index: index,
-                amount: unit.amount,
-                description: unit.description,
-              }))}
-              onAmountChange={onAmountChange}
-            />
+            {isMealPlanFood(mealItem) && onAmountChange && (
+              <AmountSelector
+                cardId={mealItem._id}
+                currentUnit={mealItem.unit}
+                currentAmount={mealItem.amount}
+                options={food.units.map((unit, index) => ({
+                  index: index,
+                  amount: unit.amount,
+                  description: unit.description,
+                }))}
+                onAmountChange={onAmountChange}
+              />
+            )}
           </div>
-          <PairButton isHovered={isHovered} menuItems={menuItems} />
+          {!isAddFood && (
+            <PairButton isHovered={isHovered} menuItems={menuItems} />
+          )}
         </div>
       </Popover>
       {closestEdge && <DropIndicator edge={closestEdge} mealCardHeight={10} />}

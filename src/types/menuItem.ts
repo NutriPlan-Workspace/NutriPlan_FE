@@ -8,3 +8,8 @@ export interface MenuItem {
   onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   wrapper?: (button: React.ReactElement) => React.ReactElement;
 }
+
+export interface MenuItemDropdown {
+  key: string;
+  label: string;
+}

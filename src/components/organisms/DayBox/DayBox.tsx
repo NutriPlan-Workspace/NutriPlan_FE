@@ -52,8 +52,12 @@ const DayBox: React.FC<DayBoxProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {isSingleDay ? (
-        <div className='flex pl-[160px]'>
-          <div className={cn('flex-1', { 'px-40': !allDayMealItems?.length })}>
+        <div
+          className={cn('flex w-full justify-end', {
+            'justify-center': !allDayMealItems,
+          })}
+        >
+          <div className='max-w-[450px] flex-1 px-4'>
             <DayBoxHeader
               mealDate={mealDate}
               isToday={isToday}
@@ -67,17 +71,15 @@ const DayBox: React.FC<DayBoxProps> = ({
               onCopyPreviousDay={onCopyPreviousDay}
             />
           </div>
-          {allDayMealItems?.length ? (
-            <div className='flex-1'>
-              <div className='flex-1 pl-[60px]'>
-                <NutritionPopoverDay
-                  nutritionData={totalNutrition}
-                  title='PERCENT CALORIES FROM'
-                  isSingleDay={isSingleDay}
-                />
-              </div>
+          {Boolean(allDayMealItems?.length) && (
+            <div className='max-w-[450px] flex-1 px-4'>
+              <NutritionPopoverDay
+                nutritionData={totalNutrition}
+                title='PERCENT CALORIES FROM'
+                isSingleDay={isSingleDay}
+              />
             </div>
-          ) : null}
+          )}
         </div>
       ) : (
         <>

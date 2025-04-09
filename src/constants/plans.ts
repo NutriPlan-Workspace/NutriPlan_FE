@@ -1,4 +1,4 @@
-import { MenuItem } from '@/types/menuItem';
+import { MenuItemDropdown } from '@/types/menuItem';
 import { getDisplayWeek } from '@/utils/dateUtils';
 
 export const PLAN_TYPES = {
@@ -7,7 +7,7 @@ export const PLAN_TYPES = {
   WEEKLY_VIEW: '3',
 } as const;
 
-export const PLAN_MENU_ITEMS: MenuItem[] = [
+export const PLAN_MENU_ITEMS: MenuItemDropdown[] = [
   { key: PLAN_TYPES.SINGLE_DAY, label: 'Single Day' },
   { key: PLAN_TYPES.MULTI_DAY, label: 'Multi Day' },
   { key: PLAN_TYPES.WEEKLY_VIEW, label: 'Weekly View' },
@@ -27,7 +27,7 @@ export const getWeekOptions = (
   endCurrentWeek: Date,
   startNextWeek: Date,
   endNextWeek: Date,
-): MenuItem[] => [
+): MenuItemDropdown[] => [
   {
     key: WEEK_TYPES.LAST_WEEK,
     label: `Last week, ${getDisplayWeek(startLastWeek, endLastWeek)}`,

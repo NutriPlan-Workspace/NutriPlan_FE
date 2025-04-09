@@ -4,10 +4,10 @@ import { Dropdown, Space, Typography } from 'antd';
 import { cn } from 'helpers/helpers';
 
 import { PLAN_TYPES } from '@/constants/plans';
-import { MenuItem } from '@/types/menuItem';
+import { MenuItemDropdown } from '@/types/menuItem';
 
 interface DropdownMenuProps {
-  items: MenuItem[];
+  items: MenuItemDropdown[];
   className?: string;
   onSelect?: (selectedKey: string) => void;
 }
