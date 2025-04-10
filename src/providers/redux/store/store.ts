@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { authMiddleware } from '@/redux/middlewares/authMiddleware';
-import { baseApi } from '@/redux/query/apis/baseApi';
+import { baseApi, baseApiWithAuth } from '@/redux/query/apis/baseApi';
 import { cloudinaryApi } from '@/redux/query/apis/cloudinary/cloudinaryApi';
 import { foodReducer } from '@/redux/slices/food';
 import { userReducer } from '@/redux/slices/user';
@@ -15,12 +14,13 @@ export const store = configureStore({
     mealPlan: mealPlanReducer,
     [baseApi.reducerPath]: baseApi.reducer,
     [cloudinaryApi.reducerPath]: cloudinaryApi.reducer,
+    [baseApiWithAuth.reducerPath]: baseApiWithAuth.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       baseApi.middleware,
       cloudinaryApi.middleware,
-      authMiddleware,
+      baseApiWithAuth.middleware,
     ),
 });
 

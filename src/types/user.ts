@@ -26,3 +26,11 @@ export interface NutritionTarget {
   maxiumSodium: number;
   maxiumCholesterol: number;
 }
+
+export interface UserResponse {
+  success: boolean;
+  message: string;
+  code: number;
+  data: User;
+  error?: string;
+}

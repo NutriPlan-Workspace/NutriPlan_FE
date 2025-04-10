@@ -6,7 +6,6 @@ export interface AuthResponse {
   code: number;
   data: {
     payload: User;
-    accessToken: string;
   };
 }
 
@@ -19,4 +18,11 @@ export interface RegisterData {
   fullName: string;
   email: string;
   password: string;
+}
+
+export interface LogoutResponse {
+  success: boolean;
+  message: string;
+  code: number;
+  error?: string;
 }

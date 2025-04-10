@@ -1,4 +1,4 @@
-import { baseApi } from '@/redux/query/apis/baseApi';
+import { baseApiWithAuth } from '@/redux/query/apis/baseApi';
 import {
   addCacheMealPlans,
   setViewingMealPlans,
@@ -15,7 +15,7 @@ import type {
 } from '@/types/mealPlan';
 import { getDayRangeFromTo, getMealDate, isSameDay } from '@/utils/dateUtils';
 
-export const mealPlanApi = baseApi.injectEndpoints({
+export const mealPlanApi = baseApiWithAuth.injectEndpoints({
   endpoints: (builder) => ({
     getMealPlanSingleDay: builder.query<
       MealPlanSingleDayResponse,

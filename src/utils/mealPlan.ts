@@ -7,7 +7,6 @@ import type {
 
 const EMPTY_TEMPLATE: MealPlanDay = {
   _id: '',
-  userId: '',
   mealDate: '',
   mealItems: { breakfast: [], lunch: [], dinner: [] },
 };
@@ -22,7 +21,6 @@ export function getMealPlanDayAfterAddNewMeal(
   }
   return {
     _id: mealPlanDay._id || '',
-    userId: mealPlanDay.userId || '',
     mealDate: mealPlanDay.mealDate || '',
     mealItems: {
       breakfast: mealPlanDay.mealItems.breakfast ?? [],
@@ -51,7 +49,6 @@ export function getMealPlanDayAfterMovingMealInSameDay(
   }
   return {
     _id: mealPlanDay._id || '',
-    userId: mealPlanDay.userId || '',
     mealDate: mealPlanDay.mealDate || '',
     mealItems: {
       breakfast: mealPlanDay.mealItems.breakfast ?? [],
@@ -73,7 +70,6 @@ export function getMealPlanDayAfterRemoveMealItem(
   }
   return {
     _id: mealPlanDay._id || '',
-    userId: mealPlanDay.userId || '',
     mealDate: mealPlanDay.mealDate || '',
     mealItems: {
       breakfast: mealPlanDay.mealItems.breakfast ?? [],
@@ -111,7 +107,6 @@ export function getMealPlanDayDatabaseDTOByMealPlanDay(
 ): MealPlanDatabaseDTO {
   return {
     _id: mealPlanDay._id,
-    userId: mealPlanDay.userId,
     mealDate: mealPlanDay.mealDate,
     mealItems: {
       breakfast: mealPlanDay.mealItems.breakfast.map((meal) => ({

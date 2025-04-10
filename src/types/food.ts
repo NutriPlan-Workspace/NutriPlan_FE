@@ -26,7 +26,6 @@ export interface Food {
     preparation: string;
   }[];
   isCustom: boolean;
-  userId: string;
   videoUrl: string;
   deleted: boolean;
   createdAt: string;

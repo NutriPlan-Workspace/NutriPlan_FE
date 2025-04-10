@@ -12,11 +12,9 @@ import {
   mealPlanSelector,
   updateViewingMealPlanByIndex,
 } from '@/redux/slices/mealPlan';
-import { userSelector } from '@/redux/slices/user';
 import { getMealDate, isSameDay } from '@/utils/dateUtils';
 
 export const useMealTrack = (selectedDate: Date | undefined) => {
-  const userId = useSelector(userSelector).id;
   const isMounted = useRef(false);
   const dispatch = useDispatch();
   const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
@@ -40,7 +38,7 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
   }, [selectedDate]);
 
   // Fetch meal plan data for the selected date range
-  const dayRangeArgs = from && to && userId ? { from, to, userId } : skipToken;
+  const dayRangeArgs = from && to ? { from, to } : skipToken;
 
   const {
     refetch: refetchViewingMealPlans,
@@ -48,10 +46,10 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
   } = useGetMealPlanDayRangeQuery(dayRangeArgs);
 
   useEffect(() => {
-    if (from && to && userId) {
+    if (from && to) {
       refetchViewingMealPlans();
     }
-  }, [from, to, userId, refetchViewingMealPlans]);
+  }, [from, to, refetchViewingMealPlans]);
 
   // Update loading state when fetching meal plans
   useEffect(() => {
@@ -120,7 +118,6 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
       try {
         const mealPlan = await getMealPlanSingleDay({
           date: viewingMealPlans[getDataIndex].mealDate,
-          userId,
         });
         if (mealPlan.data) {
           dispatch(
@@ -147,7 +144,7 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
         });
       }
     },
-    [getMealPlanSingleDay, isLoadingList, userId, viewingMealPlans, dispatch],
+    [getMealPlanSingleDay, isLoadingList, viewingMealPlans, dispatch],
   );
 
   const handleBeforeChange = useCallback(

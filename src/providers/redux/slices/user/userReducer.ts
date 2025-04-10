@@ -4,17 +4,16 @@ import { Role } from '@/constants/role';
 import type { User } from '@/types/user';
 
 export type UserState = {
-  id: string;
-  fullName: string;
-  email: string;
-  role: Role;
+  user: User;
 };
 
 export const userInitialState: UserState = {
-  id: '',
-  fullName: '',
-  email: '',
-  role: Role.GUEST,
+  user: {
+    id: '',
+    fullName: '',
+    email: '',
+    role: Role.GUEST,
+  },
 };
 
 const userSlice = createSlice({
@@ -22,14 +21,13 @@ const userSlice = createSlice({
   initialState: userInitialState,
   reducers: {
     setUser: (state, action: PayloadAction<User>) => {
-      const { id, fullName, email, role } = action.payload;
-      state.id = id;
-      state.fullName = fullName;
-      state.email = email;
-      state.role = role;
+      state.user = action.payload;
+    },
+    removeUser: (state) => {
+      state.user = userInitialState.user;
     },
   },
 });
 
-export const { setUser } = userSlice.actions;
+export const { setUser, removeUser } = userSlice.actions;
 export default userSlice.reducer;

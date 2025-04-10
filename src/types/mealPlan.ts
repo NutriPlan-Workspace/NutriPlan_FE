@@ -1,6 +1,5 @@
 import { Food } from './food';
 
-
 export interface MealPlanFood {
   _id: string;
   foodId: Food;
@@ -16,7 +15,6 @@ export interface MealItems {
 
 export interface MealPlanDay {
   _id: string;
-  userId: string;
   mealDate: string;
   mealItems: MealItems;
 }
@@ -27,7 +25,6 @@ export interface MealPlanWithDate {
 }
 export interface MealPlanDatabaseDTO {
   _id: string;
-  userId: string;
   mealDate: string;
   mealItems: {
     breakfast: {
@@ -53,13 +50,11 @@ export interface PostMealPlanQueryArgs {
 }
 export interface GetMealPlanSingleDayQueryArgs {
   date: string;
-  userId: string;
 }
 
 export interface GetMealPlanDayRangeQueryArgs {
   from: string;
   to: string;
-  userId: string;
 }
 
 export interface UpdateMealPlanQueryArgs {
