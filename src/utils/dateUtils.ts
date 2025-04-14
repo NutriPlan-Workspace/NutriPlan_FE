@@ -53,9 +53,12 @@ export const isSameDateRange = (
   from?.toDateString() === start?.toDateString() &&
   to?.toDateString() === end?.toDateString();
 
-export const formatDate = (date: string) => {
-  const newDate = new Date(date);
-  return newDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+export const formatDate = (date: string | Date) => {
+  const newDate = typeof date === 'string' ? new Date(date) : date;
+  return newDate.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
 };
 
 export const isSameDay = (date1: Date, date2: Date) =>

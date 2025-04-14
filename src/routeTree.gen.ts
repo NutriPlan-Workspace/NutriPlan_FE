@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as WeightGoalIndexImport } from './routes/weight-goal/index'
 import { Route as UnauthorizedIndexImport } from './routes/unauthorized/index'
 import { Route as ThisWeekIndexImport } from './routes/this-week/index'
 import { Route as RegisterIndexImport } from './routes/register/index'
@@ -27,6 +28,12 @@ import { Route as AdminIndexImport } from './routes/admin/index'
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const WeightGoalIndexRoute = WeightGoalIndexImport.update({
+  id: '/weight-goal/',
+  path: '/weight-goal/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -158,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthorizedIndexImport
       parentRoute: typeof rootRoute
     }
+    '/weight-goal/': {
+      id: '/weight-goal/'
+      path: '/weight-goal'
+      fullPath: '/weight-goal'
+      preLoaderRoute: typeof WeightGoalIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -174,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterIndexRoute
   '/this-week': typeof ThisWeekIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
+  '/weight-goal': typeof WeightGoalIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -187,6 +202,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterIndexRoute
   '/this-week': typeof ThisWeekIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
+  '/weight-goal': typeof WeightGoalIndexRoute
 }
 
 export interface FileRoutesById {
@@ -201,6 +217,7 @@ export interface FileRoutesById {
   '/register/': typeof RegisterIndexRoute
   '/this-week/': typeof ThisWeekIndexRoute
   '/unauthorized/': typeof UnauthorizedIndexRoute
+  '/weight-goal/': typeof WeightGoalIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -216,6 +233,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/this-week'
     | '/unauthorized'
+    | '/weight-goal'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -228,6 +246,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/this-week'
     | '/unauthorized'
+    | '/weight-goal'
   id:
     | '__root__'
     | '/'
@@ -240,6 +259,7 @@ export interface FileRouteTypes {
     | '/register/'
     | '/this-week/'
     | '/unauthorized/'
+    | '/weight-goal/'
   fileRoutesById: FileRoutesById
 }
 
@@ -254,6 +274,7 @@ export interface RootRouteChildren {
   RegisterIndexRoute: typeof RegisterIndexRoute
   ThisWeekIndexRoute: typeof ThisWeekIndexRoute
   UnauthorizedIndexRoute: typeof UnauthorizedIndexRoute
+  WeightGoalIndexRoute: typeof WeightGoalIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -267,6 +288,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterIndexRoute: RegisterIndexRoute,
   ThisWeekIndexRoute: ThisWeekIndexRoute,
   UnauthorizedIndexRoute: UnauthorizedIndexRoute,
+  WeightGoalIndexRoute: WeightGoalIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -288,7 +310,8 @@ export const routeTree = rootRoute
         "/profile/",
         "/register/",
         "/this-week/",
-        "/unauthorized/"
+        "/unauthorized/",
+        "/weight-goal/"
       ]
     },
     "/": {
@@ -320,6 +343,9 @@ export const routeTree = rootRoute
     },
     "/unauthorized/": {
       "filePath": "unauthorized/index.tsx"
+    },
+    "/weight-goal/": {
+      "filePath": "weight-goal/index.tsx"
     }
   }
 }
