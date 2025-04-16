@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 import { GrDocumentUpdate } from 'react-icons/gr';
-import { MdErrorOutline } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { InputNumber } from 'antd';
+import { Tooltip } from 'antd';
 
 import Button from '@/atoms/Button/Button';
 import PopupButton from '@/atoms/Button/PopupButton';
@@ -134,18 +134,25 @@ const WeightAndGoal: React.FC = () => {
             <div className='flex flex-col'>
               <div className='flex w-[300px] items-center'>
                 <div className='ml-auto'>
-                  <InputNumber
-                    type='number'
-                    value={weight}
-                    onChange={(val) => {
-                      setWeight(val);
-                      setError(null);
-                    }}
-                    controls={false}
-                    className={`h-10 w-24 rounded-xl border px-4 py-1 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-                      error ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
+                  <Tooltip
+                    title={error}
+                    color='orange'
+                    open={!!error}
+                    placement='bottom'
+                  >
+                    <InputNumber
+                      type='number'
+                      value={weight}
+                      onChange={(val) => {
+                        setWeight(val);
+                        setError(null);
+                      }}
+                      controls={false}
+                      className={`h-10 w-24 rounded-xl border px-4 py-1 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+                        error ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                  </Tooltip>
                   <span className='ml-2 text-sm text-gray-500'>kg</span>
                   <Button
                     onClick={handleUpdate}
@@ -165,12 +172,6 @@ const WeightAndGoal: React.FC = () => {
                   </Button>
                 </div>
               </div>
-              {error && (
-                <div className='mt-1 flex items-center gap-1 pl-2 text-xs text-red-500'>
-                  <MdErrorOutline className='text-base' />
-                  <span>{error}</span>
-                </div>
-              )}
             </div>
           </div>
         </div>

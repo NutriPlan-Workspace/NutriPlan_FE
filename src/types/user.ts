@@ -74,7 +74,7 @@ export interface PhysicalStat {
   gender: string;
   heightRecords: { height: number }[];
   weightRecords: { weight: number }[];
-  dateOfBirth: Date;
+  dateOfBirth: string;
   bodyFat: string;
   activityLevel: string;
 }
