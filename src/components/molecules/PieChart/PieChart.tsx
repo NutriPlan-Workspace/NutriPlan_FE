@@ -3,11 +3,11 @@ import { Cell, Pie, PieChart as AntdPieChart } from 'recharts';
 
 import { RenderCustomizedLabel } from '@/atoms/RenderCustomizedLabel';
 import { NUTRITION_HEX_COLOR } from '@/constants/nutritionFormat';
-import type { NutritionFields } from '@/types/food';
+import { NutritionSummaryFields } from '@/types/mealPlan';
 
 interface PieChartProps {
   className?: string;
-  nutritionData: NutritionFields;
+  nutritionData: NutritionSummaryFields;
   size?: number;
   label?: boolean;
 }

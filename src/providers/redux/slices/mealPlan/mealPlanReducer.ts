@@ -6,11 +6,13 @@ import { isSameDay } from '@/utils/dateUtils';
 export type MealPlanState = {
   cacheMealPlans: MealPlanWithDate[];
   viewingMealPlans: MealPlanWithDate[];
+  draggingCardHeight: number;
 };
 
 export const mealPlanInitialState: MealPlanState = {
   cacheMealPlans: [],
   viewingMealPlans: [],
+  draggingCardHeight: 0,
 };
 
 const mealPlanSlice = createSlice({
@@ -79,6 +81,12 @@ const mealPlanSlice = createSlice({
       );
       state.cacheMealPlans[index] = action.payload.mealPlanWithDate;
     },
+    setDraggingCardHeight: (
+      state,
+      action: PayloadAction<{ draggingCardHeight: number }>,
+    ) => {
+      state.draggingCardHeight = action.payload.draggingCardHeight;
+    },
   },
 });
 
@@ -89,5 +97,6 @@ export const {
   updateViewingMealPlanByDates,
   addCacheMealPlans,
   updateCacheMealPlanByDate,
+  setDraggingCardHeight,
 } = mealPlanSlice.actions;
 export default mealPlanSlice.reducer;

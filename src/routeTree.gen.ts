@@ -16,6 +16,7 @@ import { Route as WeightGoalIndexImport } from './routes/weight-goal/index'
 import { Route as UnauthorizedIndexImport } from './routes/unauthorized/index'
 import { Route as RegisterIndexImport } from './routes/register/index'
 import { Route as ProfileIndexImport } from './routes/profile/index'
+import { Route as PhysicalStatsIndexImport } from './routes/physical-stats/index'
 import { Route as NutritionTargetsIndexImport } from './routes/nutrition-targets/index'
 import { Route as MealPlanIndexImport } from './routes/meal-plan/index'
 import { Route as LoginIndexImport } from './routes/login/index'
@@ -51,6 +52,12 @@ const RegisterIndexRoute = RegisterIndexImport.update({
 const ProfileIndexRoute = ProfileIndexImport.update({
   id: '/profile/',
   path: '/profile/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PhysicalStatsIndexRoute = PhysicalStatsIndexImport.update({
+  id: '/physical-stats/',
+  path: '/physical-stats/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -130,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NutritionTargetsIndexImport
       parentRoute: typeof rootRoute
     }
+    '/physical-stats/': {
+      id: '/physical-stats/'
+      path: '/physical-stats'
+      fullPath: '/physical-stats'
+      preLoaderRoute: typeof PhysicalStatsIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/profile/': {
       id: '/profile/'
       path: '/profile'
@@ -170,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
+  '/physical-stats': typeof PhysicalStatsIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/register': typeof RegisterIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
@@ -183,6 +198,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
+  '/physical-stats': typeof PhysicalStatsIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/register': typeof RegisterIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
@@ -197,6 +213,7 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexRoute
   '/meal-plan/': typeof MealPlanIndexRoute
   '/nutrition-targets/': typeof NutritionTargetsIndexRoute
+  '/physical-stats/': typeof PhysicalStatsIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/register/': typeof RegisterIndexRoute
   '/unauthorized/': typeof UnauthorizedIndexRoute
@@ -212,6 +229,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
+    | '/physical-stats'
     | '/profile'
     | '/register'
     | '/unauthorized'
@@ -224,6 +242,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
+    | '/physical-stats'
     | '/profile'
     | '/register'
     | '/unauthorized'
@@ -236,6 +255,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/meal-plan/'
     | '/nutrition-targets/'
+    | '/physical-stats/'
     | '/profile/'
     | '/register/'
     | '/unauthorized/'
@@ -250,6 +270,7 @@ export interface RootRouteChildren {
   LoginIndexRoute: typeof LoginIndexRoute
   MealPlanIndexRoute: typeof MealPlanIndexRoute
   NutritionTargetsIndexRoute: typeof NutritionTargetsIndexRoute
+  PhysicalStatsIndexRoute: typeof PhysicalStatsIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
   UnauthorizedIndexRoute: typeof UnauthorizedIndexRoute
@@ -263,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginIndexRoute: LoginIndexRoute,
   MealPlanIndexRoute: MealPlanIndexRoute,
   NutritionTargetsIndexRoute: NutritionTargetsIndexRoute,
+  PhysicalStatsIndexRoute: PhysicalStatsIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   RegisterIndexRoute: RegisterIndexRoute,
   UnauthorizedIndexRoute: UnauthorizedIndexRoute,
@@ -285,6 +307,7 @@ export const routeTree = rootRoute
         "/login/",
         "/meal-plan/",
         "/nutrition-targets/",
+        "/physical-stats/",
         "/profile/",
         "/register/",
         "/unauthorized/",
@@ -308,6 +331,9 @@ export const routeTree = rootRoute
     },
     "/nutrition-targets/": {
       "filePath": "nutrition-targets/index.tsx"
+    },
+    "/physical-stats/": {
+      "filePath": "physical-stats/index.tsx"
     },
     "/profile/": {
       "filePath": "profile/index.tsx"

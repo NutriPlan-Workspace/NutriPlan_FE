@@ -1,11 +1,11 @@
-import React, { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 import { SIDEBAR_WIDTH } from '@/constants/layout';
 import { Sidebar } from '@/organisms/Sidebar';
 
 interface LayoutLoginedProps {
-  children: ((isSidebarOpen: boolean) => ReactNode) | ReactNode;
+  children: (isSidebarOpen: boolean) => React.ReactNode;
 }
 
 const LayoutLogined: React.FC<LayoutLoginedProps> = ({ children }) => {
@@ -27,9 +27,7 @@ const LayoutLogined: React.FC<LayoutLoginedProps> = ({ children }) => {
       </motion.div>
 
       <motion.div className='flex-1'>
-        <main className='h-full w-full'>
-          {typeof children === 'function' ? children(isSidebarOpen) : children}
-        </main>
+        <main className='h-full w-full'>{children(isSidebarOpen)}</main>
       </motion.div>
     </div>
   );

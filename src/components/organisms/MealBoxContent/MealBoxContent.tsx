@@ -3,6 +3,7 @@ import { HiOutlineArrowPath } from 'react-icons/hi2';
 import { useDispatch, useSelector } from 'react-redux';
 import { Typography } from 'antd';
 
+import { DropIndicator } from '@/atoms/DropIndicator';
 import { MealCard } from '@/organisms/MealCard';
 import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import {
@@ -22,14 +23,17 @@ interface MealBoxContentProps {
   mealDate: string;
   mealType: keyof MealItems;
   mealItems: MealPlanFood[];
+  isDragEnter: boolean;
 }
 
 const MealBoxContent: React.FC<MealBoxContentProps> = ({
   mealDate,
   mealType,
   mealItems,
+  isDragEnter,
 }) => {
   const dispatch = useDispatch();
+  const draggingCardHeight = useSelector(mealPlanSelector).draggingCardHeight;
   const [updateMealPlan] = useUpdateMealPlanMutation();
   const viewingMealPlan = useSelector(mealPlanSelector).viewingMealPlans;
 
@@ -151,13 +155,18 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
   return (
     <>
       {mealItems.length === 0 ? (
-        <Typography className='mt-2 text-gray-500'>
-          Hit{' '}
-          <span className='inline-flex'>
-            <HiOutlineArrowPath className='mx-1' />
-          </span>{' '}
-          to generate, or search for foods to add and drag them in.
-        </Typography>
+        <>
+          <Typography className='mt-2 text-gray-500'>
+            Hit{' '}
+            <span className='inline-flex'>
+              <HiOutlineArrowPath className='mx-1' />
+            </span>{' '}
+            to generate, or search for foods to add and drag them in.
+          </Typography>
+          {isDragEnter && (
+            <DropIndicator edge='bottom' mealCardHeight={draggingCardHeight} />
+          )}
+        </>
       ) : (
         mealItems.map((mealItem) => (
           <MealCard

@@ -25,7 +25,11 @@ const MealBox: React.FC<MealBoxProps> = ({
   mealType,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const mealBoxRef = useMealBoxDrop({ mealDate, mealType, setIsHovered });
+  const { mealBoxRef, isDragEnter } = useMealBoxDrop({
+    mealDate,
+    mealType,
+    setIsHovered,
+  });
 
   return (
     <div
@@ -57,6 +61,7 @@ const MealBox: React.FC<MealBoxProps> = ({
                   mealDate={mealDate}
                   mealType={mealType as keyof MealItems}
                   mealItems={mealItems}
+                  isDragEnter={isDragEnter}
                 />
               </div>
             </>

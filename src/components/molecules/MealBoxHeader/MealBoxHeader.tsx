@@ -8,13 +8,12 @@ import { MenuProps, Popover, Typography } from 'antd';
 
 import { PairButton } from '@/atoms/PairButton';
 import { NutritionPopoverMeal } from '@/molecules/NutritionPopoverMeal';
-import type { NutritionFields } from '@/types/food';
-import type { MealPlanFood } from '@/types/mealPlan';
+import type { MealPlanFood, NutritionSummaryFields } from '@/types/mealPlan';
 
 interface MealBoxHeaderProps {
   mealType: string;
   calories: number;
-  nutritionData: NutritionFields;
+  nutritionData: NutritionSummaryFields;
   mealItems: MealPlanFood[];
   isHovered: boolean;
 }

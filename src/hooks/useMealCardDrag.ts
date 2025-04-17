@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import {
   draggable,
@@ -11,6 +12,11 @@ import {
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import invariant from 'tiny-invariant';
 
+import {
+  mealPlanSelector,
+  setDraggingCardHeight,
+} from '@/redux/slices/mealPlan';
+
 export const useMealCardDrag = ({
   mealDate,
   mealType,
@@ -20,6 +26,8 @@ export const useMealCardDrag = ({
   mealType: string;
   cardId: string;
 }) => {
+  const dispatch = useDispatch();
+  const draggingCardHeight = useSelector(mealPlanSelector).draggingCardHeight;
   const [isDragging, setIsDragging] = useState(false);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const mealCardRef = useRef<HTMLDivElement | null>(null);
@@ -37,8 +45,20 @@ export const useMealCardDrag = ({
           mealType,
           cardId,
         }),
-        onDragStart: () => setIsDragging(true),
-        onDrop: () => setIsDragging(false),
+        onDragStart: () => {
+          setIsDragging(true);
+          dispatch(
+            setDraggingCardHeight({
+              draggingCardHeight: mealCardElement.clientHeight,
+            }),
+          );
+          // set current card display none
+          mealCardElement.style.display = 'none';
+        },
+        onDrop: () => {
+          setIsDragging(false);
+          mealCardElement.style.display = '';
+        },
       }),
 
       dropTargetForElements({
@@ -79,7 +99,7 @@ export const useMealCardDrag = ({
         onDrop: () => setClosestEdge(null),
       }),
     );
-  }, [cardId, mealDate, mealType]);
+  }, [cardId, mealDate, mealType, dispatch]);
 
-  return { mealCardRef, isDragging, closestEdge };
+  return { mealCardRef, isDragging, closestEdge, draggingCardHeight };
 };

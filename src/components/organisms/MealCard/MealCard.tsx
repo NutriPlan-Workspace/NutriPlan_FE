@@ -40,11 +40,12 @@ const MealCard: React.FC<MealCardProps> = ({
   const handleEnterHover = () => setIsHovered(true);
   const handleLeaveHover = () => setIsHovered(false);
 
-  const { mealCardRef, isDragging, closestEdge } = useMealCardDrag({
-    mealDate,
-    mealType,
-    cardId: mealItem._id,
-  });
+  const { mealCardRef, isDragging, closestEdge, draggingCardHeight } =
+    useMealCardDrag({
+      mealDate,
+      mealType,
+      cardId: mealItem._id,
+    });
 
   const food = isMealPlanFood(mealItem) ? mealItem.foodId : mealItem;
 
@@ -56,10 +57,11 @@ const MealCard: React.FC<MealCardProps> = ({
   });
 
   return (
-    <div
-      ref={mealCardRef}
-      className={cn('relative', { 'opacity-40': isDragging })}
-    >
+    <div className={cn('relative', { 'opacity-40': isDragging })}>
+      {closestEdge === 'top' && (
+        <DropIndicator edge='top' mealCardHeight={draggingCardHeight} />
+      )}
+
       <Popover
         placement='left'
         color='white'
@@ -70,11 +72,12 @@ const MealCard: React.FC<MealCardProps> = ({
             overflow: 'hidden',
           },
         }}
-        content={<NutritionPopoverFood mealItem={mealItem} showIngredient />}
+        content={<NutritionPopoverFood mealItem={mealItem} />}
       >
         <div
+          ref={mealCardRef}
           className={cn(
-            'flex items-center rounded-[5px] border-2 border-transparent bg-white p-[3px_3px] transition-all duration-200 hover:shadow-md',
+            'flex items-center rounded-[5px] border-2 border-transparent bg-white p-[3px] transition-all duration-200 hover:shadow-md',
             { 'border-primary-400': isHovered },
           )}
           onMouseEnter={handleEnterHover}
@@ -82,7 +85,10 @@ const MealCard: React.FC<MealCardProps> = ({
         >
           <Image
             src={food.imgUrls?.[0] || ''}
-            className={`h-[50px] w-[50px] max-w-[50px] rounded-[10px] object-cover transition-all duration-200 ${isHovered ? 'border-primary-400 border-2' : 'border-2 border-transparent'}`}
+            className={cn(
+              'h-[50px] w-[50px] max-w-[50px] rounded-[10px] border-2 border-transparent object-cover transition-all duration-200',
+              { 'border-primary-400 border-2': isHovered },
+            )}
           />
           <div className='ml-[10px] flex w-full flex-col justify-center gap-[3px] pr-[10px]'>
             {/* title */}
@@ -108,7 +114,9 @@ const MealCard: React.FC<MealCardProps> = ({
           )}
         </div>
       </Popover>
-      {closestEdge && <DropIndicator edge={closestEdge} mealCardHeight={10} />}
+      {closestEdge === 'bottom' && (
+        <DropIndicator edge='bottom' mealCardHeight={draggingCardHeight} />
+      )}
     </div>
   );
 };

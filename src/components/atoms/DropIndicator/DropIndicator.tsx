@@ -4,28 +4,31 @@ import { cn } from '@/helpers/helpers';
 
 interface DropIndicatorProps {
   edge: 'top' | 'bottom' | 'right' | 'left';
-  mealCardHeight: number | null;
+  mealCardHeight: number;
 }
 
 const DropIndicator: React.FC<DropIndicatorProps> = ({
   edge,
   mealCardHeight,
 }) => {
-  const getEdgeStyle = () => {
-    switch (edge) {
-      case 'top':
-        return 'top-0';
-      case 'bottom':
-        return 'bottom-[-5px]';
-      default:
-        return '';
-    }
+  const edgeStyles: Record<string, string> = {
+    top: 'top-0 left-0 w-full',
+    bottom: 'bottom-0 left-0 w-full',
+    right: '',
+    left: '',
   };
+
   return (
     <div
-      style={{ height: mealCardHeight ?? '0' }}
-      className={cn(getEdgeStyle(), 'absolute w-full bg-red-300')}
-    ></div>
+      style={{ height: mealCardHeight }}
+      className={cn(
+        'bg-[repeating-linear-gradient(45deg,_rgba(255,255,255,0.3)_0px,_rgba(255,255,255,0.3)_10px,_transparent_10px,_transparent_20px)]',
+        'border-2 border-dashed border-[#FFC84E]',
+        'bg-primary-100 relative rounded-md',
+        'transition-all duration-200',
+        edgeStyles[edge] || '',
+      )}
+    />
   );
 };
 

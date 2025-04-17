@@ -1,35 +1,47 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 
 interface UseMealBoxDropProps {
   mealDate: string;
   mealType: string;
-  setIsHovered?: (isHovered: boolean) => void;
+  setIsHovered: (isHovered: boolean) => void;
 }
 
 const useMealBoxDrop = ({
   mealDate,
   mealType,
-  setIsHovered = () => {},
+  setIsHovered,
 }: UseMealBoxDropProps) => {
   const mealBoxRef = useRef<HTMLDivElement | null>(null);
+  const [isDragEnter, setIsDragEnter] = useState(false);
 
   useEffect(() => {
     const mealBoxElement = mealBoxRef.current;
     if (!mealBoxElement) return;
 
-    return dropTargetForElements({
+    const cleanup = dropTargetForElements({
       element: mealBoxElement,
       onDragStart: () => setIsHovered(true),
-      onDragEnter: () => setIsHovered(true),
-      onDragLeave: () => setIsHovered(false),
-      onDrop: () => setIsHovered(false),
+      onDragEnter: () => {
+        setIsHovered(true);
+        setIsDragEnter(true);
+      },
+      onDragLeave: () => {
+        setIsHovered(false);
+        setIsDragEnter(false);
+      },
+      onDrop: () => {
+        setIsHovered(false);
+        setIsDragEnter(false);
+      },
       getData: () => ({ mealDate, mealType }),
-      getIsSticky: () => true,
+      getIsSticky: () => false,
     });
+
+    return cleanup;
   }, [mealDate, mealType, setIsHovered]);
 
-  return mealBoxRef;
+  return { mealBoxRef, isDragEnter };
 };
 
 export default useMealBoxDrop;

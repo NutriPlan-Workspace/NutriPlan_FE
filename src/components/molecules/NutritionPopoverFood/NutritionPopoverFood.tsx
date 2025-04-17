@@ -1,16 +1,15 @@
 import React from 'react';
-import { Divider, Typography } from 'antd';
+import { Typography } from 'antd';
 
 import { nutritionFormat } from '@/constants/nutritionFormat';
-import type { Food, NutritionFields } from '@/types/food';
-import type { MealPlanFood } from '@/types/mealPlan';
+import type { Food } from '@/types/food';
+import type { MealPlanFood, NutritionSummaryFields } from '@/types/mealPlan';
 import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
 
 interface NutritionPopoverFoodProps {
   mealItem: MealPlanFood | Food;
-  showIngredient: boolean;
 }
 
 const isMealItem = (item: MealPlanFood | Food): item is MealPlanFood =>
@@ -18,12 +17,11 @@ const isMealItem = (item: MealPlanFood | Food): item is MealPlanFood =>
 
 const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
   mealItem,
-  showIngredient,
 }) => {
   const food = isMealItem(mealItem) ? mealItem.foodId : mealItem;
   const currentUnit = isMealItem(mealItem)
     ? food.units[mealItem.unit]
-    : food.units[food.defaultUnit];
+    : food.units[0];
   const diffCalories = isMealItem(mealItem)
     ? mealItem.amount / food.units[mealItem.unit]?.amount
     : 1;
@@ -31,12 +29,12 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
   return (
     <div className='popover-content w-[240px]'>
       <div
-        className='h-[150px] w-full bg-cover bg-center'
+        className='h-[220px] w-full bg-cover bg-center'
         style={{
           backgroundImage: `url(${food.imgUrls ? food.imgUrls[0] : ''})`,
         }}
       >
-        <div className='flex h-full flex-col items-start justify-end bg-gradient-to-b from-transparent via-white/70 to-white p-3.5'>
+        <div className='flex h-full flex-col items-start justify-end bg-gradient-to-b from-transparent via-white/80 to-white p-3.5'>
           <Title className='title text-[1.1rem] text-black' level={5}>
             {food.name}
           </Title>
@@ -45,7 +43,7 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
           </Typography>
         </div>
       </div>
-      <div className='p-3.5'>
+      <div className='p-3.5 pb-4.5'>
         <Typography className='mb-1 text-[0.8rem] font-medium tracking-widest text-black'>
           PER{' '}
           {isMealItem(mealItem)
@@ -59,7 +57,7 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
               <Typography className={item.color}>{item.label}: </Typography>
               <Typography className={item.color}>
                 {roundNumber(
-                  food.nutrition[item.key as keyof NutritionFields] *
+                  food.nutrition[item.key as keyof NutritionSummaryFields] *
                     diffCalories,
                   2,
                 )}
@@ -68,23 +66,6 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
             </div>
           </div>
         ))}
-
-        {showIngredient && food.ingredients && (
-          <>
-            <Divider className='mx-0 my-2.5 border-[#ddd]' />
-            <div className='ingredients'>
-              {food.ingredients.map((ingredient) => (
-                <Typography
-                  key={ingredient.ingredientFoodId._id}
-                  className='text-black'
-                >
-                  {ingredient.amount} {ingredient.preparation} {ingredient.unit}{' '}
-                  of {ingredient.ingredientFoodId.name}
-                </Typography>
-              ))}
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

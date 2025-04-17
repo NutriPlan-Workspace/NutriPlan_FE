@@ -10,14 +10,14 @@ import { Button, Col, Row, Tooltip, Typography } from 'antd';
 import { nutritionFormat } from '@/constants/nutritionFormat';
 import { cn } from '@/helpers/helpers';
 import { PieChart } from '@/molecules/PieChart';
-import type { NutritionFields } from '@/types/food';
+import type { NutritionSummaryFields } from '@/types/mealPlan';
 import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
 
 interface NutritionPopoverDayProps {
   title: string;
-  nutritionData: NutritionFields;
+  nutritionData: NutritionSummaryFields;
   onClick?: () => void;
   isSingleDay?: boolean;
 }

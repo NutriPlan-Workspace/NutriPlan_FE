@@ -3,13 +3,13 @@ import { Typography } from 'antd';
 
 import { nutritionFormat } from '@/constants/nutritionFormat';
 import { PieChart } from '@/molecules/PieChart';
-import type { NutritionFields } from '@/types/food';
+import type { NutritionSummaryFields } from '@/types/mealPlan';
 import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
 interface NutritionPopoverMealProps {
   mealType: string;
-  nutritionData: NutritionFields;
+  nutritionData: NutritionSummaryFields;
 }
 const NutritionPopoverMeal: React.FC<NutritionPopoverMealProps> = ({
   mealType,

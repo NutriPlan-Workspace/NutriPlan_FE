@@ -1,8 +1,31 @@
-import { Food } from './food';
+export interface NutritionSummaryFields {
+  calories: number;
+  carbs: number;
+  fats: number;
+  proteins: number;
+  fiber: number;
+  sodium: number;
+  cholesterol: number;
+}
+export interface PropertySummaryFields {
+  prepTime: number;
+  cookTime: number;
+}
 
 export interface MealPlanFood {
   _id: string;
-  foodId: Food;
+  foodId: {
+    _id: string;
+    name: string;
+    imgUrls: string[];
+    property: PropertySummaryFields;
+    nutrition: NutritionSummaryFields;
+    units: {
+      _id: string;
+      amount: number;
+      description: string;
+    }[];
+  };
   amount: number;
   unit: number;
 }
