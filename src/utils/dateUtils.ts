@@ -102,3 +102,12 @@ export const getDayRangeFromTo = (from: string, to: string): Date[] => {
 };
 
 export const getMealDate = (date: Date): string => format(date, 'yyyy-MM-dd');
+
+export const getDiffDays = (date1: Date, date2: Date): number => {
+  const msPerDay = 1000 * 60 * 60 * 24;
+  return Math.abs(
+    Math.floor(
+      (startOfDay(date1).getTime() - startOfDay(date2).getTime()) / msPerDay,
+    ),
+  );
+};

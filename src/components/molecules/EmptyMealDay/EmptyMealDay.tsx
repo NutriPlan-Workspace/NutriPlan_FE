@@ -7,27 +7,35 @@ import {
 import { HiOutlineArrowPath } from 'react-icons/hi2';
 
 import { Button } from '@/atoms/Button';
+import { cn } from '@/helpers/helpers';
 import { getDayOfWeek } from '@/utils/dateUtils';
 
 interface EmptyMealDayProps {
   mealDate: string;
   onCreateBlank: (mealDate: string) => void;
   onCopyPreviousDay: (mealDate: string) => void;
+  isWeekly?: boolean;
 }
 
 const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
   mealDate,
   onCreateBlank,
   onCopyPreviousDay,
+  isWeekly = false,
 }) => (
-  <div className='w-full rounded-sm bg-white px-4 pt-[15px] pb-[60px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]'>
+  <div
+    className={cn(
+      'w-full rounded-sm bg-white px-4 pt-[15px] pb-[60px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]',
+      { 'pb-[20px]': isWeekly },
+    )}
+  >
     <p className='mt-2 text-center'>
       This meal plan will be automatically generated and emailed to you the
       prior Friday
     </p>
     <p className='my-3 text-center font-bold'>- or -</p>
     <p className='text-center'>Want to build it right now?</p>
-    <div className='mt-8 flex justify-center'>
+    <div className={cn('mt-8 flex justify-center', { 'mt-2': isWeekly })}>
       <Button
         size='large'
         variant='solid'

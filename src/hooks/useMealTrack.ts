@@ -1,5 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Slider from 'react-slick';
 import { toast } from 'react-toastify';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
@@ -12,32 +19,72 @@ import {
   mealPlanSelector,
   updateViewingMealPlanByIndex,
 } from '@/redux/slices/mealPlan';
-import { getMealDate, isSameDay } from '@/utils/dateUtils';
+import {
+  getDiffDays,
+  getMealDate,
+  isSameDay,
+  shiftDate,
+} from '@/utils/dateUtils';
 
-export const useMealTrack = (selectedDate: Date | undefined) => {
-  const isMounted = useRef(false);
+export const useMealTrack = (
+  selectedDate: Date,
+  sliderRef: React.RefObject<Slider | null>,
+) => {
   const dispatch = useDispatch();
   const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
   const cacheMealPlans = useSelector(mealPlanSelector).cacheMealPlans;
   const [isLoadingList, setIsLoadingList] = useState<boolean[]>(
     Array(NUM_OF_SLIDES).fill(true),
   );
+  const [currentSlide, setCurrentSlide] = useState(3);
+  const isTooFarJumpRef = useRef(false);
   const [getMealPlanSingleDay] = useLazyGetMealPlanSingleDayQuery();
+  const prevSelectedDateForJumpRef = useRef<Date | null>(null);
+  const prevDateRef = useRef<Date | null>(null);
 
-  // Define day range for the selected date
   const { from, to } = useMemo(() => {
     if (!selectedDate) return {};
+    if (!prevDateRef.current) {
+      prevDateRef.current = selectedDate;
+      const from = new Date(selectedDate);
+      from.setDate(from.getDate() - ADJUST_DISTANCE);
+      const to = new Date(selectedDate);
+      to.setDate(to.getDate() + ADJUST_DISTANCE);
+      return {
+        from: getMealDate(from),
+        to: getMealDate(to),
+      };
+    }
+    const prevDate = prevDateRef.current;
+    const nextDate = shiftDate(prevDate, 1);
+    const prevDateShifted = shiftDate(prevDate, -1);
+    if (isSameDay(selectedDate, nextDate)) {
+      const nextIndex = (currentSlide + 1) % NUM_OF_SLIDES;
+      setCurrentSlide(nextIndex);
+      sliderRef.current?.slickNext();
+      prevDateRef.current = selectedDate;
+      return {};
+    }
+    if (isSameDay(selectedDate, prevDateShifted)) {
+      const prevIndex = (currentSlide - 1 + NUM_OF_SLIDES) % NUM_OF_SLIDES;
+      setCurrentSlide(prevIndex);
+      sliderRef.current?.slickPrev();
+      prevDateRef.current = selectedDate;
+      return {};
+    }
+    prevDateRef.current = selectedDate;
     const from = new Date(selectedDate);
     from.setDate(from.getDate() - ADJUST_DISTANCE);
     const to = new Date(selectedDate);
     to.setDate(to.getDate() + ADJUST_DISTANCE);
+    sliderRef.current?.slickGoTo(3);
+    setCurrentSlide(3);
     return {
       from: getMealDate(from),
       to: getMealDate(to),
     };
   }, [selectedDate]);
 
-  // Fetch meal plan data for the selected date range
   const dayRangeArgs = from && to ? { from, to } : skipToken;
 
   const {
@@ -51,10 +98,28 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
     }
   }, [from, to, refetchViewingMealPlans]);
 
-  // Update loading state when fetching meal plans
   useEffect(() => {
     setIsLoadingList(Array(NUM_OF_SLIDES).fill(isFetchingViewingMealPlans));
   }, [isFetchingViewingMealPlans]);
+
+  useEffect(() => {
+    if (!selectedDate) return;
+
+    if (!prevSelectedDateForJumpRef.current) {
+      prevSelectedDateForJumpRef.current = selectedDate;
+      isTooFarJumpRef.current = false;
+      return;
+    }
+
+    const diffDays = getDiffDays(
+      selectedDate,
+      prevSelectedDateForJumpRef.current,
+    );
+
+    prevSelectedDateForJumpRef.current = selectedDate;
+    const tooFar = diffDays >= 2;
+    isTooFarJumpRef.current = tooFar;
+  }, [selectedDate]);
 
   const updateLastElement = useCallback(
     (current: number, next: number, isForward: boolean) => {
@@ -65,7 +130,6 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
       const adjustingIndex = isForward
         ? mod(next + ADJUST_DISTANCE, NUM_OF_SLIDES)
         : mod(next - ADJUST_DISTANCE, NUM_OF_SLIDES);
-
       const adjustingDay = new Date(
         viewingMealPlans[preAdjustingIndex].mealDate,
       );
@@ -149,13 +213,14 @@ export const useMealTrack = (selectedDate: Date | undefined) => {
 
   const handleBeforeChange = useCallback(
     async (current: number, next: number) => {
-      // if (!isMounted.current) return;
+      if (isTooFarJumpRef.current) return;
+
       const isForward = (current + 1) % NUM_OF_SLIDES === next;
 
       updateLastElement(current, next, isForward);
       await updateNextToElement(next, isForward);
     },
-    [isMounted, updateLastElement, updateNextToElement],
+    [updateLastElement, updateNextToElement],
   );
 
   // TODO: Implement handleCreateBlank and handleCopyPreviousDay

@@ -1,21 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { skipToken } from '@reduxjs/toolkit/query/react';
 
+import { useDate } from '@/contexts/DateContext';
+import { EmptyMealDay } from '@/molecules/EmptyMealDay';
 import MealPlanHeader from '@/molecules/MealPlanHeader/MealPlanHeader';
 import { MealBox } from '@/organisms/MealBox';
-import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
-import type { MealPlanDay } from '@/types/mealPlan';
 import {
-  getTotalCalories,
-  getTotalNutrition,
-} from '@/utils/calculateNutrition';
+  useGetMealPlanDayRangeQuery,
+  useUpdateMealPlanMutation,
+} from '@/redux/query/apis/mealPlan/mealPlanApi';
+import { mealPlanSelector } from '@/redux/slices/mealPlan';
+import type { MealPlanDay } from '@/types/mealPlan';
+import { getMealDate } from '@/utils/dateUtils';
 
-interface MealPlanWeekProps {
-  data: MealPlanDay[];
-}
-
-const MealPlanWeek: React.FC<MealPlanWeekProps> = ({ data }) => {
-  const [mealPlans, setMealPlans] = useState<MealPlanDay[]>(data);
+const MealPlanWeek: React.FC = () => {
+  const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
   const [updateMealPlan] = useUpdateMealPlanMutation();
+  const { rangeDate, selectedDate } = useDate();
+  const mealRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  const { from, to } =
+    rangeDate?.from && rangeDate?.to
+      ? { from: getMealDate(rangeDate.from), to: getMealDate(rangeDate.to) }
+      : {};
+
+  const { isFetching, refetch } = useGetMealPlanDayRangeQuery(
+    from && to ? { from, to } : skipToken,
+  );
+
+  useEffect(() => {
+    if (from && to) {
+      refetch();
+    }
+  }, [from, to, refetch]);
+
+  useEffect(() => {
+    const today = getMealDate(new Date());
+    const selectedMealDate = selectedDate ? getMealDate(selectedDate) : today;
+    const ref = mealRefs.current[selectedMealDate];
+    if (ref) {
+      ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedDate, viewingMealPlans]);
+
   const handleUpdateMealItem = async (
     mealDate: Date,
     mealType: keyof MealPlanDay['mealItems'],
@@ -23,7 +51,7 @@ const MealPlanWeek: React.FC<MealPlanWeekProps> = ({ data }) => {
     newAmount: number,
     newUnit: number,
   ) => {
-    const updatedMealPlans = mealPlans.map((mealPlan) => {
+    const updatedMealPlans = viewingMealPlans.map((mealPlan) => {
       if (mealPlan.mealDate.toString() === mealDate.toString()) {
         return {
           ...mealPlan,
@@ -40,8 +68,6 @@ const MealPlanWeek: React.FC<MealPlanWeekProps> = ({ data }) => {
       return mealPlan;
     });
 
-    setMealPlans(updatedMealPlans);
-
     const updatedPlan = updatedMealPlans.find(
       (plan) => plan.mealDate.toString() === mealDate.toString(),
     );
@@ -51,28 +77,46 @@ const MealPlanWeek: React.FC<MealPlanWeekProps> = ({ data }) => {
     }
   };
 
+  // TODO: implement when task create blank in progress
+  const onCreateBlank = () => {};
+
+  // TODO: implement when task copy previous in progress
+  const onCopyPreviousDay = () => {};
+
   return (
-    <div className='flex flex-wrap gap-4 space-y-5'>
-      {mealPlans.map((mealPlan) => (
-        <div key={mealPlan.mealDate.toString()} className='w-full'>
-          <MealPlanHeader mealDate={mealPlan.mealDate} />
-          <div className='flex flex-wrap gap-4'>
-            {(['breakfast', 'lunch', 'dinner'] as const).map((mealType) => (
-              <div key={mealType} className='w-[400px]'>
-                <MealBox
-                  title={mealType.charAt(0).toUpperCase() + mealType.slice(1)}
-                  calories={getTotalCalories(mealPlan.mealItems[mealType])}
-                  nutritionData={getTotalNutrition(
-                    mealPlan.mealItems[mealType],
-                  )}
-                  mealItems={mealPlan.mealItems[mealType]}
-                  onAmountChange={handleUpdateMealItem}
-                  mealDate={mealPlan.mealDate}
-                  mealType={mealType}
-                />
-              </div>
-            ))}
-          </div>
+    <div className='flex flex-wrap gap-4 space-y-5 border-t-4 border-t-black/10'>
+      {viewingMealPlans.map(({ mealDate, mealPlanDay }) => (
+        <div
+          key={mealDate}
+          ref={(el) => {
+            mealRefs.current[mealDate] = el;
+          }}
+          className='mx-[15px] mt-4 w-full border-b-3 border-b-black/10 pb-4'
+        >
+          <MealPlanHeader mealDate={mealDate} />
+
+          {mealPlanDay ? (
+            <div className='flex flex-wrap gap-4'>
+              {(['breakfast', 'lunch', 'dinner'] as const).map((mealType) => (
+                <div key={mealType} className='w-[390px]'>
+                  <MealBox
+                    mealItems={mealPlanDay.mealItems[mealType]}
+                    onAmountChange={handleUpdateMealItem}
+                    mealDate={mealDate}
+                    mealType={mealType}
+                    isLoading={isFetching}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyMealDay
+              mealDate={getMealDate(new Date(mealDate))}
+              isWeekly={true}
+              onCreateBlank={onCreateBlank}
+              onCopyPreviousDay={onCopyPreviousDay}
+            />
+          )}
         </div>
       ))}
     </div>

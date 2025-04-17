@@ -12,17 +12,14 @@ import { getSliderSettings } from '@/utils/sliderSettings';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-interface MealTrackProps {
-  selectedDate: Date;
-}
-
-const MealTrack: React.FC<MealTrackProps> = ({ selectedDate }) => {
-  const { selectedPlan } = useDate();
-  const sliderRef = useRef(null);
+const MealTrack: React.FC = () => {
+  const { selectedPlan, selectedDate } = useDate();
+  const parentRef = useRef<HTMLDivElement | null>(null);
+  const sliderRef = useRef<Slider | null>(null);
   const [parentWidth, setParentWidth] = useState(0);
 
   useEffect(() => {
-    if (!sliderRef.current) return;
+    if (!parentRef.current) return;
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
@@ -30,7 +27,7 @@ const MealTrack: React.FC<MealTrackProps> = ({ selectedDate }) => {
       }
     });
 
-    resizeObserver.observe(sliderRef.current);
+    resizeObserver.observe(parentRef.current);
 
     return () => resizeObserver.disconnect();
   }, []);
@@ -46,7 +43,7 @@ const MealTrack: React.FC<MealTrackProps> = ({ selectedDate }) => {
     handleBeforeChange,
     handleCreateBlank,
     handleCopyPreviousDay,
-  } = useMealTrack(selectedDate);
+  } = useMealTrack(selectedDate, sliderRef);
   useMealTrackDragDrop();
 
   const settings = getSliderSettings(
@@ -58,20 +55,22 @@ const MealTrack: React.FC<MealTrackProps> = ({ selectedDate }) => {
   );
 
   return (
-    <div ref={sliderRef} className='h-full w-full'>
-      <Slider {...settings} className='h-full w-full'>
-        {viewingMealPlans.map(({ mealDate, mealPlanDay }, index) => (
-          <DayBox
-            key={mealDate}
-            mealPlanDay={mealPlanDay}
-            mealDate={new Date(mealDate)}
-            isLoading={isLoadingList[index]}
-            isSingleDay={isSingleDay}
-            onCreateBlank={handleCreateBlank}
-            onCopyPreviousDay={handleCopyPreviousDay}
-          />
-        ))}
-      </Slider>
+    <div ref={parentRef} className='w-full'>
+      <div className='w-full overflow-x-hidden'>
+        <Slider ref={sliderRef} {...settings} className='w-full'>
+          {viewingMealPlans.map(({ mealDate, mealPlanDay }, index) => (
+            <DayBox
+              key={mealDate}
+              mealPlanDay={mealPlanDay}
+              mealDate={new Date(mealDate)}
+              isLoading={isLoadingList[index]}
+              isSingleDay={isSingleDay}
+              onCreateBlank={handleCreateBlank}
+              onCopyPreviousDay={handleCopyPreviousDay}
+            />
+          ))}
+        </Slider>
+      </div>
     </div>
   );
 };

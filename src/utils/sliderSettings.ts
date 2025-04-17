@@ -31,7 +31,7 @@ export const getSliderSettings = (
     touchMove: false,
     centerMode: true,
     centerPadding: '30px',
-    adaptiveHeight: true,
+    adaptiveHeight: false,
     beforeChange: handleBeforeChange,
   };
 };

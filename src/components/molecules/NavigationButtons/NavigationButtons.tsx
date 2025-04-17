@@ -84,7 +84,10 @@ const NavigationButtons: React.FC = () => {
 
   const handleGetToday = (): void => {
     if (selectedPlan === PLAN_TYPES.WEEKLY_VIEW) {
-      // TODO: handle other component external relative with
+      setRangeDate(getWeekRange(newDate, 0));
+      setTimeout(() => {
+        setSelectedDate(newDate);
+      }, 1000);
       return;
     }
     setSelectedDate(newDate);

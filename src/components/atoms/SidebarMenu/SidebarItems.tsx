@@ -8,9 +8,6 @@ import {
   FaSearch,
 } from 'react-icons/fa';
 import { FaRegStar } from 'react-icons/fa6';
-import { FaRegPaperPlane } from 'react-icons/fa6';
-import { FaRegCircleQuestion } from 'react-icons/fa6';
-import { FiSliders } from 'react-icons/fi';
 import { GiCoffeeCup } from 'react-icons/gi';
 import { IoPieChartOutline } from 'react-icons/io5';
 import { LuChartNoAxesColumn } from 'react-icons/lu';
@@ -74,10 +71,6 @@ export const fullMenuItems: MenuItem[] = [
         key: PATH.FOOD_EXCLUSIONS,
         label: <Link to={PATH.FOOD_EXCLUSIONS}>Food Exclusions</Link>,
       },
-      {
-        key: PATH.RATED_FOODS,
-        label: <Link to={PATH.RATED_FOODS}>Rated Foods</Link>,
-      },
     ],
   },
   {
@@ -104,46 +97,12 @@ export const fullMenuItems: MenuItem[] = [
     key: PATH.WEIGHT_GOAL,
     label: <Link to={PATH.WEIGHT_GOAL}>Weight and Goal</Link>,
     icon: <FaRegCompass className={iconClass} />,
-  },
-  {
-    key: PATH.GENERATOR_SETTINGS,
-    label: <Link to={PATH.GENERATOR_SETTINGS}>Generator Settings</Link>,
-    icon: <FiSliders />,
     className: 'mb-4',
   },
   {
     key: PATH.ACCOUNT,
-    label: 'Account',
+    label: <Link to={PATH.CREDENTIALS}>Account</Link>,
     icon: <FaRegUser className={iconClass} />,
-    children: [
-      {
-        key: PATH.CREDENTIALS,
-        label: <Link to={PATH.CREDENTIALS}>Credentials</Link>,
-      },
-      {
-        key: PATH.FAMILY_MEMBERS,
-        label: <Link to={PATH.FAMILY_MEMBERS}>Family Members</Link>,
-      },
-      {
-        key: PATH.NOTIFICATIONS,
-        label: <Link to={PATH.NOTIFICATIONS}>Notifications</Link>,
-      },
-      {
-        key: PATH.SUBSCRIPTION,
-        label: <Link to={PATH.SUBSCRIPTION}>Subscription</Link>,
-      },
-    ],
-  },
-  {
-    key: PATH.INVITE_FRIENDS,
-    label: <Link to={PATH.INVITE_FRIENDS}>Invite Friends</Link>,
-    icon: <FaRegPaperPlane className={iconClass} />,
-  },
-  {
-    key: PATH.HELP,
-    label: <Link to={PATH.HELP}>Help</Link>,
-    icon: <FaRegCircleQuestion className={iconClass} />,
-    className: 'mb-4',
   },
   {
     key: PATH.LOGOUT,

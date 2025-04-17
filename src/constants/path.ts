@@ -41,15 +41,8 @@ export const PATH = {
 
   PHYSICAL_STATS: '/physical-stats',
   WEIGHT_GOAL: '/weight-goal',
-  GENERATOR_SETTINGS: '/generator-settings',
 
-  ACCOUNT: '/account',
   CREDENTIALS: '/profile',
-  FAMILY_MEMBERS: '/account/family-members',
-  NOTIFICATIONS: '/account/notifications',
-  SUBSCRIPTION: '/account/subscription',
 
-  INVITE_FRIENDS: '/invite-friends',
-  HELP: '/help',
   LOGOUT: '/logout',
 } as const;

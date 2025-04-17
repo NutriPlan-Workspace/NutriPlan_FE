@@ -1,9 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { IoClose, IoSearch } from 'react-icons/io5';
 import { Input as AntdInput, Tabs } from 'antd';
 
 import { Button } from '@/atoms/Button';
 import { TabActionMenu } from '@/atoms/TabActionMenu';
+import { PLAN_TYPES } from '@/constants/plans';
+import { useDate } from '@/contexts/DateContext';
+import { cn } from '@/helpers/helpers';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { useSearchFoodQuery } from '@/redux/query/apis/food/foodApis';
 import { debounceValue } from '@/utils/debounce';
@@ -24,6 +27,12 @@ const SideAddFood: React.FC<SideAddFoodProps> = ({ setFilterFood }) => {
   const [searchText, setSearchText] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const dropDownRef = useRef<HTMLDivElement | null>(null);
+  const { selectedPlan } = useDate();
+
+  const isWeekly = useMemo(
+    () => selectedPlan === PLAN_TYPES.WEEKLY_VIEW,
+    [selectedPlan],
+  );
 
   useEffect(() => {
     const handler = debounceValue(searchText, 500, setDebouncedSearch);
@@ -81,7 +90,12 @@ const SideAddFood: React.FC<SideAddFoodProps> = ({ setFilterFood }) => {
   };
 
   return (
-    <div className='scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent mt-2 ml-2 flex h-full max-h-[calc(100vh-130px)] w-[400px] max-w-[450px] min-w-[400px] flex-col gap-2 overflow-y-scroll rounded-sm'>
+    <div
+      className={cn(
+        'scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent mt-2 ml-2 flex h-full max-h-[calc(100vh-130px)] w-[400px] max-w-[450px] min-w-[400px] flex-col gap-2 overflow-y-scroll rounded-sm',
+        { 'sticky top-10 left-0': isWeekly },
+      )}
+    >
       <div className='flex w-full items-center justify-between gap-2 p-1'>
         <AntdInput
           placeholder='Search Foods...'

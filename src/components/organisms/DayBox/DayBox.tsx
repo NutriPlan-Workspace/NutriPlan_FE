@@ -35,6 +35,7 @@ const DayBox: React.FC<DayBoxProps> = ({
         : [],
     [mealItems],
   );
+
   const isToday = isSameDayAsToday(mealDate);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -45,16 +46,19 @@ const DayBox: React.FC<DayBoxProps> = ({
 
   return (
     <div
-      className={`border-l-borderGray border-t-[4px] border-l-[1px] p-5 ${
-        isToday ? 'border-t-primary' : 'border-t-borderGray'
-      }`}
+      className={cn(
+        'border-l-borderGray border-t-borderGray mb-3 border-t-[4px] border-l-[1px] p-5',
+        {
+          'border-t-primary': isToday,
+        },
+      )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {isSingleDay ? (
         <div
           className={cn('flex w-full justify-end', {
-            'justify-center': !allDayMealItems,
+            'justify-center': !mealItems || !allDayMealItems.length,
           })}
         >
           <div className='max-w-[450px] flex-1 px-4'>
@@ -83,14 +87,12 @@ const DayBox: React.FC<DayBoxProps> = ({
         </div>
       ) : (
         <>
-          {/* Header */}
           <DayBoxHeader
             mealDate={mealDate}
             isToday={isToday}
             isHovered={isHovered}
           />
 
-          {/* Motion for smooth fade-in effect */}
           <motion.div
             key={isLoading ? 'loading' : 'content'}
             initial={{ opacity: 0 }}
@@ -98,13 +100,11 @@ const DayBox: React.FC<DayBoxProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
           >
-            {/* Calories Summary */}
             <DayBoxSummary
               allDayMealItems={allDayMealItems}
               isLoading={isLoading}
             />
 
-            {/* Meal Boxes */}
             <DayBoxContent
               mealItems={mealItems}
               mealDate={mealDate}

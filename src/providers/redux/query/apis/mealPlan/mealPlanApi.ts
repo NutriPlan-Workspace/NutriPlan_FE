@@ -3,16 +3,16 @@ import {
   addCacheMealPlans,
   setViewingMealPlans,
 } from '@/redux/slices/mealPlan';
+import type { ApiResponse } from '@/types/apiResponse';
 import type {
   GetMealPlanDayRangeQueryArgs,
   GetMealPlanSingleDayQueryArgs,
-  MealPlanDayRangeResponse,
+  MealPlanDay,
   MealPlanSingleDayResponse,
   PostMealPlanQueryArgs,
   PostMealPlanResponse,
   UpdateMealPlanQueryArgs,
-  UpdateMealPlanResponse,
-} from '@/types/mealPlan';
+  UpdateMealPlanResponse } from '@/types/mealPlan';
 import { getDayRangeFromTo, getMealDate, isSameDay } from '@/utils/dateUtils';
 
 export const mealPlanApi = baseApiWithAuth.injectEndpoints({
@@ -43,7 +43,7 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
     }),
 
     getMealPlanDayRange: builder.query<
-      MealPlanDayRangeResponse,
+      ApiResponse<MealPlanDay[]>,
       GetMealPlanDayRangeQueryArgs
     >({
       query: ({ from, to }) => {
