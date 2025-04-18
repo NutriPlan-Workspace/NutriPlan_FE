@@ -127,3 +127,14 @@ export function getMealPlanDayDatabaseDTOByMealPlanDay(
     },
   };
 }
+
+export function generateEmptyMealPlan(mealDate: string) {
+  return {
+    mealDate: mealDate,
+    mealItems: {
+      breakfast: [],
+      lunch: [],
+      dinner: [],
+    },
+  };
+}

@@ -15,8 +15,8 @@ interface DayBoxProps {
   mealDate: Date;
   isLoading: boolean;
   isSingleDay: boolean;
-  onCreateBlank: (mealDate: string) => void;
-  onCopyPreviousDay: (mealDate: string) => void;
+  onCreateBlank: (mealDate: string) => Promise<void>;
+  onCopyPreviousDay: (mealDate: string) => Promise<void>;
 }
 
 const DayBox: React.FC<DayBoxProps> = ({
@@ -66,6 +66,7 @@ const DayBox: React.FC<DayBoxProps> = ({
               mealDate={mealDate}
               isToday={isToday}
               isHovered={isHovered}
+              isLoading={isLoading}
             />
             <DayBoxContent
               mealItems={mealItems}
@@ -91,6 +92,7 @@ const DayBox: React.FC<DayBoxProps> = ({
             mealDate={mealDate}
             isToday={isToday}
             isHovered={isHovered}
+            isLoading={isLoading}
           />
 
           <motion.div

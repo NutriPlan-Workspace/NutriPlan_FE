@@ -4,6 +4,7 @@ import Slider from 'react-slick';
 import { SlideArrow } from '@/atoms/SlideArrow';
 import { PLAN_TYPES } from '@/constants/plans';
 import { useDate } from '@/contexts/DateContext';
+import { useCreateBlankMealPlan } from '@/hooks/useCreateBlankMealPlan';
 import { useMealTrack } from '@/hooks/useMealTrack';
 import { useMealTrackDragDrop } from '@/hooks/useMealTrackDragDrop';
 import { DayBox } from '@/organisms/DayBox';
@@ -41,9 +42,10 @@ const MealTrack: React.FC = () => {
     isLoadingList,
     viewingMealPlans,
     handleBeforeChange,
-    handleCreateBlank,
     handleCopyPreviousDay,
   } = useMealTrack(selectedDate, sliderRef);
+
+  const { handleCreateBlank } = useCreateBlankMealPlan();
   useMealTrackDragDrop();
 
   const settings = getSliderSettings(

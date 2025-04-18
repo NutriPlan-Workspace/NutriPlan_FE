@@ -11,7 +11,6 @@ export interface PropertySummaryFields {
   prepTime: number;
   cookTime: number;
 }
-
 export interface MealPlanFood {
   _id: string;
   foodId: {
@@ -68,8 +67,29 @@ export interface MealPlanDatabaseDTO {
   };
 }
 
+export interface MealPlanBody {
+  mealDate: string;
+  mealItems: {
+    breakfast: {
+      foodId: string;
+      amount: number;
+      unit: number;
+    }[];
+    lunch: {
+      foodId: string;
+      amount: number;
+      unit: number;
+    }[];
+    dinner: {
+      foodId: string;
+      amount: number;
+      unit: number;
+    }[];
+  };
+}
+
 export interface PostMealPlanQueryArgs {
-  mealPlan: MealPlanDatabaseDTO;
+  mealPlan: MealPlanBody;
 }
 export interface GetMealPlanSingleDayQueryArgs {
   date: string;
@@ -86,10 +106,9 @@ export interface UpdateMealPlanQueryArgs {
 
 export interface PostMealPlanResponse {
   success: boolean;
-  total: number;
   data: MealPlanDay;
   message: string;
-  additionalData: object;
+  code: number;
 }
 export interface MealPlanDayRangeResponse {
   success: boolean;

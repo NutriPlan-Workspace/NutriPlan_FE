@@ -12,7 +12,8 @@ import type {
   PostMealPlanQueryArgs,
   PostMealPlanResponse,
   UpdateMealPlanQueryArgs,
-  UpdateMealPlanResponse } from '@/types/mealPlan';
+  UpdateMealPlanResponse,
+} from '@/types/mealPlan';
 import { getDayRangeFromTo, getMealDate, isSameDay } from '@/utils/dateUtils';
 
 export const mealPlanApi = baseApiWithAuth.injectEndpoints({
@@ -90,7 +91,7 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
       PostMealPlanQueryArgs
     >({
       query: ({ mealPlan }) => ({
-        url: '/planner/create',
+        url: '/planner',
         method: 'POST',
         body: mealPlan,
       }),

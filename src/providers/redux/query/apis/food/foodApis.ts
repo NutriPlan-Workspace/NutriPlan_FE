@@ -15,7 +15,7 @@ export const foodsApi = baseApi.injectEndpoints({
     }),
     getFoodById: builder.query<DetailedFoodResponse, string>({
       query: (idFood) => ({
-        url: `/get-food?idFood=${idFood}`,
+        url: `/foods/${idFood}`,
       }),
     }),
     searchFood: builder.query<

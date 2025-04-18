@@ -28,7 +28,7 @@ import {
 
 export const useMealTrack = (
   selectedDate: Date,
-  sliderRef: React.RefObject<Slider | null>,
+  sliderRef?: React.RefObject<Slider | null>,
 ) => {
   const dispatch = useDispatch();
   const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
@@ -61,14 +61,14 @@ export const useMealTrack = (
     if (isSameDay(selectedDate, nextDate)) {
       const nextIndex = (currentSlide + 1) % NUM_OF_SLIDES;
       setCurrentSlide(nextIndex);
-      sliderRef.current?.slickNext();
+      sliderRef?.current?.slickNext();
       prevDateRef.current = selectedDate;
       return {};
     }
     if (isSameDay(selectedDate, prevDateShifted)) {
       const prevIndex = (currentSlide - 1 + NUM_OF_SLIDES) % NUM_OF_SLIDES;
       setCurrentSlide(prevIndex);
-      sliderRef.current?.slickPrev();
+      sliderRef?.current?.slickPrev();
       prevDateRef.current = selectedDate;
       return {};
     }
@@ -77,7 +77,7 @@ export const useMealTrack = (
     from.setDate(from.getDate() - ADJUST_DISTANCE);
     const to = new Date(selectedDate);
     to.setDate(to.getDate() + ADJUST_DISTANCE);
-    sliderRef.current?.slickGoTo(3);
+    sliderRef?.current?.slickGoTo(3);
     setCurrentSlide(3);
     return {
       from: getMealDate(from),
@@ -223,11 +223,6 @@ export const useMealTrack = (
     [updateLastElement, updateNextToElement],
   );
 
-  // TODO: Implement handleCreateBlank and handleCopyPreviousDay
-  const handleCreateBlank = useCallback(async (mealDate: string) => {
-    console.log('Create Blank', mealDate);
-  }, []);
-
   const handleCopyPreviousDay = useCallback(async (mealDate: string) => {
     console.log('Copy Previous Day', mealDate);
   }, []);
@@ -236,7 +231,6 @@ export const useMealTrack = (
     isLoadingList,
     viewingMealPlans,
     handleBeforeChange,
-    handleCreateBlank,
     handleCopyPreviousDay,
   };
 };

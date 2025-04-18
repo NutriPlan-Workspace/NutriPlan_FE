@@ -9,8 +9,8 @@ interface DayBoxContentProps {
   mealItems: MealItems | undefined;
   mealDate: Date;
   isLoading: boolean;
-  onCreateBlank: (mealDate: string) => void;
-  onCopyPreviousDay: (mealDate: string) => void;
+  onCreateBlank: (mealDate: string) => Promise<void>;
+  onCopyPreviousDay: (mealDate: string) => Promise<void>;
 }
 
 const DayBoxContent: React.FC<DayBoxContentProps> = ({

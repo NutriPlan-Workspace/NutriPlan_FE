@@ -8,6 +8,7 @@ import {
 } from 'react-icons/hi2';
 import { MenuProps, Typography } from 'antd';
 
+import { DayBoxHeaderSkeleton } from '@/atoms/DayBoxHeaderSkeleton';
 import { PairButton } from '@/atoms/PairButton';
 import { cn } from '@/helpers/helpers';
 import { getDateOfMonth, getDayOfWeek } from '@/utils/dateUtils';
@@ -16,12 +17,14 @@ interface DayBoxHeaderProps {
   mealDate: Date;
   isToday: boolean;
   isHovered: boolean;
+  isLoading: boolean;
 }
 
 const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
   mealDate,
   isToday,
   isHovered,
+  isLoading,
 }) => {
   // TODO: Implement onClick for each menu item
   const menuItems: MenuProps['items'] = [
@@ -54,7 +57,7 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
       key: '4',
     },
   ];
-
+  if (isLoading) return <DayBoxHeaderSkeleton />;
   return (
     <div className='mb-[10px] px-[15px]'>
       <Typography

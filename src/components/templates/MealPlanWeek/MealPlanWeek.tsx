@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { useDate } from '@/contexts/DateContext';
+import { useCreateBlankMealPlan } from '@/hooks/useCreateBlankMealPlan';
 import { EmptyMealDay } from '@/molecules/EmptyMealDay';
 import MealPlanHeader from '@/molecules/MealPlanHeader/MealPlanHeader';
 import { MealBox } from '@/organisms/MealBox';
@@ -18,6 +19,7 @@ const MealPlanWeek: React.FC = () => {
   const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
   const [updateMealPlan] = useUpdateMealPlanMutation();
   const { rangeDate, selectedDate } = useDate();
+  const { handleCreateBlank } = useCreateBlankMealPlan();
   const mealRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const { from, to } =
@@ -77,9 +79,6 @@ const MealPlanWeek: React.FC = () => {
     }
   };
 
-  // TODO: implement when task create blank in progress
-  const onCreateBlank = () => {};
-
   // TODO: implement when task copy previous in progress
   const onCopyPreviousDay = () => {};
 
@@ -113,7 +112,7 @@ const MealPlanWeek: React.FC = () => {
             <EmptyMealDay
               mealDate={getMealDate(new Date(mealDate))}
               isWeekly={true}
-              onCreateBlank={onCreateBlank}
+              onCreateBlank={handleCreateBlank}
               onCopyPreviousDay={onCopyPreviousDay}
             />
           )}
