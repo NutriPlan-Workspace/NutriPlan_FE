@@ -23,6 +23,7 @@ export const ERROR_MESSAGES = {
   TITLE_REQUIRED: 'Title is required!',
   CALORIES_MAX: 'Calories must be at most 5000!',
   NUTRIENT_MIN: 'Value must be a non-negative number!',
+  REMOVE_FOOD_FAILED: 'Failed to remove food from collection!',
 };
 
 export const SUCCESS_MESSAGES = {

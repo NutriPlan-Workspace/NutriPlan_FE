@@ -27,6 +27,7 @@ export const PATH = {
   DISCOVER: '/discover',
   CUSTOM_RECIPES: '/custom-recipes',
   COLLECTIONS: '/collections',
+  COLLECTIOND_ID: '/collections/$id',
   SAVED_PLANS: '/saved-plans',
 
   DIET_NUTRITION: '/diet-nutrition',

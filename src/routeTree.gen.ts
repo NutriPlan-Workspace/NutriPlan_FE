@@ -20,8 +20,10 @@ import { Route as PhysicalStatsIndexImport } from './routes/physical-stats/index
 import { Route as NutritionTargetsIndexImport } from './routes/nutrition-targets/index'
 import { Route as MealPlanIndexImport } from './routes/meal-plan/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as CollectionsIndexImport } from './routes/collections/index'
 import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
+import { Route as CollectionsIdImport } from './routes/collections/$id'
 
 // Create/Update Routes
 
@@ -79,6 +81,12 @@ const LoginIndexRoute = LoginIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const CollectionsIndexRoute = CollectionsIndexImport.update({
+  id: '/collections/',
+  path: '/collections/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const BrowseFoodsIndexRoute = BrowseFoodsIndexImport.update({
   id: '/browse-foods/',
   path: '/browse-foods/',
@@ -88,6 +96,12 @@ const BrowseFoodsIndexRoute = BrowseFoodsIndexImport.update({
 const AdminIndexRoute = AdminIndexImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CollectionsIdRoute = CollectionsIdImport.update({
+  id: '/collections/$id',
+  path: '/collections/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/collections/$id': {
+      id: '/collections/$id'
+      path: '/collections/$id'
+      fullPath: '/collections/$id'
+      preLoaderRoute: typeof CollectionsIdImport
+      parentRoute: typeof rootRoute
+    }
     '/admin/': {
       id: '/admin/'
       path: '/admin'
@@ -114,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/browse-foods'
       fullPath: '/browse-foods'
       preLoaderRoute: typeof BrowseFoodsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/collections/': {
+      id: '/collections/'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof CollectionsIndexImport
       parentRoute: typeof rootRoute
     }
     '/login/': {
@@ -179,8 +207,10 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/collections/$id': typeof CollectionsIdRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
+  '/collections': typeof CollectionsIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
@@ -193,8 +223,10 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/collections/$id': typeof CollectionsIdRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
+  '/collections': typeof CollectionsIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
@@ -208,8 +240,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/collections/$id': typeof CollectionsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/browse-foods/': typeof BrowseFoodsIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
   '/login/': typeof LoginIndexRoute
   '/meal-plan/': typeof MealPlanIndexRoute
   '/nutrition-targets/': typeof NutritionTargetsIndexRoute
@@ -224,8 +258,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/collections/$id'
     | '/admin'
     | '/browse-foods'
+    | '/collections'
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
@@ -237,8 +273,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/collections/$id'
     | '/admin'
     | '/browse-foods'
+    | '/collections'
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
@@ -250,8 +288,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/collections/$id'
     | '/admin/'
     | '/browse-foods/'
+    | '/collections/'
     | '/login/'
     | '/meal-plan/'
     | '/nutrition-targets/'
@@ -265,8 +305,10 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CollectionsIdRoute: typeof CollectionsIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
   BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
+  CollectionsIndexRoute: typeof CollectionsIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   MealPlanIndexRoute: typeof MealPlanIndexRoute
   NutritionTargetsIndexRoute: typeof NutritionTargetsIndexRoute
@@ -279,8 +321,10 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CollectionsIdRoute: CollectionsIdRoute,
   AdminIndexRoute: AdminIndexRoute,
   BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
+  CollectionsIndexRoute: CollectionsIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   MealPlanIndexRoute: MealPlanIndexRoute,
   NutritionTargetsIndexRoute: NutritionTargetsIndexRoute,
@@ -302,8 +346,10 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/collections/$id",
         "/admin/",
         "/browse-foods/",
+        "/collections/",
         "/login/",
         "/meal-plan/",
         "/nutrition-targets/",
@@ -317,11 +363,17 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
+    "/collections/$id": {
+      "filePath": "collections/$id.tsx"
+    },
     "/admin/": {
       "filePath": "admin/index.tsx"
     },
     "/browse-foods/": {
       "filePath": "browse-foods/index.tsx"
+    },
+    "/collections/": {
+      "filePath": "collections/index.tsx"
     },
     "/login/": {
       "filePath": "login/index.tsx"
