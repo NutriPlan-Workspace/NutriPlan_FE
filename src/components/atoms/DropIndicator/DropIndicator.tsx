@@ -2,6 +2,8 @@ import React from 'react';
 
 import { cn } from '@/helpers/helpers';
 
+const PADDING_FOR_DROP_INDICATOR = 3; // px
+
 interface DropIndicatorProps {
   edge: 'top' | 'bottom' | 'right' | 'left';
   mealCardHeight: number;
@@ -20,7 +22,7 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({
 
   return (
     <div
-      style={{ height: mealCardHeight }}
+      style={{ height: mealCardHeight + PADDING_FOR_DROP_INDICATOR }}
       className={cn(
         'bg-[repeating-linear-gradient(45deg,_rgba(255,255,255,0.3)_0px,_rgba(255,255,255,0.3)_10px,_transparent_10px,_transparent_20px)]',
         'border-2 border-dashed border-[#FFC84E]',

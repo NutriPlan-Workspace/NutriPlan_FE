@@ -15,50 +15,50 @@ import { getMenuItems } from './MenuItemMealCard';
 const { Link } = Typography;
 
 interface MealCardProps {
+  index: number;
   mealDate: string;
   mealType: keyof MealPlanDay['mealItems'];
-  mealItem: MealPlanFood | Food;
-  isAddFood?: boolean;
-  onAmountChange?: (amount: number, unit: number, cardId: string) => void;
-  onRemoveFood?: (cardId: string) => void;
-  onDuplicateFood?: (cardId: string) => void;
+  mealItem: MealPlanFood;
+  onAmountChange: (amount: number, unit: number, cardId: string) => void;
+  onRemoveFood: (index: number) => void;
+  onDuplicateFood: (index: number) => void;
 }
 
 const isMealPlanFood = (item: MealPlanFood | Food): item is MealPlanFood =>
   (item as MealPlanFood).foodId !== undefined;
 
 const MealCard: React.FC<MealCardProps> = ({
+  index,
   mealDate,
   mealType,
   mealItem,
   onAmountChange,
   onRemoveFood,
   onDuplicateFood,
-  isAddFood = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const handleEnterHover = () => setIsHovered(true);
   const handleLeaveHover = () => setIsHovered(false);
 
-  const { mealCardRef, isDragging, closestEdge, draggingCardHeight } =
+  const { dragState, mealCardRef, closestEdge, draggingCardHeight } =
     useMealCardDrag({
       mealDate,
       mealType,
       cardId: mealItem._id,
+      index,
     });
 
   const food = isMealPlanFood(mealItem) ? mealItem.foodId : mealItem;
 
   const menuItems = getMenuItems({
-    isAddFood,
     onRemoveFood,
     onDuplicateFood,
-    mealItem,
+    index,
   });
 
   return (
-    <div className={cn('relative', { 'opacity-40': isDragging })}>
-      {closestEdge === 'top' && (
+    <div className='relative'>
+      {dragState && closestEdge === 'top' && (
         <DropIndicator edge='top' mealCardHeight={draggingCardHeight} />
       )}
 
@@ -109,12 +109,10 @@ const MealCard: React.FC<MealCardProps> = ({
               />
             )}
           </div>
-          {!isAddFood && (
-            <PairButton isHovered={isHovered} menuItems={menuItems} />
-          )}
+          <PairButton isHovered={isHovered} menuItems={menuItems} />
         </div>
       </Popover>
-      {closestEdge === 'bottom' && (
+      {dragState && closestEdge === 'bottom' && (
         <DropIndicator edge='bottom' mealCardHeight={draggingCardHeight} />
       )}
     </div>

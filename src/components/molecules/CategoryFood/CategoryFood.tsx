@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button } from '@/atoms/Button';
 import { CategoryFoodSkeleton } from '@/molecules/CategoryFoodSkeleton';
-import { MealCard } from '@/organisms/MealCard';
+import { FoodCardSideAdd } from '@/organisms/FoodCardSideAdd';
 import type { Food } from '@/types/food';
 
 interface CategoryFoodProps {
@@ -35,8 +35,8 @@ const CategoryFood: React.FC<CategoryFoodProps> = ({
             No foods available.
           </p>
         ) : (
-          displayedFoods.map((food) => (
-            <MealCard key={food._id} mealItem={food} isAddFood={true} />
+          displayedFoods.map((food, index) => (
+            <FoodCardSideAdd key={index} food={food} />
           ))
         )}
       </div>

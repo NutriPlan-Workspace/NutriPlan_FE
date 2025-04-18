@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
 
-import useMealBoxDrop from '@/hooks/useMealBoxDrop';
 import { MealBoxHeader } from '@/molecules/MealBoxHeader';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
 import { MealBoxContent } from '@/organisms/MealBoxContent';
@@ -12,7 +10,7 @@ import {
 } from '@/utils/calculateNutrition';
 
 interface MealBoxProps {
-  mealItems: MealPlanFood[] | undefined;
+  mealItems: MealPlanFood[];
   isLoading?: boolean;
   mealDate: string;
   mealType: keyof MealPlanDay['mealItems'];
@@ -25,11 +23,6 @@ const MealBox: React.FC<MealBoxProps> = ({
   mealType,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { mealBoxRef, isDragEnter } = useMealBoxDrop({
-    mealDate,
-    mealType,
-    setIsHovered,
-  });
 
   return (
     <div
@@ -37,37 +30,26 @@ const MealBox: React.FC<MealBoxProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <motion.div
-        key={`${isLoading}-${mealItems?.length}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        {isLoading ? (
-          <MealBoxSkeleton />
-        ) : (
-          mealItems && (
-            <>
-              <MealBoxHeader
-                mealType={mealType}
-                calories={getTotalCalories(mealItems)}
-                nutritionData={getTotalNutrition(mealItems)}
-                mealItems={mealItems}
-                isHovered={isHovered}
-              />
-              <div ref={mealBoxRef} className='rounded-lg bg-white'>
-                <MealBoxContent
-                  mealDate={mealDate}
-                  mealType={mealType as keyof MealItems}
-                  mealItems={mealItems}
-                  isDragEnter={isDragEnter}
-                />
-              </div>
-            </>
-          )
-        )}
-      </motion.div>
+      {isLoading ? (
+        <MealBoxSkeleton />
+      ) : (
+        <div>
+          <MealBoxHeader
+            mealType={mealType}
+            calories={getTotalCalories(mealItems)}
+            nutritionData={getTotalNutrition(mealItems)}
+            mealItems={mealItems}
+            isHovered={isHovered}
+          />
+          <div className='rounded-lg bg-white'>
+            <MealBoxContent
+              mealDate={mealDate}
+              mealType={mealType as keyof MealItems}
+              mealItems={mealItems}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

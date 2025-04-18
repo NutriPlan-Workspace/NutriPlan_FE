@@ -33,6 +33,19 @@ export interface Food {
   __v: number;
 }
 
+export interface SideAddFoodResponse {
+  data: {
+    recipe: {
+      foods: Food[];
+      total: number;
+    };
+    customRecipe: {
+      foods: Food[];
+      total: number;
+    };
+  };
+}
+
 export interface DetailedFoodResponse {
   data: {
     mainFood: Food;

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
+import { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/dist/types/types';
 
 import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import {
@@ -8,23 +8,15 @@ import {
   updateCacheMealPlanByDate,
   updateViewingMealPlanByDates,
 } from '@/redux/slices/mealPlan';
-import { MealItems, MealPlanDay } from '@/types/mealPlan';
+import { MealItems, MealPlanDay, MealPlanFood } from '@/types/mealPlan';
 import { isSameDay } from '@/utils/dateUtils';
 import {
-  getMealPlanDayAfterAddNewMeal,
-  getMealPlanDayAfterMovingMealInSameDay,
+  getMealPlanDayAfterAddAndRemoveMealItem,
+  getMealPlanDayAfterAddNewMealItem,
   getMealPlanDayAfterRemoveMealItem,
   getMealPlanDayDatabaseDTOByMealPlanDay,
 } from '@/utils/mealPlan';
-
-interface MoveMealCardParams {
-  movedMealCardIndexInSourceMealBox: number;
-  sourceMealDate: string;
-  sourceMealType: keyof MealItems;
-  movedMealCardIndexInDestinationMealBox: number;
-  destinationMealDate: string;
-  destinationMealType: keyof MealItems;
-}
+import { showToastError } from '@/utils/toastUtils';
 
 export const useDragDropLogic = () => {
   const dispatch = useDispatch();
@@ -39,17 +31,42 @@ export const useDragDropLogic = () => {
     [userMealPlan],
   );
 
+  const findDestinationIndex = ({
+    isSameMealBox,
+    sourceMealCardIndex,
+    destinationMealCardIndex,
+    closestEdgeOfTarget,
+  }: {
+    isSameMealBox?: boolean | undefined;
+    sourceMealCardIndex?: number | undefined;
+    destinationMealCardIndex: number;
+    closestEdgeOfTarget: Edge | null;
+  }) => {
+    if (isSameMealBox === undefined || sourceMealCardIndex === undefined) {
+      return closestEdgeOfTarget === 'top'
+        ? destinationMealCardIndex
+        : destinationMealCardIndex + 1;
+    }
+
+    let newDestinationIndex =
+      isSameMealBox && sourceMealCardIndex < destinationMealCardIndex
+        ? destinationMealCardIndex - 1
+        : destinationMealCardIndex;
+    return closestEdgeOfTarget === 'top'
+      ? newDestinationIndex
+      : newDestinationIndex + 1;
+  };
+
   const updateMealPlans = useCallback(
     async (updates: { mealDate: string; mealPlanDay: MealPlanDay }[]) => {
-      const responses = await Promise.all(
-        updates.map(({ mealPlanDay }) =>
-          updateMealPlan({
-            mealPlan: getMealPlanDayDatabaseDTOByMealPlanDay(mealPlanDay),
-          }).unwrap(),
-        ),
-      );
+      // 1. Backup current state
+      const previousState = updates.map(({ mealDate }) => {
+        const current = findMealPlanDay(mealDate);
+        return { mealDate, mealPlanDay: current };
+      });
 
-      if (responses.every((res) => res.success)) {
+      try {
+        // 2. Update UI
         dispatch(updateViewingMealPlanByDates({ mealPlanWithDates: updates }));
         updates.forEach(({ mealDate, mealPlanDay }) => {
           dispatch(
@@ -58,111 +75,173 @@ export const useDragDropLogic = () => {
             }),
           );
         });
+
+        // 3. Call API
+        const responses = await Promise.all(
+          updates.map(({ mealPlanDay }) =>
+            updateMealPlan({
+              mealPlan: getMealPlanDayDatabaseDTOByMealPlanDay(mealPlanDay),
+            }).unwrap(),
+          ),
+        );
+
+        // 4. Check for failures
+        if (!responses.every((res) => res.success)) {
+          throw new Error('Some API calls failed');
+        }
+      } catch (error) {
+        showToastError(`Reverting optimistic update due to error:${error}`);
+
+        // 5. Revert to previous state
+        dispatch(
+          updateViewingMealPlanByDates({ mealPlanWithDates: previousState }),
+        );
+        previousState.forEach(({ mealDate, mealPlanDay }) => {
+          dispatch(
+            updateCacheMealPlanByDate({
+              mealPlanWithDate: { mealDate, mealPlanDay },
+            }),
+          );
+        });
       }
     },
-    [dispatch, updateMealPlan],
+    [dispatch, updateMealPlan, findMealPlanDay],
   );
 
-  const moveMealCard = useCallback(
-    async (params: MoveMealCardParams) => {
-      const isSameDayMove =
-        params.sourceMealDate === params.destinationMealDate;
-      const mealPlanDay = findMealPlanDay(params.sourceMealDate);
-      if (!mealPlanDay) return;
-
-      const sourceMealBoxItems = mealPlanDay.mealItems[params.sourceMealType];
-      const mealItemToMove =
-        sourceMealBoxItems?.[params.movedMealCardIndexInSourceMealBox];
-      if (!mealItemToMove) return;
-
-      const newSourceMealItems = sourceMealBoxItems.filter(
-        (mealItem) => mealItem._id !== mealItemToMove._id,
+  const insertDestination = useCallback(
+    ({
+      mealDate,
+      mealType,
+      destinationIndex,
+      mealCard,
+    }: {
+      mealDate: string;
+      mealType: keyof MealItems;
+      destinationIndex: number;
+      mealCard: MealPlanFood;
+    }) => {
+      const mealPlanDay = findMealPlanDay(mealDate);
+      const newMealPlanDay = getMealPlanDayAfterAddNewMealItem(
+        mealPlanDay,
+        mealType,
+        mealCard,
+        destinationIndex,
       );
 
-      const newDestinationMealItems = [
-        ...(isSameDayMove
-          ? mealPlanDay.mealItems[params.destinationMealType]
-          : findMealPlanDay(params.destinationMealDate)?.mealItems[
-              params.destinationMealType
-            ] || []),
-      ];
-      newDestinationMealItems.splice(
-        params.movedMealCardIndexInDestinationMealBox ?? 0,
-        0,
-        { ...mealItemToMove },
+      updateMealPlans([{ mealDate, mealPlanDay: newMealPlanDay }]);
+    },
+    [findMealPlanDay, updateMealPlans],
+  );
+
+  const removeSource = useCallback(
+    ({
+      mealDate,
+      mealType,
+      index,
+    }: {
+      mealDate: string;
+      mealType: keyof MealItems;
+      index: number;
+    }) => {
+      const mealPlanDay = findMealPlanDay(mealDate);
+      const newMealPlanDay = getMealPlanDayAfterRemoveMealItem(
+        mealPlanDay,
+        mealType,
+        index,
       );
 
-      const newMealPlanDay = isSameDayMove
-        ? getMealPlanDayAfterMovingMealInSameDay(
-            newSourceMealItems,
-            newDestinationMealItems,
-            params.sourceMealType,
-            params.destinationMealType,
-            mealPlanDay,
-          )
-        : getMealPlanDayAfterRemoveMealItem(
-            mealPlanDay,
-            params.sourceMealType,
-            mealItemToMove._id,
-          );
+      updateMealPlans([{ mealDate, mealPlanDay: newMealPlanDay }]);
+    },
+    [findMealPlanDay, updateMealPlans],
+  );
 
-      const newDestinationMealPlanDay = !isSameDayMove
-        ? getMealPlanDayAfterAddNewMeal(
-            newDestinationMealItems,
-            params.destinationMealType,
-            findMealPlanDay(params.destinationMealDate),
-          )
-        : undefined;
+  const removeSourceAndInsertDestinationSameDay = useCallback(
+    ({
+      mealDate,
+      sourceMealType,
+      sourceIndex,
+      destinationMealType,
+      destinationIndex,
+    }: {
+      mealDate: string;
+      sourceMealType: keyof MealItems;
+      sourceIndex: number;
+      destinationMealType: keyof MealItems;
+      destinationIndex: number;
+    }) => {
+      const mealPlanDay = findMealPlanDay(mealDate);
 
-      await updateMealPlans([
-        { mealDate: params.sourceMealDate, mealPlanDay: newMealPlanDay },
-        ...(newDestinationMealPlanDay
-          ? [
-              {
-                mealDate: params.destinationMealDate,
-                mealPlanDay: newDestinationMealPlanDay,
-              },
-            ]
-          : []),
+      const newMealPlanDay = getMealPlanDayAfterAddAndRemoveMealItem(
+        mealPlanDay,
+        sourceMealType,
+        sourceIndex,
+        destinationMealType,
+        destinationIndex,
+      );
+
+      updateMealPlans([
+        {
+          mealDate,
+          mealPlanDay: newMealPlanDay,
+        },
       ]);
     },
     [findMealPlanDay, updateMealPlans],
   );
 
-  const reorderMealCard = useCallback(
-    async ({
-      mealDate,
-      mealType,
-      startIndex,
-      finishIndex,
+  const removeSourceAndInsertDestinationDiffDay = useCallback(
+    ({
+      sourceMealDate,
+      sourceMealType,
+      sourceIndex,
+      destinationMealDate,
+      destinationMealType,
+      destinationIndex,
     }: {
-      mealDate: string;
-      mealType: keyof MealItems;
-      startIndex: number;
-      finishIndex: number;
+      sourceMealDate: string;
+      sourceMealType: keyof MealItems;
+      sourceIndex: number;
+      destinationMealDate: string;
+      destinationMealType: keyof MealItems;
+      destinationIndex: number;
     }) => {
-      const mealPlanDay = findMealPlanDay(mealDate);
-      if (!mealPlanDay) return;
+      const sourceMealPlanDay = findMealPlanDay(sourceMealDate);
+      const destinationMealPlanDay = findMealPlanDay(destinationMealDate);
 
-      const mealBoxItems = mealPlanDay.mealItems[mealType];
-      if (!mealBoxItems) return;
+      if (!sourceMealPlanDay || !destinationMealPlanDay) return;
 
-      const reorderedMealBoxItems = reorder({
-        list: mealBoxItems,
-        startIndex,
-        finishIndex,
-      });
-
-      const newMealPlanDay = getMealPlanDayAfterAddNewMeal(
-        reorderedMealBoxItems,
-        mealType,
-        mealPlanDay,
+      const newSourceMealPlanDay = getMealPlanDayAfterRemoveMealItem(
+        sourceMealPlanDay,
+        sourceMealType,
+        sourceIndex,
       );
 
-      await updateMealPlans([{ mealDate, mealPlanDay: newMealPlanDay }]);
+      const newDestinationMealPlanDay = getMealPlanDayAfterAddNewMealItem(
+        destinationMealPlanDay,
+        destinationMealType,
+        sourceMealPlanDay.mealItems[sourceMealType][sourceIndex],
+        destinationIndex,
+      );
+
+      updateMealPlans([
+        {
+          mealDate: sourceMealDate,
+          mealPlanDay: newSourceMealPlanDay,
+        },
+        {
+          mealDate: destinationMealDate,
+          mealPlanDay: newDestinationMealPlanDay,
+        },
+      ]);
     },
     [findMealPlanDay, updateMealPlans],
   );
 
-  return { moveMealCard, reorderMealCard };
+  return {
+    insertDestination,
+    removeSource,
+    removeSourceAndInsertDestinationSameDay,
+    removeSourceAndInsertDestinationDiffDay,
+    findDestinationIndex,
+  };
 };

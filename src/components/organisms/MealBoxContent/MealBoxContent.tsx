@@ -2,8 +2,10 @@ import React from 'react';
 import { HiOutlineArrowPath } from 'react-icons/hi2';
 import { useDispatch, useSelector } from 'react-redux';
 import { Typography } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
 
 import { DropIndicator } from '@/atoms/DropIndicator';
+import useMealBoxDrop from '@/hooks/useMealBoxDrop';
 import { MealCard } from '@/organisms/MealCard';
 import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import {
@@ -13,7 +15,7 @@ import {
 import { MealItems, MealPlanFood } from '@/types/mealPlan';
 import { isSameDay } from '@/utils/dateUtils';
 import {
-  getMealPlanDayAfterAddNewMeal,
+  getMealPlanDayAfterAddNewMealItem,
   getMealPlanDayAfterChangeAmount,
   getMealPlanDayAfterRemoveMealItem,
   getMealPlanDayDatabaseDTOByMealPlanDay,
@@ -23,19 +25,21 @@ interface MealBoxContentProps {
   mealDate: string;
   mealType: keyof MealItems;
   mealItems: MealPlanFood[];
-  isDragEnter: boolean;
 }
 
 const MealBoxContent: React.FC<MealBoxContentProps> = ({
   mealDate,
   mealType,
   mealItems,
-  isDragEnter,
 }) => {
   const dispatch = useDispatch();
-  const draggingCardHeight = useSelector(mealPlanSelector).draggingCardHeight;
+  const { draggingCardHeight } = useSelector(mealPlanSelector);
   const [updateMealPlan] = useUpdateMealPlanMutation();
   const viewingMealPlan = useSelector(mealPlanSelector).viewingMealPlans;
+  const { mealBoxRef, isDragEnter, isOnlyItemDraggingOver } = useMealBoxDrop({
+    mealDate,
+    mealType,
+  });
 
   const handleAmountChange = async (
     amount: number,
@@ -76,8 +80,7 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
     });
   };
 
-  const handleRemoveFood = async (cardId: string) => {
-    // Create copy of MealDay that have the updated mealItem
+  const handleRemoveFood = async (index: number) => {
     const currentMealPlanDay = viewingMealPlan.find((viewingMealPlanDay) =>
       isSameDay(new Date(viewingMealPlanDay.mealDate), new Date(mealDate)),
     );
@@ -89,7 +92,7 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
     const updatedMealPlanDay = getMealPlanDayAfterRemoveMealItem(
       currentMealPlanDay.mealPlanDay,
       mealType,
-      cardId,
+      index,
     );
 
     const updatedMealPlanDatabaseDTO =
@@ -109,8 +112,7 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
     });
   };
 
-  const handleDuplicateFood = async (cardId: string) => {
-    // Create copy of MealDay that have the updated mealItem
+  const handleDuplicateFood = async (index: number) => {
     const currentMealPlanDay = viewingMealPlan.find((viewingMealPlanDay) =>
       isSameDay(new Date(viewingMealPlanDay.mealDate), new Date(mealDate)),
     );
@@ -119,22 +121,16 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
       return;
     }
 
-    const mealItems = [...currentMealPlanDay.mealPlanDay.mealItems[mealType]];
+    const duplicateItem = {
+      ...JSON.parse(JSON.stringify(mealItems[index])),
+      _id: uuidv4(),
+    };
 
-    const index = mealItems.findIndex((meal) => meal._id === cardId);
-    if (index !== -1 && mealItems[index].foodId) {
-      const duplicateItem = {
-        ...JSON.parse(JSON.stringify(mealItems[index])),
-        _id: `${cardId}-${Date.now()}`,
-      };
-
-      mealItems.splice(index + 1, 0, duplicateItem);
-    }
-
-    const updatedMealPlanDay = getMealPlanDayAfterAddNewMeal(
-      mealItems,
-      mealType,
+    const updatedMealPlanDay = getMealPlanDayAfterAddNewMealItem(
       currentMealPlanDay.mealPlanDay,
+      mealType,
+      duplicateItem,
+      index + 1,
     );
 
     dispatch(
@@ -153,24 +149,26 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
   };
 
   return (
-    <>
+    <div ref={mealBoxRef} className='min-h-[60px]'>
       {mealItems.length === 0 ? (
-        <>
-          <Typography className='mt-2 text-gray-500'>
-            Hit{' '}
-            <span className='inline-flex'>
-              <HiOutlineArrowPath className='mx-1' />
-            </span>{' '}
-            to generate, or search for foods to add and drag them in.
-          </Typography>
-          {isDragEnter && (
+        <div className='pt-2'>
+          {!isDragEnter ? (
+            <Typography className='text-gray-500'>
+              Hit{' '}
+              <span className='inline-flex'>
+                <HiOutlineArrowPath className='mx-1' />
+              </span>{' '}
+              to generate, or search for foods to add and drag them in.
+            </Typography>
+          ) : (
             <DropIndicator edge='bottom' mealCardHeight={draggingCardHeight} />
           )}
-        </>
+        </div>
       ) : (
-        mealItems.map((mealItem) => (
+        mealItems.map((mealItem, index) => (
           <MealCard
-            key={mealItem._id}
+            key={index}
+            index={index}
             mealDate={mealDate}
             mealType={mealType}
             mealItem={mealItem}
@@ -180,7 +178,10 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
           />
         ))
       )}
-    </>
+      {mealItems.length === 1 && isOnlyItemDraggingOver && isDragEnter && (
+        <DropIndicator edge='bottom' mealCardHeight={draggingCardHeight} />
+      )}
+    </div>
   );
 };
 export default MealBoxContent;

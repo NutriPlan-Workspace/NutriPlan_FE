@@ -7,12 +7,16 @@ export type MealPlanState = {
   cacheMealPlans: MealPlanWithDate[];
   viewingMealPlans: MealPlanWithDate[];
   draggingCardHeight: number;
+  isDragging: boolean;
+  isDraggingOverCard: boolean;
 };
 
 export const mealPlanInitialState: MealPlanState = {
   cacheMealPlans: [],
   viewingMealPlans: [],
   draggingCardHeight: 0,
+  isDragging: false,
+  isDraggingOverCard: false,
 };
 
 const mealPlanSlice = createSlice({
@@ -32,20 +36,24 @@ const mealPlanSlice = createSlice({
         index: number;
       }>,
     ) => {
-      state.viewingMealPlans[action.payload.index] =
-        action.payload.mealPlanWithDate;
+      state.viewingMealPlans = state.viewingMealPlans.map((item, idx) =>
+        idx === action.payload.index
+          ? { ...action.payload.mealPlanWithDate }
+          : item,
+      );
     },
     updateViewingMealPlanByDate: (
       state,
       action: PayloadAction<{ mealPlanWithDate: MealPlanWithDate }>,
     ) => {
-      const index = state.viewingMealPlans.findIndex((mealPlan) =>
+      state.viewingMealPlans = state.viewingMealPlans.map((mealPlan) =>
         isSameDay(
           new Date(mealPlan.mealDate),
           new Date(action.payload.mealPlanWithDate.mealDate),
-        ),
+        )
+          ? { ...action.payload.mealPlanWithDate }
+          : mealPlan,
       );
-      state.viewingMealPlans[index] = action.payload.mealPlanWithDate;
     },
     updateViewingMealPlanByDates: (
       state,
@@ -87,6 +95,15 @@ const mealPlanSlice = createSlice({
     ) => {
       state.draggingCardHeight = action.payload.draggingCardHeight;
     },
+    setIsDragging: (state, action: PayloadAction<{ isDragging: boolean }>) => {
+      state.isDragging = action.payload.isDragging;
+    },
+    setIsDraggingOverCard: (
+      state,
+      action: PayloadAction<{ isDraggingOverCard: boolean }>,
+    ) => {
+      state.isDraggingOverCard = action.payload.isDraggingOverCard;
+    },
   },
 });
 
@@ -98,5 +115,7 @@ export const {
   addCacheMealPlans,
   updateCacheMealPlanByDate,
   setDraggingCardHeight,
+  setIsDragging,
+  setIsDraggingOverCard,
 } = mealPlanSlice.actions;
 export default mealPlanSlice.reducer;

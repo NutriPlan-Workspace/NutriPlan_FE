@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { ADJUST_DISTANCE } from '@/constants/mealPlan';
 import { PLAN_TYPES } from '@/constants/plans';
 
 export const getSliderSettings = (
@@ -19,7 +20,7 @@ export const getSliderSettings = (
   })();
 
   return {
-    initialSlide: 3,
+    initialSlide: ADJUST_DISTANCE,
     dots: false,
     speed: 200,
     slidesToShow,

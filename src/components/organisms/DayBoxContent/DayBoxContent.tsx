@@ -26,19 +26,19 @@ const DayBoxContent: React.FC<DayBoxContentProps> = ({
         <MealBox
           mealDate={getMealDate(mealDate)}
           mealType='breakfast'
-          mealItems={mealItems?.breakfast}
+          mealItems={mealItems?.breakfast ?? []}
           isLoading={isLoading}
         />
         <MealBox
           mealDate={getMealDate(mealDate)}
           mealType='lunch'
-          mealItems={mealItems?.lunch}
+          mealItems={mealItems?.lunch ?? []}
           isLoading={isLoading}
         />
         <MealBox
           mealDate={getMealDate(mealDate)}
           mealType='dinner'
-          mealItems={mealItems?.dinner}
+          mealItems={mealItems?.dinner ?? []}
           isLoading={isLoading}
         />
       </div>

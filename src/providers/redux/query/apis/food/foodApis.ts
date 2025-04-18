@@ -1,12 +1,16 @@
 import { FOODS_ENDPOINT, SEARCH_FOOD_ENDPOINT } from '@/constants/endpoints';
 import { baseApi } from '@/redux/query/apis/baseApi';
 import type { ApiResponse } from '@/types/apiResponse';
-import type { DetailedFoodResponse, Food, FoodCategory } from '@/types/food';
+import type {
+  DetailedFoodResponse,
+  FoodCategory,
+  SideAddFoodResponse,
+} from '@/types/food';
 
 export const foodsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getFoods: builder.query<
-      ApiResponse<Food[]>,
+      ApiResponse<SideAddFoodResponse>,
       { page: number; limit?: number }
     >({
       query: ({ page, limit = 8 }) =>

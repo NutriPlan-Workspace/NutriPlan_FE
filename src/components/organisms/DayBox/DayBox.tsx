@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 
 import { cn } from '@/helpers/helpers';
@@ -28,21 +28,15 @@ const DayBox: React.FC<DayBoxProps> = ({
   onCopyPreviousDay,
 }) => {
   const mealItems = mealPlanDay?.mealItems || undefined;
-  const allDayMealItems = useMemo(
-    () =>
-      mealItems
-        ? [...mealItems.breakfast, ...mealItems.lunch, ...mealItems.dinner]
-        : [],
-    [mealItems],
-  );
-
+  const allDayMealItems = mealItems
+    ? [...mealItems.breakfast, ...mealItems.lunch, ...mealItems.dinner]
+    : undefined;
   const isToday = isSameDayAsToday(mealDate);
   const [isHovered, setIsHovered] = useState(false);
 
-  const totalNutrition = useMemo(
-    () => getTotalNutrition(allDayMealItems),
-    [allDayMealItems],
-  );
+  const totalNutrition = allDayMealItems
+    ? getTotalNutrition(allDayMealItems)
+    : undefined;
 
   return (
     <div
@@ -58,7 +52,7 @@ const DayBox: React.FC<DayBoxProps> = ({
       {isSingleDay ? (
         <div
           className={cn('flex w-full justify-end', {
-            'justify-center': !mealItems || !allDayMealItems.length,
+            'justify-center': !mealItems || !allDayMealItems?.length,
           })}
         >
           <div className='max-w-[450px] flex-1 px-4'>
@@ -121,4 +115,4 @@ const DayBox: React.FC<DayBoxProps> = ({
   );
 };
 
-export default React.memo(DayBox);
+export default DayBox;

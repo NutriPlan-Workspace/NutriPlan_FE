@@ -6,19 +6,17 @@ import {
 import { MenuProps } from 'antd';
 
 interface MenuItemProps {
-  isAddFood: boolean;
-  onRemoveFood?: (id: string) => void;
-  onDuplicateFood?: (id: string) => void;
-  mealItem: { _id: string };
+  onRemoveFood?: (index: number) => void;
+  onDuplicateFood?: (index: number) => void;
+  index: number;
 }
 
 export const getMenuItems = ({
-  isAddFood,
   onRemoveFood,
   onDuplicateFood,
-  mealItem,
+  index,
 }: MenuItemProps): MenuProps['items'] | undefined => {
-  if (!isAddFood && onRemoveFood && onDuplicateFood) {
+  if (onRemoveFood && onDuplicateFood) {
     return [
       {
         key: '0',
@@ -29,14 +27,14 @@ export const getMenuItems = ({
         key: '1',
         label: 'Remove Food',
         icon: <HiOutlineArchiveBoxXMark />,
-        onClick: () => onRemoveFood(mealItem._id),
+        onClick: () => onRemoveFood(index),
       },
       { type: 'divider' },
       {
         key: '2',
         label: 'Duplicate this Food',
         icon: <HiOutlineDocumentDuplicate />,
-        onClick: () => onDuplicateFood(mealItem._id),
+        onClick: () => onDuplicateFood(index),
       },
     ];
   }

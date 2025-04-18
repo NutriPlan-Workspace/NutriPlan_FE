@@ -15,20 +15,23 @@ import invariant from 'tiny-invariant';
 import {
   mealPlanSelector,
   setDraggingCardHeight,
+  setIsDragging,
 } from '@/redux/slices/mealPlan';
 
 export const useMealCardDrag = ({
   mealDate,
   mealType,
   cardId,
+  index,
 }: {
   mealDate: string;
   mealType: string;
   cardId: string;
+  index: number;
 }) => {
+  const [dragState, setDragState] = useState(false);
   const dispatch = useDispatch();
   const draggingCardHeight = useSelector(mealPlanSelector).draggingCardHeight;
-  const [isDragging, setIsDragging] = useState(false);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const mealCardRef = useRef<HTMLDivElement | null>(null);
 
@@ -44,20 +47,18 @@ export const useMealCardDrag = ({
           mealDate,
           mealType,
           cardId,
+          index,
+          height: mealCardElement.clientHeight,
         }),
         onDragStart: () => {
-          setIsDragging(true);
-          dispatch(
-            setDraggingCardHeight({
-              draggingCardHeight: mealCardElement.clientHeight,
-            }),
-          );
-          // set current card display none
-          mealCardElement.style.display = 'none';
+          const height = mealCardElement.clientHeight;
+          dispatch(setDraggingCardHeight({ draggingCardHeight: height }));
+          dispatch(setIsDragging({ isDragging: true }));
+          mealCardElement.style.opacity = '0.4';
         },
         onDrop: () => {
-          setIsDragging(false);
-          mealCardElement.style.display = '';
+          mealCardElement.style.display = 'flex';
+          dispatch(setIsDragging({ isDragging: false }));
         },
       }),
 
@@ -69,6 +70,7 @@ export const useMealCardDrag = ({
             mealDate,
             mealType,
             cardId,
+            index,
           };
           return attachClosestEdge(data, {
             input,
@@ -83,7 +85,9 @@ export const useMealCardDrag = ({
             args.source.data.mealType !== mealType ||
             args.source.data.cardId !== cardId
           ) {
-            setClosestEdge(extractClosestEdge(args.self.data));
+            setDragState(true);
+            const edge = extractClosestEdge(args.self.data);
+            setClosestEdge(edge);
           }
         },
         onDrag: (args) => {
@@ -92,14 +96,28 @@ export const useMealCardDrag = ({
             args.source.data.mealType !== mealType ||
             args.source.data.cardId !== cardId
           ) {
-            setClosestEdge(extractClosestEdge(args.self.data));
+            const edge = extractClosestEdge(args.self.data);
+            setClosestEdge(edge);
           }
         },
-        onDragLeave: () => setClosestEdge(null),
-        onDrop: () => setClosestEdge(null),
+        onDragLeave: ({ source }) => {
+          setDragState(false);
+          setClosestEdge(null);
+          if (source.data.cardId === cardId) {
+            mealCardElement.style.display = 'none';
+            mealCardElement.style.opacity = '1';
+          }
+        },
+        onDrop: ({ source }) => {
+          setDragState(false);
+          setClosestEdge(null);
+          if (source.data.cardId === cardId) {
+            mealCardElement.style.opacity = '1';
+          }
+        },
       }),
     );
-  }, [cardId, mealDate, mealType, dispatch]);
+  }, [cardId, mealDate, mealType, dispatch, index]);
 
-  return { mealCardRef, isDragging, closestEdge, draggingCardHeight };
+  return { mealCardRef, closestEdge, draggingCardHeight, dragState };
 };

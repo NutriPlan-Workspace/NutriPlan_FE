@@ -1,3 +1,6 @@
+import { v4 as uuidv4 } from 'uuid';
+
+import { Food } from '@/types/food';
 import type {
   MealItems,
   MealPlanDatabaseDTO,
@@ -11,51 +14,68 @@ const EMPTY_TEMPLATE: MealPlanDay = {
   mealItems: { breakfast: [], lunch: [], dinner: [] },
 };
 
-export function getMealPlanDayAfterAddNewMeal(
-  mealPlanMealItems: MealPlanFood[] | undefined,
-  mealType: keyof MealItems,
-  mealPlanDay: MealPlanDay | undefined,
-) {
-  if (!mealPlanMealItems || !mealType || !mealPlanDay) {
-    return EMPTY_TEMPLATE;
-  }
+export function convertFoodCardToMealPlanFood(food: Food): MealPlanFood {
   return {
-    _id: mealPlanDay._id || '',
-    mealDate: mealPlanDay.mealDate || '',
-    mealItems: {
-      breakfast: mealPlanDay.mealItems.breakfast ?? [],
-      lunch: mealPlanDay.mealItems.lunch ?? [],
-      dinner: mealPlanDay.mealItems.dinner ?? [],
-      [mealType as keyof MealItems]: mealPlanMealItems ?? [],
+    _id: uuidv4(),
+    foodId: {
+      _id: food._id,
+      name: food.name,
+      imgUrls: food.imgUrls,
+      property: {
+        prepTime: food.property.prepTime,
+        cookTime: food.property.cookTime,
+      },
+      nutrition: {
+        carbs: food.nutrition.carbs,
+        fats: food.nutrition.fats,
+        proteins: food.nutrition.proteins,
+        calories: food.nutrition.calories,
+        fiber: food.nutrition.fiber,
+        sodium: food.nutrition.sodium,
+        cholesterol: food.nutrition.cholesterol,
+      },
+      units: food.units.map(
+        (unit: { _id: string; amount: number; description: string }) => ({
+          _id: unit._id,
+          amount: unit.amount,
+          description: unit.description,
+        }),
+      ),
     },
+    amount: 1,
+    unit: food.defaultUnit,
   };
 }
 
-export function getMealPlanDayAfterMovingMealInSameDay(
-  sourceMealPlanMealItems: MealPlanFood[] | undefined,
-  destinationMealPlanMealItemsTo: MealPlanFood[] | undefined,
-  sourceMealType: keyof MealItems,
-  destinationMealType: keyof MealItems,
+export function getMealPlanDayAfterAddNewMealItem(
   mealPlanDay: MealPlanDay | undefined,
+  mealType: keyof MealItems,
+  mealCard: MealPlanFood | undefined,
+  destinationIndex: number | undefined,
 ) {
   if (
-    !sourceMealPlanMealItems ||
-    !destinationMealPlanMealItemsTo ||
-    !sourceMealType ||
-    !destinationMealType ||
-    !mealPlanDay
+    !mealPlanDay ||
+    !mealType ||
+    !mealCard ||
+    destinationIndex === undefined
   ) {
     return EMPTY_TEMPLATE;
   }
+
+  let updatedMealItems = [...mealPlanDay.mealItems[mealType]];
+
+  if (destinationIndex === -1) {
+    updatedMealItems.push(mealCard);
+  } else {
+    updatedMealItems.splice(destinationIndex, 0, mealCard);
+  }
+
   return {
     _id: mealPlanDay._id || '',
     mealDate: mealPlanDay.mealDate || '',
     mealItems: {
-      breakfast: mealPlanDay.mealItems.breakfast ?? [],
-      lunch: mealPlanDay.mealItems.lunch ?? [],
-      dinner: mealPlanDay.mealItems.dinner ?? [],
-      [sourceMealType as keyof MealItems]: sourceMealPlanMealItems,
-      [destinationMealType as keyof MealItems]: destinationMealPlanMealItemsTo,
+      ...mealPlanDay.mealItems,
+      [mealType]: updatedMealItems,
     },
   };
 }
@@ -63,9 +83,9 @@ export function getMealPlanDayAfterMovingMealInSameDay(
 export function getMealPlanDayAfterRemoveMealItem(
   mealPlanDay: MealPlanDay | undefined,
   mealType: keyof MealItems,
-  cardId: string | undefined,
+  sourceIndex: number | undefined,
 ) {
-  if (!mealPlanDay || !mealType || !cardId) {
+  if (!mealPlanDay || !mealType || sourceIndex === undefined) {
     return EMPTY_TEMPLATE;
   }
   return {
@@ -75,11 +95,47 @@ export function getMealPlanDayAfterRemoveMealItem(
       breakfast: mealPlanDay.mealItems.breakfast ?? [],
       lunch: mealPlanDay.mealItems.lunch ?? [],
       dinner: mealPlanDay.mealItems.dinner ?? [],
-      [mealType as keyof MealItems]: mealPlanDay.mealItems[mealType].filter(
-        (meal) => meal._id !== cardId,
-      ),
+      [mealType]: [
+        ...mealPlanDay.mealItems[mealType].slice(0, sourceIndex),
+        ...mealPlanDay.mealItems[mealType].slice(sourceIndex + 1),
+      ],
     },
   };
+}
+
+export function getMealPlanDayAfterAddAndRemoveMealItem(
+  mealPlanDay: MealPlanDay | undefined,
+  sourceMealType: keyof MealItems,
+  sourceIndex: number,
+  destinationMealType: keyof MealItems,
+  destinationIndex: number,
+) {
+  if (
+    !mealPlanDay ||
+    !sourceMealType ||
+    sourceIndex === undefined ||
+    !destinationMealType ||
+    destinationIndex === undefined
+  ) {
+    return EMPTY_TEMPLATE;
+  }
+
+  const mealItem = JSON.parse(
+    JSON.stringify(mealPlanDay.mealItems[sourceMealType][sourceIndex]),
+  );
+
+  const afterRemove = getMealPlanDayAfterRemoveMealItem(
+    mealPlanDay,
+    sourceMealType,
+    sourceIndex,
+  );
+
+  return getMealPlanDayAfterAddNewMealItem(
+    afterRemove,
+    destinationMealType,
+    mealItem,
+    destinationIndex,
+  );
 }
 
 export function getMealPlanDayAfterChangeAmount(

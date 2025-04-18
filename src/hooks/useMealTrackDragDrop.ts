@@ -1,171 +1,220 @@
 import { useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import {
-  Edge,
-  extractClosestEdge,
-} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
-import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index';
+import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 
-import { mealPlanSelector } from '@/redux/slices/mealPlan';
-import { MealItems, MealPlanFood } from '@/types/mealPlan';
-import { isSameDay } from '@/utils/dateUtils';
+import type { Food } from '@/types/food';
+import type { MealItems } from '@/types/mealPlan';
+import { convertFoodCardToMealPlanFood } from '@/utils/mealPlan';
 
 import { useDragDropLogic } from './useDragDropLogic';
 
 export const useMealTrackDragDrop = () => {
-  const { moveMealCard, reorderMealCard } = useDragDropLogic();
-  const userMealPlan = useSelector(mealPlanSelector).viewingMealPlans;
+  const {
+    insertDestination,
+    removeSource,
+    removeSourceAndInsertDestinationSameDay,
+    removeSourceAndInsertDestinationDiffDay,
+    findDestinationIndex,
+  } = useDragDropLogic();
 
-  const handleDropToMealBox = useCallback(
-    (
-      sourceMealBoxItems: MealPlanFood[] | undefined,
-      draggedMealCardIndex: number | undefined,
-      sourceMealDate: string,
-      sourceMealType: keyof MealItems,
-      destinationMealDate: string,
-      destinationMealType: keyof MealItems,
-    ) => {
+  const handleDropLogic = useCallback(
+    ({
+      foodCard,
+      sourceMealDate,
+      sourceMealType,
+      sourceIndex,
+      destinationMealDate,
+      destinationMealType,
+      destinationIndex,
+    }: {
+      foodCard?: Food;
+      sourceMealDate?: string;
+      sourceMealType?: keyof MealItems;
+      sourceIndex?: number | undefined;
+      destinationMealDate?: string;
+      destinationMealType?: keyof MealItems;
+      destinationIndex?: number;
+    }) => {
       if (
+        sourceMealDate === destinationMealDate &&
         sourceMealType === destinationMealType &&
-        sourceMealDate === destinationMealDate
+        sourceIndex === destinationIndex
       ) {
-        const destinationIndex = getReorderDestinationIndex({
-          startIndex: draggedMealCardIndex ?? 0,
-          indexOfTarget: sourceMealBoxItems ? sourceMealBoxItems.length - 1 : 0,
-          closestEdgeOfTarget: null,
-          axis: 'vertical',
+        return;
+      }
+      if (
+        destinationMealDate === undefined ||
+        destinationMealType === undefined ||
+        destinationIndex === undefined
+      ) {
+        removeSource({
+          mealDate: sourceMealDate ?? '',
+          mealType: sourceMealType ?? 'breakfast',
+          index: sourceIndex ?? 0,
         });
-        reorderMealCard({
-          mealDate: sourceMealDate,
-          mealType: sourceMealType,
-          startIndex: draggedMealCardIndex ?? 0,
-          finishIndex: destinationIndex,
+        return;
+      }
+      if (foodCard) {
+        const convertedFoodCard = convertFoodCardToMealPlanFood(foodCard);
+
+        insertDestination({
+          mealDate: destinationMealDate,
+          mealType: destinationMealType,
+          mealCard: convertedFoodCard,
+          destinationIndex,
         });
         return;
       }
 
-      moveMealCard({
-        movedMealCardIndexInSourceMealBox: draggedMealCardIndex ?? 0,
-        sourceMealDate: sourceMealDate,
-        sourceMealType: sourceMealType,
-        movedMealCardIndexInDestinationMealBox: 0,
-        destinationMealDate: destinationMealDate,
-        destinationMealType: destinationMealType,
-      });
-    },
-    [moveMealCard, reorderMealCard],
-  );
-
-  const handleDropToMealCard = useCallback(
-    (
-      draggedMealCardIndex: number | undefined,
-      sourceMealDate: string,
-      sourceMealType: keyof MealItems,
-      destinationMealDate: string,
-      destinationMealType: keyof MealItems,
-      destinationMealCardIndex: number | undefined,
-      closestEdgeOfTarget: Edge | null,
-    ) => {
-      if (
-        sourceMealType === destinationMealType &&
-        sourceMealDate === destinationMealDate
-      ) {
-        const destinationIndex = getReorderDestinationIndex({
-          startIndex: draggedMealCardIndex ?? 0,
-          indexOfTarget: destinationMealCardIndex ?? 0,
-          closestEdgeOfTarget,
-          axis: 'vertical',
-        });
-        reorderMealCard({
-          mealDate: sourceMealDate,
-          mealType: sourceMealType,
-          startIndex: draggedMealCardIndex ?? 0,
-          finishIndex: destinationIndex,
+      if (sourceMealDate === undefined && sourceMealType === undefined) {
+        removeSourceAndInsertDestinationSameDay({
+          mealDate: destinationMealDate,
+          sourceMealType: destinationMealType,
+          sourceIndex: sourceIndex ?? 0,
+          destinationMealType: destinationMealType,
+          destinationIndex,
         });
         return;
       }
 
-      const destinationIndex =
-        closestEdgeOfTarget === 'top'
-          ? (destinationMealCardIndex ?? 0)
-          : (destinationMealCardIndex ?? 0) + 1;
-      moveMealCard({
-        movedMealCardIndexInSourceMealBox: draggedMealCardIndex ?? 0,
-        sourceMealDate: sourceMealDate,
-        sourceMealType: sourceMealType,
-        movedMealCardIndexInDestinationMealBox: destinationIndex,
+      if (sourceMealDate === undefined && sourceMealType) {
+        removeSourceAndInsertDestinationSameDay({
+          mealDate: destinationMealDate,
+          sourceMealType: sourceMealType,
+          sourceIndex: sourceIndex ?? 0,
+          destinationMealType: destinationMealType,
+          destinationIndex,
+        });
+        return;
+      }
+
+      removeSourceAndInsertDestinationDiffDay({
+        sourceMealDate: sourceMealDate ?? '',
+        sourceMealType: sourceMealType ?? 'breakfast',
+        sourceIndex: sourceIndex ?? 0,
         destinationMealDate: destinationMealDate,
         destinationMealType: destinationMealType,
+        destinationIndex,
       });
     },
-    [moveMealCard, reorderMealCard],
+    [
+      insertDestination,
+      removeSource,
+      removeSourceAndInsertDestinationSameDay,
+      removeSourceAndInsertDestinationDiffDay,
+    ],
   );
 
   const handleDrop = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ({ source, location }: { source: any; location: any }) => {
       const destination = location.current.dropTargets.length;
-      if (!destination && source.data.type !== 'mealCard') return;
 
-      const draggedMealCardId = source.data.cardId;
-      const sourceMealCardRecord = location.initial.dropTargets[0];
-      const sourceMealDate = sourceMealCardRecord.data.mealDate;
-      const sourceMealType = sourceMealCardRecord.data.mealType;
-      const sourceMealBoxItems = userMealPlan.find((mealPlan) =>
-        isSameDay(new Date(mealPlan.mealDate), new Date(sourceMealDate)),
-      )?.mealPlanDay?.mealItems[sourceMealType as keyof MealItems];
-      const draggedMealCardIndex = sourceMealBoxItems?.findIndex(
-        (mealItem) => mealItem._id === draggedMealCardId,
-      );
+      if (!destination) return;
 
-      /* MealBox and MealCard is also a drop target
+      /*
+       * Two Draggable (source):
+       * 1. MealCard
+       * 2. FoodCardSideAdd
+       *
+       * MealBox and MealCard is also a drop target
        * 1. MealBox so destination is 1
        * 2. MealCard (inside MealBox) so destination is 2
+       * 3. RemoveDropzone not inside MealBox or MealCard so destination is 1
        */
-      if (destination === 1) {
-        const [destinationMealBoxRecord] = location.current.dropTargets;
-        handleDropToMealBox(
-          sourceMealBoxItems,
-          draggedMealCardIndex,
-          sourceMealDate,
-          sourceMealType,
-          destinationMealBoxRecord.data.mealDate,
-          destinationMealBoxRecord.data.mealType,
-        );
+      if (
+        destination === 1 &&
+        location.current.dropTargets[0].data.type === 'removeDropzone' &&
+        source.data.type === 'mealCard'
+      ) {
+        const mealCard = source.data;
+        handleDropLogic({
+          sourceMealDate: mealCard.mealDate,
+          sourceMealType: mealCard.mealType,
+          sourceIndex: mealCard.index,
+        });
         return;
       }
+      if (destination === 1 && source.data.type === 'foodCardSideAdd') {
+        const foodCard = source.data.food;
+        const [destinationMealBoxRecord] = location.current.dropTargets;
 
-      if (destination === 2) {
+        handleDropLogic({
+          foodCard: foodCard,
+          destinationMealDate: destinationMealBoxRecord.data.mealDate,
+          destinationMealType: destinationMealBoxRecord.data.mealType,
+          destinationIndex: -1,
+        });
+        return;
+      }
+      if (destination === 2 && source.data.type === 'foodCardSideAdd') {
+        const foodCard = source.data.food;
         const destinationMealCardRecord = location.current.dropTargets[0];
-        const destinationMealBoxItems = userMealPlan.find((mealPlan) =>
-          isSameDay(
-            new Date(mealPlan.mealDate),
-            new Date(destinationMealCardRecord.data.mealDate),
-          ),
-        )?.mealPlanDay?.mealItems[
-          destinationMealCardRecord.data.mealType as keyof MealItems
-        ];
-        const destinationMealCardIndex = destinationMealBoxItems?.findIndex(
-          (mealItem) => mealItem._id === destinationMealCardRecord.data.cardId,
-        );
+        const destinationMealCardIndex = destinationMealCardRecord.data.index;
         const closestEdgeOfTarget = extractClosestEdge(
           destinationMealCardRecord.data,
         );
-
-        handleDropToMealCard(
-          draggedMealCardIndex,
-          sourceMealDate,
-          sourceMealType,
-          destinationMealCardRecord.data.mealDate,
-          destinationMealCardRecord.data.mealType,
+        const destinationIndex = findDestinationIndex({
           destinationMealCardIndex,
           closestEdgeOfTarget,
+        });
+
+        handleDropLogic({
+          foodCard: foodCard,
+          destinationMealDate: destinationMealCardRecord.data.mealDate,
+          destinationMealType: destinationMealCardRecord.data.mealType,
+          destinationIndex: destinationIndex,
+        });
+        return;
+      }
+      if (destination === 1 && source.data.type === 'mealCard') {
+        const [destinationMealBoxRecord] = location.current.dropTargets;
+        const isSameMealDate =
+          source.data.mealDate === destinationMealBoxRecord.data.mealDate;
+        const isSameMealType =
+          source.data.mealType === destinationMealBoxRecord.data.mealType;
+
+        handleDropLogic({
+          sourceMealDate: isSameMealDate ? undefined : source.data.mealDate,
+          sourceMealType:
+            isSameMealDate && isSameMealType ? undefined : source.data.mealType,
+          sourceIndex: source.data.index,
+          destinationMealDate: destinationMealBoxRecord.data.mealDate,
+          destinationMealType: destinationMealBoxRecord.data.mealType,
+          destinationIndex: -1,
+        });
+        return;
+      }
+      if (destination === 2 && source.data.type === 'mealCard') {
+        const destinationMealCardRecord = location.current.dropTargets[0];
+        const destinationMealCardIndex = destinationMealCardRecord.data.index;
+        const closestEdgeOfTarget = extractClosestEdge(
+          destinationMealCardRecord.data,
         );
+        const isSameMealDate =
+          source.data.mealDate === destinationMealCardRecord.data.mealDate;
+        const isSameMealType =
+          source.data.mealType === destinationMealCardRecord.data.mealType;
+
+        const destinationIndex = findDestinationIndex({
+          isSameMealBox: isSameMealDate && isSameMealType,
+          sourceMealCardIndex: source.data.index,
+          destinationMealCardIndex,
+          closestEdgeOfTarget,
+        });
+        handleDropLogic({
+          sourceMealDate: isSameMealDate ? undefined : source.data.mealDate,
+          sourceMealType:
+            isSameMealDate && isSameMealType ? undefined : source.data.mealType,
+          sourceIndex: source.data.index,
+          destinationMealDate: destinationMealCardRecord.data.mealDate,
+          destinationMealType: destinationMealCardRecord.data.mealType,
+          destinationIndex: destinationIndex,
+        });
         return;
       }
     },
-    [userMealPlan, handleDropToMealBox, handleDropToMealCard],
+    [handleDropLogic, findDestinationIndex],
   );
 
   useEffect(() => monitorForElements({ onDrop: handleDrop }), [handleDrop]);

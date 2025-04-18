@@ -9,6 +9,8 @@ import { DateProvider } from '@/contexts/DateContext';
 import ToastProvider from '@/contexts/ToastContext';
 import { store } from '@/redux/store';
 
+import '@ant-design/v5-patch-for-react-19';
+
 import { routeTree } from './routeTree.gen';
 
 import './index.css';

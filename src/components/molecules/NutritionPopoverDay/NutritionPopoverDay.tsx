@@ -17,7 +17,7 @@ const { Title } = Typography;
 
 interface NutritionPopoverDayProps {
   title: string;
-  nutritionData: NutritionSummaryFields;
+  nutritionData: NutritionSummaryFields | undefined;
   onClick?: () => void;
   isSingleDay?: boolean;
 }
@@ -56,12 +56,14 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
             {title}
           </Title>
         </div>
-        <PieChart
-          className='rounded-[75px] bg-white shadow-[0_0_8px_8px_white]'
-          nutritionData={nutritionData}
-          size={isSingleDay ? 200 : 150}
-          label={true}
-        />
+        {nutritionData && (
+          <PieChart
+            className='rounded-[75px] bg-white shadow-[0_0_8px_8px_white]'
+            nutritionData={nutritionData}
+            size={isSingleDay ? 200 : 150}
+            label={true}
+          />
+        )}
       </div>
     </div>
     <div className='w-full p-3.5'>
@@ -119,7 +121,7 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
                   {item.label}:
                 </Typography>
                 <Typography className={item.color}>
-                  {roundNumber(nutritionData[item.key], 2)}
+                  {nutritionData && roundNumber(nutritionData[item.key], 2)}
                   {item.unit}
                 </Typography>
               </div>
@@ -127,7 +129,7 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
             <Col span={10}>
               <div className='flex justify-center'>
                 <Typography className='text-black'>
-                  {roundNumber(nutritionData[item.key], 2)}
+                  {nutritionData && roundNumber(nutritionData[item.key], 2)}
                   {item.unit}
                 </Typography>
               </div>

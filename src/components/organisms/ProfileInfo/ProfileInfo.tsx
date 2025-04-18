@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { Button } from '@/atoms/Button';
 import { cn } from '@/helpers/helpers';
-import { useGetUserData } from '@/hooks/useGetUserData';
 import { ChangePasswordForm } from '@/molecules/ChangePasswordForm';
+import { userSelector } from '@/redux/slices/user';
 
 const ProfileInfo: React.FC = () => {
-  const user = useGetUserData();
+  const user = useSelector(userSelector).user;
   const [showChangePassword, setShowChangePassword] = useState(false);
 
   return (

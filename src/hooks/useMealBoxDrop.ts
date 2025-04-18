@@ -4,16 +4,12 @@ import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element
 interface UseMealBoxDropProps {
   mealDate: string;
   mealType: string;
-  setIsHovered: (isHovered: boolean) => void;
 }
 
-const useMealBoxDrop = ({
-  mealDate,
-  mealType,
-  setIsHovered,
-}: UseMealBoxDropProps) => {
+const useMealBoxDrop = ({ mealDate, mealType }: UseMealBoxDropProps) => {
   const mealBoxRef = useRef<HTMLDivElement | null>(null);
   const [isDragEnter, setIsDragEnter] = useState(false);
+  const [isOnlyItemDraggingOver, setIsOnlyItemDraggingOver] = useState(false);
 
   useEffect(() => {
     const mealBoxElement = mealBoxRef.current;
@@ -21,27 +17,36 @@ const useMealBoxDrop = ({
 
     const cleanup = dropTargetForElements({
       element: mealBoxElement,
-      onDragStart: () => setIsHovered(true),
-      onDragEnter: () => {
-        setIsHovered(true);
+      onDragEnter: ({ source }) => {
         setIsDragEnter(true);
+        if (
+          source.data.mealDate === mealDate &&
+          source.data.mealType === mealType
+        ) {
+          setIsOnlyItemDraggingOver(true);
+        }
       },
-      onDragLeave: () => {
-        setIsHovered(false);
+      onDragLeave: ({ source }) => {
         setIsDragEnter(false);
+        if (
+          source.data.mealDate === mealDate &&
+          source.data.mealType === mealType
+        ) {
+          setIsOnlyItemDraggingOver(false);
+        }
       },
       onDrop: () => {
-        setIsHovered(false);
         setIsDragEnter(false);
+        setIsOnlyItemDraggingOver(false);
       },
-      getData: () => ({ mealDate, mealType }),
-      getIsSticky: () => false,
+      getData: () => ({ type: 'mealBox', mealDate, mealType }),
+      getIsSticky: () => true,
     });
 
     return cleanup;
-  }, [mealDate, mealType, setIsHovered]);
+  }, [mealDate, mealType]);
 
-  return { mealBoxRef, isDragEnter };
+  return { mealBoxRef, isDragEnter, isOnlyItemDraggingOver };
 };
 
 export default useMealBoxDrop;

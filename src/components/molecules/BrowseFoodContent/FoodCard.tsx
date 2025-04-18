@@ -74,7 +74,6 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem }) => {
               amount: 1,
               unit: 1,
             }}
-            showIngredient={false}
           />
         }
       >

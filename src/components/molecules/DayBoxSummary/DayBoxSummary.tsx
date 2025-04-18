@@ -51,7 +51,7 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
       <Button
         className={cn(
           'align-center border-borderGray flex h-[42px] w-full justify-start rounded-md border-1 px-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_8px_8px_rgba(0,0,0,0.05),_0px_0px_8px_rgba(35,31,32,0.1)]',
-          { 'invisible opacity-0': !allDayMealItems?.length && !isLoading },
+          { 'invisible opacity-0': !allDayMealItems && !isLoading },
         )}
       >
         {isLoading ? (
