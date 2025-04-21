@@ -46,7 +46,6 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
     unit: number,
     cardId: string,
   ) => {
-    // Create copy of MealDay that have the updated mealItem
     const currentMealPlanDay = viewingMealPlan.find((viewingMealPlanDay) =>
       isSameDay(new Date(viewingMealPlanDay.mealDate), new Date(mealDate)),
     );

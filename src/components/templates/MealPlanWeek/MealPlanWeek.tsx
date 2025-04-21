@@ -4,20 +4,16 @@ import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { useDate } from '@/contexts/DateContext';
 import { useCreateBlankMealPlan } from '@/hooks/useCreateBlankMealPlan';
+import { useMealTrackDragDrop } from '@/hooks/useMealTrackDragDrop';
 import { EmptyMealDay } from '@/molecules/EmptyMealDay';
 import MealPlanHeader from '@/molecules/MealPlanHeader/MealPlanHeader';
 import { MealBox } from '@/organisms/MealBox';
-import {
-  useGetMealPlanDayRangeQuery,
-  useUpdateMealPlanMutation,
-} from '@/redux/query/apis/mealPlan/mealPlanApi';
+import { useGetMealPlanDayRangeQuery } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import { mealPlanSelector } from '@/redux/slices/mealPlan';
-import type { MealPlanDay } from '@/types/mealPlan';
 import { getMealDate } from '@/utils/dateUtils';
 
 const MealPlanWeek: React.FC = () => {
   const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
-  const [updateMealPlan] = useUpdateMealPlanMutation();
   const { rangeDate, selectedDate } = useDate();
   const { handleCreateBlank } = useCreateBlankMealPlan();
   const mealRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -46,38 +42,7 @@ const MealPlanWeek: React.FC = () => {
     }
   }, [selectedDate, viewingMealPlans]);
 
-  const handleUpdateMealItem = async (
-    mealDate: Date,
-    mealType: keyof MealPlanDay['mealItems'],
-    mealItemId: string,
-    newAmount: number,
-    newUnit: number,
-  ) => {
-    const updatedMealPlans = viewingMealPlans.map((mealPlan) => {
-      if (mealPlan.mealDate.toString() === mealDate.toString()) {
-        return {
-          ...mealPlan,
-          mealItems: {
-            ...mealPlan.mealItems,
-            [mealType]: mealPlan.mealItems[mealType].map((item) =>
-              item.id === mealItemId
-                ? { ...item, amount: newAmount, unit: newUnit }
-                : item,
-            ),
-          },
-        };
-      }
-      return mealPlan;
-    });
-
-    const updatedPlan = updatedMealPlans.find(
-      (plan) => plan.mealDate.toString() === mealDate.toString(),
-    );
-
-    if (updatedPlan) {
-      updateMealPlan(updatedPlan);
-    }
-  };
+  useMealTrackDragDrop();
 
   // TODO: implement when task copy previous in progress
   const onCopyPreviousDay = () => {};
@@ -100,7 +65,6 @@ const MealPlanWeek: React.FC = () => {
                 <div key={mealType} className='w-[390px]'>
                   <MealBox
                     mealItems={mealPlanDay.mealItems[mealType]}
-                    onAmountChange={handleUpdateMealItem}
                     mealDate={mealDate}
                     mealType={mealType}
                     isLoading={isFetching}
