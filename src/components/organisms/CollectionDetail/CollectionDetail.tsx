@@ -11,6 +11,7 @@ import { ERROR_MESSAGES } from '@/constants/message';
 import { useToast } from '@/contexts/ToastContext';
 import { ActionButtons } from '@/molecules/ActionButtons';
 import { FoodsSection } from '@/molecules/FoodsSection';
+import { PopupUpload } from '@/molecules/PopupUpload';
 import {
   useGetCollectionDetailQuery,
   useUpdateCollectionMutation,
@@ -30,13 +31,18 @@ const CollectionDetail: React.FC = () => {
   const { id } = useParams({ strict: false });
   const [foods, setFoods] = useState<CollectionFood[]>([]);
   const { data, isLoading } = useGetCollectionDetailQuery(id!);
+  const [upload, setUpload] = useState(false);
   const [updateCollection] = useUpdateCollectionMutation();
   const user = useSelector(userSelector).user;
   const { showToastError } = useToast();
+  const [img, setImg] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (data?.data?.foods) {
       setFoods(data.data.foods);
+    }
+    if (data?.data?.img) {
+      setImg(data.data.img);
     }
   }, [data]);
 
@@ -52,8 +58,20 @@ const CollectionDetail: React.FC = () => {
     console.log('Delete clicked');
   };
 
-  const handleUpload = () => {
-    console.log('Upload clicked');
+  const handleUploaded = async (url: string) => {
+    if (!id) return;
+    try {
+      await updateCollection({
+        id,
+        data: {
+          img: url,
+        },
+      }).unwrap();
+      setImg(url);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      showToastError(ERROR_MESSAGES.IMAGE_UPLOAD_FAILED);
+    }
   };
 
   const handleRemoveFood = async (foodId: string) => {
@@ -102,18 +120,23 @@ const CollectionDetail: React.FC = () => {
           <Image
             width={200}
             src={
-              data?.data?.img ||
+              img ||
               'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
             }
             className='rounded-md'
           />
           <Button
-            className='my-2 flex items-center gap-2'
-            onClick={handleUpload}
+            className='hover:border-primary my-2 flex items-center gap-2 hover:text-black'
+            onClick={() => setUpload(!upload)}
           >
             <IoCloudUpload />
             <Paragraph className='m-0'>Upload</Paragraph>
           </Button>
+          <PopupUpload
+            isModalOpen={upload}
+            setModalOpen={setUpload}
+            onUploaded={handleUploaded}
+          />
         </div>
         <div className='mt-4 flex flex-col justify-between gap-14'>
           <div>

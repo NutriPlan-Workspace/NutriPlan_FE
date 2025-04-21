@@ -24,6 +24,7 @@ export const ERROR_MESSAGES = {
   CALORIES_MAX: 'Calories must be at most 5000!',
   NUTRIENT_MIN: 'Value must be a non-negative number!',
   REMOVE_FOOD_FAILED: 'Failed to remove food from collection!',
+  IMAGE_UPLOAD_FAILED: 'Image upload failed! Please try again.',
 };
 
 export const SUCCESS_MESSAGES = {
