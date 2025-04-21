@@ -223,14 +223,9 @@ export const useMealTrack = (
     [updateLastElement, updateNextToElement],
   );
 
-  const handleCopyPreviousDay = useCallback(async (mealDate: string) => {
-    console.log('Copy Previous Day', mealDate);
-  }, []);
-
   return {
     isLoadingList,
     viewingMealPlans,
     handleBeforeChange,
-    handleCopyPreviousDay,
   };
 };

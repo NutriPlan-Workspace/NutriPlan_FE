@@ -74,7 +74,18 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
         }
       },
     }),
-
+    getLatestMealPlan: builder.mutation<
+      MealPlanSingleDayResponse,
+      GetMealPlanSingleDayQueryArgs
+    >({
+      query: ({ date }) => {
+        const params = new URLSearchParams({ date }).toString();
+        return {
+          url: `/planner/copy?${params}`,
+          method: 'GET',
+        };
+      },
+    }),
     updateMealPlan: builder.mutation<
       UpdateMealPlanResponse,
       UpdateMealPlanQueryArgs
@@ -105,4 +116,5 @@ export const {
   useGetMealPlanDayRangeQuery,
   useUpdateMealPlanMutation,
   useCreateMealPlanMutation,
+  useGetLatestMealPlanMutation,
 } = mealPlanApi;
