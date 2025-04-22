@@ -1,3 +1,5 @@
+import { NutritionGoal } from '@/types/user';
+
 export enum NUTRITION_TEXT_COLOR {
   CARBS = 'text-carbsYellow',
   FATS = 'text-fatsBlue',
@@ -205,3 +207,13 @@ export const nutritionFieldGroup = [
     ],
   },
 ];
+
+export const targetKeyMap: Record<
+  'calories' | 'carbs' | 'fats' | 'proteins',
+  keyof NutritionGoal
+> = {
+  calories: 'calories',
+  carbs: 'carbTarget',
+  fats: 'fatTarget',
+  proteins: 'proteinTarget',
+};

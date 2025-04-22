@@ -16,6 +16,7 @@ interface MealBoxHeaderProps {
   nutritionData: NutritionSummaryFields;
   mealItems: MealPlanFood[];
   isHovered: boolean;
+  onClearMealItems: () => void;
 }
 
 const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
@@ -24,6 +25,7 @@ const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
   nutritionData,
   mealItems,
   isHovered,
+  onClearMealItems,
 }) => {
   // TODO: Implement onClick for each menu item
   const menuItems: MenuProps['items'] = [
@@ -36,6 +38,9 @@ const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
       label: 'Clear Foods',
       icon: <HiOutlineArchiveBoxXMark />,
       key: '1',
+      onClick: () => {
+        onClearMealItems();
+      },
     },
     {
       type: 'divider',

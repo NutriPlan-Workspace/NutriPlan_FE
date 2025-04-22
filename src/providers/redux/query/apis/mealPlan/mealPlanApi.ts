@@ -107,6 +107,15 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
         body: mealPlan,
       }),
     }),
+    removeMealPlan: builder.mutation<
+      { success: boolean; message?: string },
+      string
+    >({
+      query: (mealPlanId) => ({
+        url: `/planner/${mealPlanId}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
@@ -117,4 +126,5 @@ export const {
   useUpdateMealPlanMutation,
   useCreateMealPlanMutation,
   useGetLatestMealPlanMutation,
+  useRemoveMealPlanMutation,
 } = mealPlanApi;

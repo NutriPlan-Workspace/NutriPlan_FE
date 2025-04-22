@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'motion/react';
 
 import { cn } from '@/helpers/helpers';
@@ -6,9 +7,12 @@ import { DayBoxHeader } from '@/molecules/DayBoxHeader';
 import { DayBoxSummary } from '@/molecules/DayBoxSummary';
 import { NutritionPopoverDay } from '@/molecules/NutritionPopoverDay';
 import { DayBoxContent } from '@/organisms/DayBoxContent';
+import { useRemoveMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
+import { useGetNutritionTargetQuery } from '@/redux/query/apis/user/userApis';
+import { mealPlanSelector, setViewingMealPlans } from '@/redux/slices/mealPlan';
 import type { MealPlanDay } from '@/types/mealPlan';
 import { getTotalNutrition } from '@/utils/calculateNutrition';
-import { isSameDayAsToday } from '@/utils/dateUtils';
+import { isSameDay, isSameDayAsToday } from '@/utils/dateUtils';
 
 interface DayBoxProps {
   mealPlanDay: MealPlanDay | undefined;
@@ -37,6 +41,28 @@ const DayBox: React.FC<DayBoxProps> = ({
   const totalNutrition = allDayMealItems
     ? getTotalNutrition(allDayMealItems)
     : undefined;
+  const { data } = useGetNutritionTargetQuery();
+  const dispatch = useDispatch();
+  const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
+  const [deleteMealPlan] = useRemoveMealPlanMutation();
+  const date = new Date(mealDate);
+  const formattedDate = date.toISOString().slice(0, 10);
+
+  const handleRemoveMealDay = async (mealDate: string) => {
+    const mealPlanToDelete = viewingMealPlans.find((mealPlan) =>
+      isSameDay(new Date(mealPlan.mealDate), new Date(mealDate)),
+    );
+    if (!mealPlanToDelete || !mealPlanToDelete.mealPlanDay?._id) {
+      return;
+    }
+    await deleteMealPlan(mealPlanToDelete.mealPlanDay._id);
+    const updatedPlans = viewingMealPlans.map((plan) =>
+      isSameDay(new Date(plan.mealDate), new Date(mealDate))
+        ? { ...plan, mealPlanDay: undefined }
+        : plan,
+    );
+    dispatch(setViewingMealPlans({ mealPlanWithDates: updatedPlans }));
+  };
 
   return (
     <div
@@ -57,6 +83,7 @@ const DayBox: React.FC<DayBoxProps> = ({
         >
           <div className='max-w-[450px] flex-1 px-4'>
             <DayBoxHeader
+              onClearMealDay={() => handleRemoveMealDay(formattedDate)}
               mealDate={mealDate}
               isToday={isToday}
               isHovered={isHovered}
@@ -73,6 +100,7 @@ const DayBox: React.FC<DayBoxProps> = ({
           {Boolean(allDayMealItems?.length) && (
             <div className='max-w-[450px] flex-1 px-4'>
               <NutritionPopoverDay
+                targetNutrition={data?.data}
                 nutritionData={totalNutrition}
                 title='PERCENT CALORIES FROM'
                 isSingleDay={isSingleDay}
@@ -83,6 +111,7 @@ const DayBox: React.FC<DayBoxProps> = ({
       ) : (
         <>
           <DayBoxHeader
+            onClearMealDay={() => handleRemoveMealDay(formattedDate)}
             mealDate={mealDate}
             isToday={isToday}
             isHovered={isHovered}
@@ -97,10 +126,12 @@ const DayBox: React.FC<DayBoxProps> = ({
             transition={{ duration: 0.4 }}
           >
             <DayBoxSummary
+              targetNutrition={data?.data}
               allDayMealItems={allDayMealItems}
               isLoading={isLoading}
             />
 
+            {/* Meal Boxes */}
             <DayBoxContent
               mealItems={mealItems}
               mealDate={mealDate}

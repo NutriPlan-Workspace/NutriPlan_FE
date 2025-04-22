@@ -7,10 +7,11 @@ import {
 } from 'react-icons/hi';
 import { Button, Col, Row, Tooltip, Typography } from 'antd';
 
-import { nutritionFormat } from '@/constants/nutritionFormat';
+import { nutritionFormat, targetKeyMap } from '@/constants/nutritionFormat';
 import { cn } from '@/helpers/helpers';
 import { PieChart } from '@/molecules/PieChart';
 import type { NutritionSummaryFields } from '@/types/mealPlan';
+import type { NutritionGoal } from '@/types/user';
 import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
@@ -18,6 +19,7 @@ const { Title } = Typography;
 interface NutritionPopoverDayProps {
   title: string;
   nutritionData: NutritionSummaryFields | undefined;
+  targetNutrition?: NutritionGoal;
   onClick?: () => void;
   isSingleDay?: boolean;
 }
@@ -25,11 +27,14 @@ interface NutritionPopoverDayProps {
 const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
   title,
   nutritionData,
+  targetNutrition,
   onClick,
   isSingleDay = false,
 }) => (
   <div
-    className={cn('flex flex-col items-center', { 'w-[400px]': !isSingleDay })}
+    className={cn('flex flex-col items-center', {
+      'w-[400px]': !isSingleDay,
+    })}
   >
     <div
       className={cn(
@@ -126,17 +131,29 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
                 </Typography>
               </div>
             </Col>
+
             <Col span={10}>
               <div className='flex justify-center'>
                 <Typography className='text-black'>
-                  {nutritionData && roundNumber(nutritionData[item.key], 2)}
-                  {item.unit}
+                  {item.key === 'calories'
+                    ? roundNumber(
+                        isNaN(targetNutrition?.[targetKeyMap[item.key]])
+                          ? 0
+                          : targetNutrition?.[targetKeyMap[item.key]],
+                        2,
+                      )
+                    : `${isNaN(targetNutrition?.[targetKeyMap[item.key]]?.from) ? '' : roundNumber(targetNutrition?.[targetKeyMap[item.key]]?.from, 2)} - 
+       ${isNaN(targetNutrition?.[targetKeyMap[item.key]]?.to) ? '' : roundNumber(targetNutrition?.[targetKeyMap[item.key]]?.to, 2)}`}
+                  {isNaN(targetNutrition?.[targetKeyMap[item.key]]?.to)
+                    ? ''
+                    : item.unit}
                 </Typography>
               </div>
             </Col>
           </Row>
         </div>
       ))}
+
       <br />
       <Button
         variant='filled'

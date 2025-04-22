@@ -61,7 +61,7 @@ export interface NutritionGoalResponse {
 }
 
 export interface NutritionGoal {
-  userId: string;
+  userId?: string;
   calories: number;
   proteinTarget: Range;
   carbTarget: Range;

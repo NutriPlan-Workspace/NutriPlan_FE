@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   HiOutlineArchiveBoxXMark,
   HiOutlineArrowLeftEndOnRectangle,
@@ -6,7 +6,7 @@ import {
   HiOutlineDocument,
   HiOutlineDocumentDuplicate,
 } from 'react-icons/hi2';
-import { MenuProps, Typography } from 'antd';
+import { MenuProps, Modal, Typography } from 'antd';
 
 import { DayBoxHeaderSkeleton } from '@/atoms/DayBoxHeaderSkeleton';
 import { PairButton } from '@/atoms/PairButton';
@@ -18,6 +18,7 @@ interface DayBoxHeaderProps {
   isToday: boolean;
   isHovered: boolean;
   isLoading: boolean;
+  onClearMealDay: () => void;
 }
 
 const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
@@ -25,8 +26,14 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
   isToday,
   isHovered,
   isLoading,
+  onClearMealDay,
 }) => {
-  // TODO: Implement onClick for each menu item
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const handleConfirmDelete = () => {
+    onClearMealDay();
+    setIsConfirmModalOpen(false);
+  };
+
   const menuItems: MenuProps['items'] = [
     {
       label: 'Insert Blank Day',
@@ -37,6 +44,9 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
       label: 'Clear Day',
       icon: <HiOutlineArchiveBoxXMark />,
       key: '1',
+      onClick: () => {
+        setIsConfirmModalOpen(true);
+      },
     },
     {
       type: 'divider',
@@ -76,6 +86,21 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
         </Typography>
         <PairButton isHovered={isHovered} menuItems={menuItems} />
       </div>
+
+      <Modal
+        open={isConfirmModalOpen}
+        onOk={handleConfirmDelete}
+        onCancel={() => setIsConfirmModalOpen(false)}
+        okText='Yes'
+        cancelText='Cancel'
+        okButtonProps={{ danger: true }}
+        cancelButtonProps={{
+          className:
+            'bg-gray-400 text-white hover:bg-gray-500 border-none focus:outline-none',
+        }}
+      >
+        <p>Are you sure you want to delete this diet?</p>
+      </Modal>
     </div>
   );
 };

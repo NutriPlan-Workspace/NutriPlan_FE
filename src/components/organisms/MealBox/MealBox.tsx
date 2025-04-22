@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { motion } from 'motion/react';
 
 import { MealBoxHeader } from '@/molecules/MealBoxHeader';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
 import { MealBoxContent } from '@/organisms/MealBoxContent';
+import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
+import {
+  mealPlanSelector,
+  updateViewingMealPlanByDate,
+} from '@/redux/slices/mealPlan';
 import type { MealItems, MealPlanDay, MealPlanFood } from '@/types/mealPlan';
 import {
   getTotalCalories,
   getTotalNutrition,
 } from '@/utils/calculateNutrition';
+import { isSameDay } from '@/utils/dateUtils';
+import { getMealPlanDayDatabaseDTOByMealPlanDay } from '@/utils/mealPlan';
 
 interface MealBoxProps {
   mealItems: MealPlanFood[];
@@ -23,6 +32,37 @@ const MealBox: React.FC<MealBoxProps> = ({
   mealType,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const dispatch = useDispatch();
+  const [updateMealPlan] = useUpdateMealPlanMutation();
+  const viewingMealPlan = useSelector(mealPlanSelector).viewingMealPlans;
+
+  const handleRemoveAllFoodInMealType = async (
+    mealDate: string,
+    mealType: keyof MealItems,
+  ) => {
+    const currentMealPlanDay = viewingMealPlan.find((plan) =>
+      isSameDay(new Date(plan.mealDate), new Date(mealDate)),
+    );
+    if (!currentMealPlanDay || !currentMealPlanDay.mealPlanDay?.mealItems)
+      return;
+    const updatedMealItems = { ...currentMealPlanDay.mealPlanDay.mealItems };
+    updatedMealItems[mealType] = [];
+    const updatedMealPlanDay = {
+      ...currentMealPlanDay.mealPlanDay,
+      mealItems: updatedMealItems,
+    };
+    dispatch(
+      updateViewingMealPlanByDate({
+        mealPlanWithDate: {
+          mealPlanDay: updatedMealPlanDay,
+          mealDate: mealDate,
+        },
+      }),
+    );
+    const updatedMealPlanDatabaseDTO =
+      getMealPlanDayDatabaseDTOByMealPlanDay(updatedMealPlanDay);
+    await updateMealPlan({ mealPlan: updatedMealPlanDatabaseDTO });
+  };
 
   return (
     <div
@@ -35,6 +75,9 @@ const MealBox: React.FC<MealBoxProps> = ({
       ) : (
         <div>
           <MealBoxHeader
+            onClearMealItems={() =>
+              handleRemoveAllFoodInMealType(mealDate, mealType)
+            }
             mealType={mealType}
             calories={getTotalCalories(mealItems)}
             nutritionData={getTotalNutrition(mealItems)}

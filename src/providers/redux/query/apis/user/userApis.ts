@@ -1,7 +1,7 @@
 import { NUTRITION_TARGET_ENDPOINT } from '@/constants/endpoints';
 import { baseApi } from '@/redux/query/apis/baseApi';
 import type { ApiResponse } from '@/types/apiResponse';
-import type { NutritionTarget } from '@/types/user';
+import type { NutritionGoalResponse, NutritionTarget } from '@/types/user';
 
 export const nutritionApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -21,10 +21,17 @@ export const nutritionApi = baseApi.injectEndpoints({
         body: body,
       }),
     }),
+    getNutritionTarget: builder.query<NutritionGoalResponse, void>({
+      query: () => ({
+        url: '/user/nutrition-target',
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
 export const {
   useGetNutritionRequestQuery,
   useUpdateNutritionRequestMutation,
+  useGetNutritionTargetQuery,
 } = nutritionApi;
