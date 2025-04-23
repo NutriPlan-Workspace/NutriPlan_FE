@@ -18,7 +18,7 @@ export interface CollectionFood {
   _id: string;
 }
 
-export interface BodyCollectionUpdate {
+export interface Collection {
   _id: string;
   userId: string;
   title: string;

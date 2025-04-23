@@ -4,7 +4,7 @@ import { Dropdown, Space, Typography } from 'antd';
 import { cn } from 'helpers/helpers';
 
 import { PLAN_TYPES } from '@/constants/plans';
-import { MenuItemDropdown } from '@/types/menuItem';
+import type { MenuItemDropdown } from '@/types/menuItem';
 
 interface DropdownMenuProps {
   items: MenuItemDropdown[];

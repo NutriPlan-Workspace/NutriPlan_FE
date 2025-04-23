@@ -1,6 +1,6 @@
 import { MenuProps } from 'antd';
 
-import { MenuItem } from '@/types/menuItem';
+import type { MenuItem } from '@/types/menuItem';
 
 export const getMealMenuItems = (
   menuItemsRef: MenuItem[],

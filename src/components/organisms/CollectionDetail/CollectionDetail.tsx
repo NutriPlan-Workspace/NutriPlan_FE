@@ -3,7 +3,9 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import { IoCloudUpload } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 import { useParams } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import { Image, Typography } from 'antd';
+import { motion } from 'framer-motion';
 
 import { Button } from '@/atoms/Button';
 import { CollectionSkeleton } from '@/atoms/CollectionSkeleton';
@@ -36,6 +38,7 @@ const CollectionDetail: React.FC = () => {
   const user = useSelector(userSelector).user;
   const { showToastError } = useToast();
   const [img, setImg] = useState<string | undefined>(undefined);
+  const router = useRouter();
 
   useEffect(() => {
     if (data?.data?.foods) {
@@ -108,59 +111,68 @@ const CollectionDetail: React.FC = () => {
   }
 
   return (
-    <div className='m-4 flex flex-col gap-4'>
-      <div className='flex items-center gap-4'>
-        <FaArrowLeft />
-        <Title level={3} className='m-0 font-thin'>
-          {data?.data?.title}
-        </Title>
-      </div>
-      <div className='flex items-start gap-6'>
-        <div className='flex flex-col gap-2'>
-          <Image
-            width={200}
-            src={
-              img ||
-              'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-            }
-            className='rounded-md'
+    <motion.div
+      className='m-5 flex flex-col gap-4'
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
+      <div className='flex flex-col gap-4'>
+        <div className='flex items-center gap-4'>
+          <FaArrowLeft
+            onClick={() => router.history.back()}
+            className='hover:text-primary cursor-pointer transition'
           />
-          <Button
-            className='hover:border-primary my-2 flex items-center gap-2 hover:text-black'
-            onClick={() => setUpload(!upload)}
-          >
-            <IoCloudUpload />
-            <Paragraph className='m-0'>Upload</Paragraph>
-          </Button>
-          <PopupUpload
+          <Title level={3} className='m-0 font-thin'>
+            {data?.data?.title}
+          </Title>
+        </div>
+        <div className='flex items-start gap-6'>
+          <div className='flex w-[200px] flex-col gap-2'>
+            <Image
+              src={
+                img ||
+                'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+              }
+              className='rounded-md'
+            />
+            <Button
+              className='my-2 flex items-center gap-2'
+              onClick={() => setUpload(!upload)}
+            >
+              <IoCloudUpload />
+              <Paragraph className='m-0'>Upload</Paragraph>
+            </Button>
+            <PopupUpload
             isModalOpen={upload}
             setModalOpen={setUpload}
             onUploaded={handleUploaded}
           />
-        </div>
-        <div className='mt-4 flex flex-col justify-between gap-14'>
-          <div>
-            <Paragraph className='m-0 text-sm font-thin text-gray-400'>
-              {user?.fullName}
-            </Paragraph>
-            <Paragraph className='m-0 text-sm font-thin text-gray-400'>
-              {data?.data?.foods?.length} item
-            </Paragraph>
           </div>
-          <ActionButtons
-            isFavorite={data?.data?.isFavorites || false}
-            onEdit={handleEdit}
-            onSetAsRecurring={handleSetAsRecurring}
-            onDelete={handleDelete}
-          />
+          <div className='mt-4 flex flex-col justify-between gap-14'>
+            <div>
+              <Paragraph className='m-0 text-sm font-thin text-gray-400'>
+                {user?.fullName}
+              </Paragraph>
+              <Paragraph className='m-0 text-sm font-thin text-gray-400'>
+                {data?.data?.foods?.length} item
+              </Paragraph>
+            </div>
+            <ActionButtons
+              isFavorite={data?.data?.isFavorites || false}
+              onEdit={handleEdit}
+              onSetAsRecurring={handleSetAsRecurring}
+              onDelete={handleDelete}
+            />
+          </div>
         </div>
+        <FoodsSection
+          dropdownItems={dropdownItems}
+          foods={foods}
+          onRemoveFood={handleRemoveFood}
+        />
       </div>
-      <FoodsSection
-        dropdownItems={dropdownItems}
-        foods={foods}
-        onRemoveFood={handleRemoveFood}
-      />
-    </div>
+    </motion.div>
   );
 };
 

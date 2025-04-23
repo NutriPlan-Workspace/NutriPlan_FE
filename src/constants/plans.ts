@@ -1,4 +1,4 @@
-import { MenuItemDropdown } from '@/types/menuItem';
+import type { MenuItemDropdown } from '@/types/menuItem';
 import { getDisplayWeek } from '@/utils/dateUtils';
 
 export const PLAN_TYPES = {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 
-import { MenuItem } from '@/types/menuItem';
+import type { MenuItemDropdown } from '@/types/menuItem';
 
 interface MenuOptionProps {
   selectedOption?: string;
-  items: MenuItem[];
+  items: MenuItemDropdown[];
   className?: string;
   onSelect?: (selectedKey: string) => void;
 }

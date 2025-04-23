@@ -46,4 +46,5 @@ export const PATH = {
   CREDENTIALS: '/profile',
 
   LOGOUT: '/logout',
+  CREATE_COLLECTION: '/collections/create',
 } as const;

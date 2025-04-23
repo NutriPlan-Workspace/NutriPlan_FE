@@ -23,6 +23,7 @@ import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as CollectionsIndexImport } from './routes/collections/index'
 import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
+import { Route as CollectionsCreateImport } from './routes/collections/create'
 import { Route as CollectionsIdImport } from './routes/collections/$id'
 
 // Create/Update Routes
@@ -99,6 +100,12 @@ const AdminIndexRoute = AdminIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const CollectionsCreateRoute = CollectionsCreateImport.update({
+  id: '/collections/create',
+  path: '/collections/create',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const CollectionsIdRoute = CollectionsIdImport.update({
   id: '/collections/$id',
   path: '/collections/$id',
@@ -121,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/collections/$id'
       fullPath: '/collections/$id'
       preLoaderRoute: typeof CollectionsIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/collections/create': {
+      id: '/collections/create'
+      path: '/collections/create'
+      fullPath: '/collections/create'
+      preLoaderRoute: typeof CollectionsCreateImport
       parentRoute: typeof rootRoute
     }
     '/admin/': {
@@ -208,6 +222,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/collections/create': typeof CollectionsCreateRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
@@ -224,6 +239,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/collections/create': typeof CollectionsCreateRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
@@ -241,6 +257,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/collections/create': typeof CollectionsCreateRoute
   '/admin/': typeof AdminIndexRoute
   '/browse-foods/': typeof BrowseFoodsIndexRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -259,6 +276,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/collections/$id'
+    | '/collections/create'
     | '/admin'
     | '/browse-foods'
     | '/collections'
@@ -274,6 +292,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/collections/$id'
+    | '/collections/create'
     | '/admin'
     | '/browse-foods'
     | '/collections'
@@ -289,6 +308,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/collections/$id'
+    | '/collections/create'
     | '/admin/'
     | '/browse-foods/'
     | '/collections/'
@@ -306,6 +326,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CollectionsIdRoute: typeof CollectionsIdRoute
+  CollectionsCreateRoute: typeof CollectionsCreateRoute
   AdminIndexRoute: typeof AdminIndexRoute
   BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
@@ -322,6 +343,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CollectionsIdRoute: CollectionsIdRoute,
+  CollectionsCreateRoute: CollectionsCreateRoute,
   AdminIndexRoute: AdminIndexRoute,
   BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
@@ -347,6 +369,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/collections/$id",
+        "/collections/create",
         "/admin/",
         "/browse-foods/",
         "/collections/",
@@ -365,6 +388,9 @@ export const routeTree = rootRoute
     },
     "/collections/$id": {
       "filePath": "collections/$id.tsx"
+    },
+    "/collections/create": {
+      "filePath": "collections/create.tsx"
     },
     "/admin/": {
       "filePath": "admin/index.tsx"

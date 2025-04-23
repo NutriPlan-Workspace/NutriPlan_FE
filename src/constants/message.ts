@@ -25,6 +25,7 @@ export const ERROR_MESSAGES = {
   NUTRIENT_MIN: 'Value must be a non-negative number!',
   REMOVE_FOOD_FAILED: 'Failed to remove food from collection!',
   IMAGE_UPLOAD_FAILED: 'Image upload failed! Please try again.',
+  CREATE_COLLECTION_FAILED: 'Failed to create collection!',
 };
 
 export const SUCCESS_MESSAGES = {

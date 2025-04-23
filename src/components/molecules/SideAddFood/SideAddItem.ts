@@ -1,4 +1,4 @@
-import { MenuItemDropdown } from '@/types/menuItem';
+import type { MenuItemDropdown } from '@/types/menuItem';
 
 export const MenuSideAddFood: MenuItemDropdown[] = [
   {
