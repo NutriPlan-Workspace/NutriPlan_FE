@@ -22,9 +22,9 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 
   return (
     <div className='flex w-full items-center justify-between'>
-      <label className='w-[100px] font-medium'>{title}</label>
+      <label className='w-[80px] font-medium'>{title}</label>
       <Row className='flex-1 rounded-md p-2'>
-        <Col span={16}>
+        <Col span={16} className='pr-4'>
           <Slider
             range={{ draggableTrack: true }}
             min={0}

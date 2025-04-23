@@ -1,25 +1,28 @@
 import { FOODS_ENDPOINT, SEARCH_FOOD_ENDPOINT } from '@/constants/endpoints';
 import { baseApi } from '@/redux/query/apis/baseApi';
 import type { ApiResponse } from '@/types/apiResponse';
-import type {
-  DetailedFoodResponse,
-  FoodCategory,
-  SideAddFoodResponse,
-} from '@/types/food';
+import type { DetailedFoodResponse, Food, FoodCategory } from '@/types/food';
+import type { FoodFilterQuery } from '@/types/foodFilterQuery';
 
 export const foodsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getFoods: builder.query<
-      ApiResponse<SideAddFoodResponse>,
-      { page: number; limit?: number }
-    >({
-      query: ({ page, limit = 8 }) =>
-        `${FOODS_ENDPOINT}?page=${page}&limit=${limit}`,
-      keepUnusedDataFor: 15,
+    getFoods: builder.query<ApiResponse<Food[]>, FoodFilterQuery>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+          if (value === undefined || value === null) return;
+          if (Array.isArray(value)) {
+            searchParams.set(key, JSON.stringify(value));
+          } else {
+            searchParams.set(key, String(value));
+          }
+        });
+        return `${FOODS_ENDPOINT}?${searchParams.toString()}`;
+      },
     }),
     getFoodById: builder.query<DetailedFoodResponse, string>({
       query: (idFood) => ({
-        url: `/foods/${idFood}`,
+        url: `${FOODS_ENDPOINT}/${idFood}`,
       }),
     }),
     searchFood: builder.query<

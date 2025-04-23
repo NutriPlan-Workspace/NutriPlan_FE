@@ -7,12 +7,34 @@ import { ScaleProviderIngre } from '@/contexts/ScaleIngreContext';
 import { useGetFoodsQuery } from '@/redux/query/apis/food/foodApis';
 import BrowseFoodTemplate from '@/templates/BrowseFoodTemplate/BrowseFoodTemplate';
 import type { Food } from '@/types/food';
+import type { FoodFilterQuery } from '@/types/foodFilterQuery';
 
 const BrowseFoodPage = () => {
   const [page, setPage] = useState(1);
   const [foods, setFoods] = useState<Food[]>([]);
+  const [filters, setFilters] = useState<Partial<FoodFilterQuery>>({});
+  const [isUpdatingFilters, setIsUpdatingFilters] = useState(false);
+  const { data, isFetching } = useGetFoodsQuery({ page, limit: 8, ...filters });
+  const isLastPage = (data && data.data?.length < 8) || false;
 
-  const { data, isFetching } = useGetFoodsQuery({ page, limit: 8 });
+  const handleFilterChange = (
+    updatedFilter: Partial<FoodFilterQuery>,
+    keysToRemove: (keyof FoodFilterQuery)[] = [],
+  ) => {
+    setFilters(() => {
+      const cleaned = { ...updatedFilter };
+      keysToRemove.forEach((key) => {
+        delete cleaned[key];
+      });
+      return cleaned;
+    });
+    setIsUpdatingFilters(true);
+  };
+
+  const handleLoadMore = () => {
+    setPage((prev) => prev + 1);
+    setIsUpdatingFilters(true);
+  };
 
   useEffect(() => {
     if (Array.isArray(data?.data)) {
@@ -22,6 +44,7 @@ const BrowseFoodPage = () => {
         ...(Array.isArray(data?.data) ? data?.data : []),
       ]);
     }
+    setIsUpdatingFilters(false);
   }, [data]);
 
   return (
@@ -29,8 +52,14 @@ const BrowseFoodPage = () => {
       <ScaleProviderIngre>
         <BrowseFoodTemplate
           foods={foods}
-          isFetching={isFetching}
-          onLoadMore={() => setPage((prev) => prev + 1)}
+          isFetching={isUpdatingFilters || isFetching}
+          onLoadMore={handleLoadMore}
+          onFilterChange={(newFilters, keysToRemove = []) => {
+            setFoods([]);
+            setPage(1);
+            handleFilterChange(newFilters, keysToRemove);
+          }}
+          isLastPage={isLastPage}
         />
       </ScaleProviderIngre>
     </ScaleProvider>

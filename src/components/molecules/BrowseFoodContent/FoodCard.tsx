@@ -86,16 +86,16 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem }) => {
               <img
                 src={foodItem.imgUrls ? foodItem.imgUrls[0] : ''}
                 alt={foodItem.name}
-                className='h-full w-full rounded-md object-cover'
+                className='h-[200px] w-full rounded-t-md object-cover'
               />
             </div>
           </div>
           <div className='mt-2'>
-            <p className='text-center font-bold text-gray-800'>
+            <p className='truncate px-2 text-center font-bold text-gray-800'>
               {foodItem.name}
             </p>
           </div>
-          <div className='flex items-center justify-center gap-2 pt-1'>
+          <div className='flex items-center justify-center gap-2 pt-1 pb-2'>
             <PieChart nutritionData={foodItem.nutrition} label={false} />
             <p className='text-sm text-gray-400'>{`${Math.round(foodItem.nutrition.calories).toString()} Calories`}</p>
           </div>
@@ -131,4 +131,5 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem }) => {
     </>
   );
 };
+
 export default FoodCard;
