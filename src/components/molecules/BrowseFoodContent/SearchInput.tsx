@@ -10,19 +10,14 @@ import { ModalFilter } from '@/molecules/ModalFilter';
 import type { FoodFilterQuery } from '@/types/foodFilterQuery';
 
 interface SearchInputProps {
-  openModal: boolean;
-  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   onFilterChange?: (
     newFilters: Partial<FoodFilterQuery>,
     keysToRemove?: (keyof FoodFilterQuery)[],
   ) => void;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({
-  openModal,
-  setOpenModal,
-  onFilterChange,
-}) => {
+const SearchInput: React.FC<SearchInputProps> = ({ onFilterChange }) => {
+  const [openModal, setOpenModal] = useState(false);
   const [hasFilter, setHasFilter] = useState(false);
   const { searchValue, setSearchValue } = useFilterModal();
   const [debouncedValue, setDebouncedValue] = useState('');

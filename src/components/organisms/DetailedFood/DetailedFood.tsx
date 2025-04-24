@@ -6,7 +6,7 @@ import { Ingredient } from '@/molecules/Ingredient';
 import { NutritionSummary } from '@/molecules/NutritionSummary';
 import { ScaleRecipe } from '@/molecules/ScaleRecipe';
 import { TimeInfo } from '@/molecules/TimeInfo';
-import { DetailedFoodResponse, Food } from '@/types/food';
+import type { Food } from '@/types/food';
 
 const DEFAULT_UNIT = [
   {
@@ -20,13 +20,10 @@ const DEFAULT_UNIT = [
 ];
 
 interface DetailedFoodProp {
-  detailedFood: DetailedFoodResponse;
-  setDetailedIngredient: (detailedIngredient: Food | null) => void;
+  food: Food | undefined;
+  listIngredient?: Food[];
 }
-const DetailedFood: React.FC<DetailedFoodProp> = ({
-  detailedFood,
-  setDetailedIngredient,
-}) => (
+const DetailedFood: React.FC<DetailedFoodProp> = ({ food, listIngredient }) => (
   <>
     <Content
       className='flex-grow bg-gray-50'
@@ -34,44 +31,36 @@ const DetailedFood: React.FC<DetailedFoodProp> = ({
     >
       <div className='grid grid-cols-[2.3fr_3fr] gap-12'>
         <div>
-          {detailedFood?.data.mainFood.imgUrls?.[0] ? (
-            <img
-              src={detailedFood?.data.mainFood.imgUrls[0]}
-              alt={detailedFood?.data.mainFood.name}
-              className='h-[25%] w-full rounded-md object-cover'
-            />
+          {food?.imgUrls?.[0] ? (
+            <div className='aspect-[1.618] w-full overflow-hidden rounded-md'>
+              <img
+                src={food?.imgUrls[0]}
+                alt={food?.name}
+                className='h-full w-full object-cover'
+              />
+            </div>
           ) : (
             <p>No Image Available</p>
           )}
-          {detailedFood?.data.mainFood.nutrition ? (
-            <NutritionSummary
-              nutrition={detailedFood?.data.mainFood.nutrition}
-              type='food'
-            />
+          {food?.nutrition ? (
+            <NutritionSummary nutrition={food?.nutrition} type='food' />
           ) : (
             <p>No Nutrition Info</p>
           )}
         </div>
         <div className='col-span-1'>
           <TimeInfo
-            prepTime={detailedFood?.data.mainFood.property.prepTime}
-            cookTime={detailedFood?.data.mainFood.property.cookTime}
+            prepTime={food ? food.property.prepTime : 0}
+            cookTime={food ? food.property.cookTime : 0}
           />
-          <ScaleRecipe
-            units={detailedFood?.data.mainFood.units || DEFAULT_UNIT}
-          />
-          {detailedFood?.data.ingredientList.length ? (
-            <Ingredient
-              ingredientList={detailedFood.data.ingredientList}
-              setDetailedIngredient={setDetailedIngredient}
-            />
+          <ScaleRecipe units={food?.units || DEFAULT_UNIT} />
+          {listIngredient ? (
+            <Ingredient ingredientList={listIngredient} />
           ) : (
             <p>No Ingredients Available</p>
           )}
-          {detailedFood?.data.mainFood.directions?.length ? (
-            <DirectionsList
-              directions={detailedFood?.data.mainFood.directions}
-            />
+          {food?.directions?.length ? (
+            <DirectionsList directions={food?.directions} />
           ) : (
             <p>No Directions Available</p>
           )}

@@ -20,7 +20,7 @@ import {
 } from '@/redux/query/apis/user/userApi';
 import { userSelector } from '@/redux/slices/user';
 import { physicalStatsSchema } from '@/schemas/physicalStatsSchema';
-import { NutritionGoal } from '@/types/user';
+import type { NutritionGoal } from '@/types/user';
 import { formatDate } from '@/utils/dateUtils';
 
 const WeightAndGoal: React.FC = () => {

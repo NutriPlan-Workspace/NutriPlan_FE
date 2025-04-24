@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { createFileRoute, FileRoutesByPath } from '@tanstack/react-router';
 
 import { PATH } from '@/constants/path';
-import { ScaleProvider } from '@/contexts/ScaleContext';
-import { ScaleProviderIngre } from '@/contexts/ScaleIngreContext';
 import { useGetFoodsQuery } from '@/redux/query/apis/food/foodApis';
 import BrowseFoodTemplate from '@/templates/BrowseFoodTemplate/BrowseFoodTemplate';
 import type { Food } from '@/types/food';
@@ -48,21 +46,17 @@ const BrowseFoodPage = () => {
   }, [data]);
 
   return (
-    <ScaleProvider>
-      <ScaleProviderIngre>
-        <BrowseFoodTemplate
-          foods={foods}
-          isFetching={isUpdatingFilters || isFetching}
-          onLoadMore={handleLoadMore}
-          onFilterChange={(newFilters, keysToRemove = []) => {
-            setFoods([]);
-            setPage(1);
-            handleFilterChange(newFilters, keysToRemove);
-          }}
-          isLastPage={isLastPage}
-        />
-      </ScaleProviderIngre>
-    </ScaleProvider>
+    <BrowseFoodTemplate
+      foods={foods}
+      isFetching={isUpdatingFilters || isFetching}
+      onLoadMore={handleLoadMore}
+      onFilterChange={(newFilters, keysToRemove = []) => {
+        setFoods([]);
+        setPage(1);
+        handleFilterChange(newFilters, keysToRemove);
+      }}
+      isLastPage={isLastPage}
+    />
   );
 };
 

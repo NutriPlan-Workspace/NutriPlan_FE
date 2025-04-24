@@ -4,7 +4,7 @@ import { PATH } from '@/constants/path';
 import { Role } from '@/constants/role';
 import { authApi } from '@/redux/query/apis/auth/authApi';
 import { store } from '@/redux/store';
-import { AuthResponse } from '@/types/auth';
+import type { AuthResponse } from '@/types/auth';
 
 export const getUserData = async () => {
   const { data } = await store.dispatch(authApi.endpoints.getUser.initiate());

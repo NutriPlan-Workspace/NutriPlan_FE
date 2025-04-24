@@ -44,5 +44,9 @@ export const foodsApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetFoodsQuery, useGetFoodByIdQuery, useSearchFoodQuery } =
-  foodsApi;
+export const {
+  useGetFoodsQuery,
+  useGetFoodByIdQuery,
+  useLazyGetFoodByIdQuery,
+  useSearchFoodQuery,
+} = foodsApi;

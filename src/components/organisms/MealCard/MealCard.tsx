@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { EyeOutlined } from '@ant-design/icons';
 import { Image, Popover, Typography } from 'antd';
 
 import { DropIndicator } from '@/atoms/DropIndicator';
@@ -7,8 +9,12 @@ import { cn } from '@/helpers/helpers';
 import { useMealCardDrag } from '@/hooks/useMealCardDrag';
 import { AmountSelector } from '@/molecules/AmountSelector';
 import { NutritionPopoverFood } from '@/molecules/NutritionPopoverFood';
-import { Food } from '@/types/food';
-import { MealPlanDay, MealPlanFood } from '@/types/mealPlan';
+import {
+  setIsModalDetailOpen,
+  setViewingDetailFood,
+} from '@/redux/slices/food';
+import type { Food } from '@/types/food';
+import type { MealPlanDay, MealPlanFood } from '@/types/mealPlan';
 
 import { getMenuItems } from './MenuItemMealCard';
 
@@ -36,7 +42,9 @@ const MealCard: React.FC<MealCardProps> = ({
   onRemoveFood,
   onDuplicateFood,
 }) => {
+  const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+
   const handleEnterHover = () => setIsHovered(true);
   const handleLeaveHover = () => setIsHovered(false);
 
@@ -61,7 +69,6 @@ const MealCard: React.FC<MealCardProps> = ({
       {dragState && closestEdge === 'top' && (
         <DropIndicator edge='top' mealCardHeight={draggingCardHeight} />
       )}
-
       <Popover
         placement='left'
         color='white'
@@ -89,11 +96,20 @@ const MealCard: React.FC<MealCardProps> = ({
               'h-[50px] w-[50px] max-w-[50px] rounded-[10px] border-2 border-transparent object-cover transition-all duration-200',
               { 'border-primary-400 border-2': isHovered },
             )}
+            preview={{
+              mask: <EyeOutlined style={{ fontSize: 20, color: 'white' }} />,
+            }}
           />
           <div className='ml-[10px] flex w-full flex-col justify-center gap-[3px] pr-[10px]'>
             {/* title */}
-            <Link className='leading-4.5 font-bold text-black transition-all duration-200 hover:underline'>
-              {food.name}
+            <Link
+              className='leading-4.5 font-bold text-black transition-all duration-200 hover:underline'
+              onClick={() => {
+                dispatch(setViewingDetailFood(mealItem));
+                dispatch(setIsModalDetailOpen(true));
+              }}
+            >
+              {mealItem.foodId.name}
             </Link>
             {isMealPlanFood(mealItem) && onAmountChange && (
               <AmountSelector

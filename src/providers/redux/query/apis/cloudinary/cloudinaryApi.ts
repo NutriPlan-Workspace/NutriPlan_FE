@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import { CLOUDINARY_CONFIG } from '@/configs/cloudinary';
-import { UploadImageResponse } from '@/types/cloudinary';
+import type { UploadImageResponse } from '@/types/cloudinary';
 import { createUploadFormData } from '@/utils/uploadImage';
 
 export const cloudinaryApi = createApi({

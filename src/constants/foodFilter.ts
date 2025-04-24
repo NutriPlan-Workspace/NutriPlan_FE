@@ -1,4 +1,4 @@
-import { FoodFilterQuery } from '@/types/foodFilterQuery';
+import type { FoodFilterQuery } from '@/types/foodFilterQuery';
 
 export const VALID_FILTERS = [
   'basicFood',

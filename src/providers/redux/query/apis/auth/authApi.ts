@@ -12,7 +12,7 @@ import type { ChangePasswordSchemaType } from '@/schemas/passwordSchema';
 import type { ApiResponse } from '@/types/apiResponse';
 import type { LoginData, LogoutResponse, RegisterData } from '@/types/auth';
 import type { AuthResponse } from '@/types/auth';
-import { UserResponse } from '@/types/user';
+import type { UserResponse } from '@/types/user';
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

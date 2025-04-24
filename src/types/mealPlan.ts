@@ -1,3 +1,5 @@
+import { NutritionFields } from './food';
+
 export interface NutritionSummaryFields {
   calories: number;
   carbs: number;
@@ -11,20 +13,22 @@ export interface PropertySummaryFields {
   prepTime: number;
   cookTime: number;
 }
+
+export interface MealPlanFoodDetail {
+  _id: string;
+  name: string;
+  imgUrls: string[];
+  property: PropertySummaryFields;
+  nutrition: NutritionFields;
+  units: {
+    _id: string;
+    amount: number;
+    description: string;
+  }[];
+}
 export interface MealPlanFood {
   _id: string;
-  foodId: {
-    _id: string;
-    name: string;
-    imgUrls: string[];
-    property: PropertySummaryFields;
-    nutrition: NutritionSummaryFields;
-    units: {
-      _id: string;
-      amount: number;
-      description: string;
-    }[];
-  };
+  foodId: MealPlanFoodDetail;
   amount: number;
   unit: number;
 }

@@ -14,7 +14,7 @@ const NutritionDetailedTable: FC<NutritionDetailedTableProps> = ({
   nutrition,
   type,
 }) => (
-  <>
+  <table className='w-full border-none'>
     {nutritionFieldGroup.map((item) => {
       const nutritionItem = item.field.map(({ key, title, unit }) => ({
         title,
@@ -58,7 +58,7 @@ const NutritionDetailedTable: FC<NutritionDetailedTableProps> = ({
         </>
       );
     })}
-  </>
+  </table>
 );
 
 export default NutritionDetailedTable;

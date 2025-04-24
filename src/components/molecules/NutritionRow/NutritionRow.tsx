@@ -14,6 +14,8 @@ interface NutritionRowProp {
 }
 
 const NutritionRow: FC<NutritionRowProp> = ({ detailedNutrition, type }) => {
+  const amountMealDay = 1;
+  const conversionFactorMealDay = 1;
   const { amount, conversionFactor } = useScale();
   const { amountIngre, conversionFactorIngre } = useScaleIngre();
   return (
@@ -35,11 +37,17 @@ const NutritionRow: FC<NutritionRowProp> = ({ detailedNutrition, type }) => {
           <td className='text-right'>
             {type === 'food'
               ? calculateNutrition(item.amount, amount, conversionFactor)
-              : calculateNutrition(
-                  item.amount,
-                  amountIngre,
-                  conversionFactorIngre,
-                )}{' '}
+              : type === 'day'
+                ? calculateNutrition(
+                    item.amount,
+                    amountMealDay,
+                    conversionFactorMealDay,
+                  )
+                : calculateNutrition(
+                    item.amount,
+                    amountIngre,
+                    conversionFactorIngre,
+                  )}{' '}
             {item.unit}
           </td>
           <td className='text-right'>--</td>

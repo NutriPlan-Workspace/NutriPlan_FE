@@ -8,7 +8,7 @@ import {
   updateCacheMealPlanByDate,
   updateViewingMealPlanByDates,
 } from '@/redux/slices/mealPlan';
-import { MealItems, MealPlanDay, MealPlanFood } from '@/types/mealPlan';
+import type { MealItems, MealPlanDay, MealPlanFood } from '@/types/mealPlan';
 import { isSameDay } from '@/utils/dateUtils';
 import {
   getMealPlanDayAfterAddAndRemoveMealItem,

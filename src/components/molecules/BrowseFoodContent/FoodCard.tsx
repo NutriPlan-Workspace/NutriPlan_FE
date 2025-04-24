@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { IoMdArrowRoundBack } from 'react-icons/io';
-import { Modal, Popover } from 'antd';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { Popover } from 'antd';
 
-import { useScale } from '@/contexts/ScaleContext';
 import { PieChart } from '@/molecules/PieChart';
-import ModalFoodIngre from '@/organisms/ModalFoodIngre/ModalFoodIngre';
-import { useGetFoodByIdQuery } from '@/redux/query/apis/food/foodApis';
-import { Food } from '@/types/food';
-import { roundNumber } from '@/utils/roundNumber';
+import {
+  setIsModalDetailOpen,
+  setViewingDetailFood,
+} from '@/redux/slices/food';
+import type { Food } from '@/types/food';
 
 import { NutritionPopoverFood } from '../NutritionPopoverFood';
 
@@ -16,44 +16,7 @@ interface FoodCardProps {
 }
 
 const FoodCard: React.FC<FoodCardProps> = ({ foodItem }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { data: detailedFood } = useGetFoodByIdQuery(foodItem._id);
-
-  const { setAmount, setConversionFactor, setUnit } = useScale();
-
-  const [titleModal, setTitleModal] = useState(
-    detailedFood?.data.mainFood.name,
-  );
-
-  const [detailedIngredient, setDetailedIngredient] = useState<Food | null>(
-    null,
-  );
-
-  const showModal = () => {
-    const amount = roundNumber(
-      detailedFood?.data.mainFood.units[1].amount || 1,
-      2,
-    );
-    const unit = detailedFood?.data.mainFood.units[1].description || 'serving';
-    setAmount(amount);
-    setUnit(unit);
-    setConversionFactor(amount);
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleOnclickBack = () => {
-    setDetailedIngredient(null);
-  };
-
+  const dispatch = useDispatch();
   return (
     <>
       <Popover
@@ -79,7 +42,10 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem }) => {
       >
         <div
           className='cursor-pointer rounded-lg border-none shadow-md'
-          onClick={showModal}
+          onClick={() => {
+            dispatch(setViewingDetailFood(foodItem));
+            dispatch(setIsModalDetailOpen(true));
+          }}
         >
           <div className='h-full w-full'>
             <div className='h-full w-full'>
@@ -101,33 +67,6 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem }) => {
           </div>
         </div>
       </Popover>
-      <Modal
-        title={
-          <div className='flex gap-2'>
-            {detailedIngredient && (
-              <span className='mt-1 h-7 rounded-md hover:cursor-pointer hover:bg-gray-100'>
-                <IoMdArrowRoundBack onClick={() => handleOnclickBack()} />
-              </span>
-            )}
-            <span>{titleModal}</span>
-          </div>
-        }
-        open={isModalOpen}
-        onOk={handleOk}
-        closable={true}
-        width={900}
-        onCancel={handleCancel}
-        footer={<></>}
-      >
-        {detailedFood && (
-          <ModalFoodIngre
-            detailedFood={detailedFood}
-            setTitleModal={setTitleModal}
-            setDetailedIngredient={setDetailedIngredient}
-            detailedIngredient={detailedIngredient}
-          />
-        )}
-      </Modal>
     </>
   );
 };

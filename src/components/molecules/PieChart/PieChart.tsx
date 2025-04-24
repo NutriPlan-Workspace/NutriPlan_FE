@@ -3,11 +3,11 @@ import { Cell, Pie, PieChart as AntdPieChart } from 'recharts';
 
 import { RenderCustomizedLabel } from '@/atoms/RenderCustomizedLabel';
 import { NUTRITION_HEX_COLOR } from '@/constants/nutritionFormat';
-import { NutritionSummaryFields } from '@/types/mealPlan';
+import type { NutritionFields } from '@/types/food';
 
 interface PieChartProps {
   className?: string;
-  nutritionData: NutritionSummaryFields;
+  nutritionData: NutritionFields | undefined;
   size?: number;
   label?: boolean;
 }
@@ -18,6 +18,7 @@ const PieChart: React.FC<PieChartProps> = ({
   size,
   label,
 }) => {
+  if (nutritionData === undefined) return null;
   const chartData = [
     {
       name: 'C',

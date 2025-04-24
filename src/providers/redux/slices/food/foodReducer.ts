@@ -1,39 +1,53 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { Food } from '@/types/food';
+import type { MealPlanFood } from '@/types/mealPlan';
 
 interface FoodState {
-  foods: Food[];
-  selectedFood?: Food;
-  page: number;
+  isModalDetailOpen: boolean;
+  viewingDetailFood: Food | MealPlanFood | null;
+  previousViewingDetailFood: Food | MealPlanFood | null;
 }
 
 const initialState: FoodState = {
-  foods: [],
-  selectedFood: undefined,
-  page: 1,
+  isModalDetailOpen: false,
+  viewingDetailFood: null,
+  previousViewingDetailFood: null,
 };
 
 const foodSlice = createSlice({
   name: 'food',
   initialState,
   reducers: {
-    setFoods: (state, action: PayloadAction<Food[]>) => {
-      state.foods = [...state.foods, ...action.payload];
+    setIsModalDetailOpen: (state, action: PayloadAction<boolean>) => {
+      state.isModalDetailOpen = action.payload;
     },
-    setPage: (state, action: PayloadAction<number>) => {
-      state.page = action.payload;
+    setViewingDetailFood: (
+      state,
+      action: PayloadAction<Food | MealPlanFood>,
+    ) => {
+      state.viewingDetailFood = action.payload;
     },
-    setSelectedFood: (state, action: PayloadAction<Food>) => {
-      state.selectedFood = action.payload;
+    removeViewingDetailFood: (state) => {
+      state.viewingDetailFood = null;
     },
-    resetFoods: (state) => {
-      state.foods = [];
-      state.page = 1;
+    setPreviousViewingDetailFood: (
+      state,
+      action: PayloadAction<Food | MealPlanFood>,
+    ) => {
+      state.previousViewingDetailFood = action.payload;
+    },
+    removePreviousViewingDetailFood: (state) => {
+      state.previousViewingDetailFood = null;
     },
   },
 });
 
-export const { setFoods, setPage, setSelectedFood, resetFoods } =
-  foodSlice.actions;
+export const {
+  setIsModalDetailOpen,
+  setViewingDetailFood,
+  removeViewingDetailFood,
+  setPreviousViewingDetailFood,
+  removePreviousViewingDetailFood,
+} = foodSlice.actions;
 export default foodSlice.reducer;

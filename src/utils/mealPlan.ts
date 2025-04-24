@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { Food } from '@/types/food';
+import type { Food } from '@/types/food';
 import type {
   MealItems,
   MealPlanDatabaseDTO,

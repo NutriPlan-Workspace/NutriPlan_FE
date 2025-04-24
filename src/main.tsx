@@ -11,6 +11,8 @@ import { store } from '@/redux/store';
 
 import '@ant-design/v5-patch-for-react-19';
 
+import { ScaleProvider } from './contexts/ScaleContext';
+import { ScaleProviderIngre } from './contexts/ScaleIngreContext';
 import { routeTree } from './routeTree.gen';
 
 import './index.css';
@@ -31,15 +33,19 @@ ReactDOM.createRoot(rootElement).render(
       <Provider store={store}>
         <ToastProvider>
           <DateProvider>
-            <ConfigProvider
-              theme={{
-                token: {
-                  fontFamily: '"TT Norms", sans-serif',
-                },
-              }}
-            >
-              <RouterProvider router={router} />
-            </ConfigProvider>
+            <ScaleProvider>
+              <ScaleProviderIngre>
+                <ConfigProvider
+                  theme={{
+                    token: {
+                      fontFamily: '"TT Norms", sans-serif',
+                    },
+                  }}
+                >
+                  <RouterProvider router={router} />
+                </ConfigProvider>
+              </ScaleProviderIngre>
+            </ScaleProvider>
           </DateProvider>
         </ToastProvider>
       </Provider>

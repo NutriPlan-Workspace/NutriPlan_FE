@@ -1,109 +1,120 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Popover } from 'antd';
+import Link from 'antd/es/typography/Link';
 
 import { useScale } from '@/contexts/ScaleContext';
-import { useScaleIngre } from '@/contexts/ScaleIngreContext';
-import { Food } from '@/types/food';
+import {
+  foodSelector,
+  setPreviousViewingDetailFood,
+  setViewingDetailFood,
+} from '@/redux/slices/food';
+import type { Food } from '@/types/food';
 
 import { PopoverIngreContent } from '../PopoverIngreContent';
 
 interface IngredientProps {
   ingredientList: Food[];
-  setDetailedIngredient: (detailedIngredient: Food | null) => void;
 }
 
-const Ingredient: React.FC<IngredientProps> = ({
-  ingredientList,
-  setDetailedIngredient,
-}) => {
+const Ingredient: React.FC<IngredientProps> = ({ ingredientList }) => {
+  const dispatch = useDispatch();
+  const viewingDetailFood = useSelector(foodSelector).viewingDetailFood;
   const { amount, conversionFactor } = useScale();
-  const [ingredient, setIngredient] = useState<Food | null>(null);
-  const { setAmountIngre, setUnitIngre } = useScaleIngre();
-
-  const showModal = (detailedIngredient: Food) => {
-    setIngredient(detailedIngredient);
-    setAmountIngre(detailedIngredient.units[0].amount);
-    setUnitIngre(detailedIngredient.units[0].description);
-  };
-  useEffect(() => {
-    if (ingredient) {
-      setDetailedIngredient(ingredient);
-    }
-  }, [ingredient]);
 
   return (
     <>
       <div>
-        <h2 className='text-xl font-semibold'>Ingredients</h2>
-        <ul className='mt-2 list-inside list-disc'>
+        <h2 className='mt-6 pb-3 text-xl font-semibold'>Ingredients</h2>
+        <ul className='list-inside list-disc'>
           {ingredientList.map((item, index) => (
-            <>
-              <div
-                key={index}
-                className='flex cursor-pointer items-center space-y-2 space-x-1 hover:bg-gray-100'
-                onClick={() => showModal(item)}
-              >
-                <span className='w-22 flex-shrink-0 p-3'>
-                  <Popover
-                    placement='right'
-                    title={item.name}
-                    content={
-                      <PopoverIngreContent
-                        calories={Number(item.nutrition.calories.toFixed(2))}
-                        carbs={Number(item.nutrition.carbs.toFixed(2))}
-                        fats={Number(item.nutrition.fats.toFixed(2))}
-                        proteins={Number(item.nutrition.proteins.toFixed(2))}
-                        fiber={Number(item.nutrition.fiber.toFixed(2))}
-                        sodium={Number(item.nutrition.sodium.toFixed(2))}
-                      />
-                    }
-                  >
-                    <img
-                      className='h-auto w-full object-cover'
-                      src={item.imgUrls[0] || ''}
-                      alt={item.name}
+            <div
+              key={index}
+              className='flex cursor-pointer items-center gap-5 p-1 pl-2 hover:bg-gray-100'
+            >
+              <div className='flex h-[64px] w-[64px] items-center justify-center'>
+                <Popover
+                  placement='right'
+                  title={item.name}
+                  content={
+                    <PopoverIngreContent
+                      calories={
+                        Number(item.nutrition?.calories?.toFixed(2)) || 0
+                      }
+                      carbs={Number(item.nutrition?.carbs?.toFixed(2)) || 0}
+                      fats={Number(item.nutrition?.fats?.toFixed(2)) || 0}
+                      proteins={
+                        Number(item.nutrition?.proteins?.toFixed(2)) || 0
+                      }
+                      fiber={Number(item.nutrition?.fiber?.toFixed(2)) || 0}
+                      sodium={Number(item.nutrition?.sodium?.toFixed(2)) || 0}
+                      cholesterol={
+                        Number(item.nutrition?.cholesterol?.toFixed(2)) || 0
+                      }
                     />
-                  </Popover>
-                </span>
-                <div className='flex min-w-70 flex-col'>
-                  <Popover
-                    placement='right'
-                    title={item.name}
-                    content={
-                      <PopoverIngreContent
-                        calories={Number(item.nutrition.calories.toFixed(2))}
-                        carbs={Number(item.nutrition.carbs.toFixed(2))}
-                        fats={Number(item.nutrition.fats.toFixed(2))}
-                        proteins={Number(item.nutrition.proteins.toFixed(2))}
-                        fiber={Number(item.nutrition.fiber.toFixed(2))}
-                        sodium={Number(item.nutrition.sodium.toFixed(2))}
-                      />
-                    }
+                  }
+                >
+                  <img
+                    className='aspect-square w-full rounded-sm object-cover'
+                    src={item.imgUrls[0] || ''}
+                    alt={item.name}
+                  />
+                </Popover>
+              </div>
+              <div className='flex min-w-70 flex-col'>
+                <Popover
+                  placement='right'
+                  title={item.name}
+                  content={
+                    <PopoverIngreContent
+                      calories={
+                        Number(item.nutrition?.calories?.toFixed(2)) || 0
+                      }
+                      carbs={Number(item.nutrition?.carbs?.toFixed(2)) || 0}
+                      fats={Number(item.nutrition?.fats?.toFixed(2)) || 0}
+                      proteins={
+                        Number(item.nutrition?.proteins?.toFixed(2)) || 0
+                      }
+                      fiber={Number(item.nutrition?.fiber?.toFixed(2)) || 0}
+                      sodium={Number(item.nutrition?.sodium?.toFixed(2)) || 0}
+                      cholesterol={
+                        Number(item.nutrition?.cholesterol?.toFixed(2)) || 0
+                      }
+                    />
+                  }
+                >
+                  <Link
+                    onClick={() => {
+                      if (!viewingDetailFood) return;
+                      dispatch(setPreviousViewingDetailFood(viewingDetailFood));
+                      dispatch(setViewingDetailFood(item));
+                    }}
+                    className='text-base font-semibold text-black hover:underline'
                   >
-                    <span className='text-lg font-semibold hover:underline'>
-                      {item.name}
-                    </span>
-                  </Popover>
-                  <p className='text-gray-500'>{item.description}</p>
-                  <div className='flex gap-x-6 text-gray-500'>
-                    <span>
-                      {(
-                        ((item.units[2].amount || 1) * amount) /
-                        conversionFactor
-                      ).toFixed(1)}{' '}
-                      {item.units[2].description}
-                    </span>
-                    <span>
-                      {(
-                        ((item.units[0].amount || 1) * amount) /
-                        conversionFactor
-                      ).toFixed(1)}{' '}
-                      {item.units[0].description}
-                    </span>
-                  </div>
+                    {item.name}
+                  </Link>
+                </Popover>
+                <p className='text-gray-500'>
+                  {item.description === 'NaN' ? '' : item.description}
+                </p>
+                <div className='flex gap-x-6 text-gray-500'>
+                  <span>
+                    {(
+                      ((item.units[2].amount || 1) * amount) /
+                      conversionFactor
+                    ).toFixed(1)}{' '}
+                    {item.units[2].description}
+                  </span>
+                  <span>
+                    {(
+                      ((item.units[0].amount || 1) * amount) /
+                      conversionFactor
+                    ).toFixed(1)}{' '}
+                    {item.units[0].description}
+                  </span>
                 </div>
               </div>
-            </>
+            </div>
           ))}
         </ul>
       </div>

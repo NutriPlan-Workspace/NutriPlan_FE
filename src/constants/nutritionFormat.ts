@@ -1,4 +1,4 @@
-import { NutritionGoal } from '@/types/user';
+import type { NutritionGoal } from '@/types/user';
 
 export enum NUTRITION_TEXT_COLOR {
   CARBS = 'text-carbsYellow',

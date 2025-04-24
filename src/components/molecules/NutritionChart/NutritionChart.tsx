@@ -4,7 +4,7 @@ import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 import { nutritionChart } from '@/constants/nutritionFormat';
 import { useScale } from '@/contexts/ScaleContext';
 import { useScaleIngre } from '@/contexts/ScaleIngreContext';
-import { NutritionFields } from '@/types/food';
+import type { NutritionFields } from '@/types/food';
 import { roundNumber } from '@/utils/roundNumber';
 
 import { CustomizedLabelChart } from '../CustomizedLabelChart';
@@ -34,7 +34,7 @@ const NutritionChart: FC<NutritionChartProps> = ({ nutrition, type }) => {
   });
 
   return (
-    <PieChart width={350} height={350}>
+    <PieChart width={240} height={240}>
       <Pie
         data={data}
         labelLine={false}

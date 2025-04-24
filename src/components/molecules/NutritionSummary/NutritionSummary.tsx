@@ -1,9 +1,9 @@
 import { FC, useState } from 'react';
-import { Button, Modal } from 'antd';
+import { Button } from 'antd';
 
 import { useScale } from '@/contexts/ScaleContext';
 import { useScaleIngre } from '@/contexts/ScaleIngreContext';
-import { DetailedNutriTable } from '@/organisms/DetailedNutriTable';
+import ModalNutritionDetail from '@/organisms/ModalNutritionDetail/ModalNutritionDetail';
 import type { NutritionFields } from '@/types/food';
 import { calculateNutrition } from '@/utils/calculateNutrition';
 
@@ -44,23 +44,18 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition, type }) => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
   return (
-    <div className='mt-5'>
-      <span className='text-xl font-semibold'>Nutrition Info</span>
-      <NutritionChart nutrition={nutrition} type={type} />
+    <div className='mt-6'>
+      <span className='pb-3 text-xl font-semibold'>Nutrition Info</span>
+      <div className='flex items-center justify-center'>
+        <NutritionChart nutrition={nutrition} type={type} />
+      </div>
       <div className='flex flex-col space-y-2'>
         <div className='flex justify-between'>
-          <h1>
+          <h1 className='text-[0.8rem] font-medium tracking-widest text-black'>
             {type === 'food'
-              ? `For${' '}${amount}${' '}${unit}`
-              : `For${' '}${amountIngre}${' '}${unitIngre}`}
+              ? `PER${' '}${amount}${' '}${unit.toUpperCase()}`
+              : `PER${' '}${amountIngre}${' '}${unitIngre.toUpperCase()}`}
           </h1>
         </div>
         {dataNutriSummary.map((item, index) => (
@@ -81,22 +76,16 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition, type }) => {
           </div>
         ))}
         <Button
-          className='border-gray-400 text-gray-600 hover:border-gray-400 hover:bg-gray-200 hover:text-black'
+          className='mt-2 border-gray-400 text-gray-600 hover:border-gray-400 hover:bg-gray-200 hover:text-black'
           onClick={showModal}
         >
           Detailed Nutrition Information
         </Button>
-        <Modal
-          title='Detailed Nutrition'
-          open={isModalOpen}
-          onOk={handleOk}
-          closable={true}
-          footer={<></>}
-          onCancel={handleCancel}
-          width={550}
-        >
-          <DetailedNutriTable nutrition={nutrition} type={type} />
-        </Modal>
+        <ModalNutritionDetail
+          nutrition={nutrition}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        />
       </div>
     </div>
   );

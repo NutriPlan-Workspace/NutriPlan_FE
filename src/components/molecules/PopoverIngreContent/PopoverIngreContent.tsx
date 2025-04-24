@@ -7,6 +7,7 @@ type PopoverIngreContentProps = {
   proteins: number;
   fiber: number;
   sodium: number;
+  cholesterol?: number;
 };
 
 const PopoverIngreContent: React.FC<PopoverIngreContentProps> = ({
@@ -16,6 +17,7 @@ const PopoverIngreContent: React.FC<PopoverIngreContentProps> = ({
   proteins,
   fiber,
   sodium,
+  cholesterol,
 }) => (
   <>
     <div className='flex flex-col space-y-1'>
@@ -51,6 +53,10 @@ const PopoverIngreContent: React.FC<PopoverIngreContentProps> = ({
       <div className='flex justify-between'>
         <span>Sodium</span>
         <span>{sodium}mg</span>
+      </div>
+      <div className='flex justify-between'>
+        <span>Cholesterol</span>
+        <span>{cholesterol}mg</span>
       </div>
     </div>
   </>

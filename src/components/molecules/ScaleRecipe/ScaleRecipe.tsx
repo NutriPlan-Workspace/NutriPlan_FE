@@ -34,8 +34,8 @@ const ScaleRecipe: React.FC<unitScaleProp> = ({ units }) => {
   };
 
   return (
-    <div className='pb-3'>
-      <h3 className='pt-3 pb-3 text-xl font-semibold'>Scale recipe</h3>
+    <div>
+      <h3 className='mt-6 pb-3 text-xl font-semibold'>Scale recipe</h3>
       <InputNumber
         min={1}
         defaultValue={units[0].amount}

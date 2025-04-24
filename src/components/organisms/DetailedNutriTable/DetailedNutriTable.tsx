@@ -11,9 +11,9 @@ const DetailedNutriTable: FC<NutritionDetailedTableProps> = ({
   nutrition,
   type,
 }) => (
-  <table className='mt-5 w-full border-none'>
+  <div className='h-[70vh] w-full overflow-y-scroll border-none px-8 pb-8'>
     <NutritionDetailedTable nutrition={nutrition} type={type} />
-  </table>
+  </div>
 );
 
 export default DetailedNutriTable;

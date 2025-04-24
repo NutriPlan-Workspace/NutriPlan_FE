@@ -2,8 +2,8 @@ import React from 'react';
 import { Typography } from 'antd';
 
 import { nutritionFormat } from '@/constants/nutritionFormat';
-import type { Food } from '@/types/food';
-import type { MealPlanFood, NutritionSummaryFields } from '@/types/mealPlan';
+import type { Food, NutritionFields } from '@/types/food';
+import type { MealPlanFood } from '@/types/mealPlan';
 import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
@@ -57,7 +57,7 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
               <Typography className={item.color}>{item.label}: </Typography>
               <Typography className={item.color}>
                 {roundNumber(
-                  food.nutrition[item.key as keyof NutritionSummaryFields] *
+                  food.nutrition[item.key as keyof NutritionFields] *
                     diffCalories,
                   2,
                 )}
