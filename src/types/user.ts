@@ -1,4 +1,5 @@
 import { Role } from '@/constants/role';
+import { PrimaryDietType } from '@/constants/user';
 
 interface Range {
   from: number;
@@ -28,6 +29,7 @@ export interface User {
     maxiumCholesterol: number;
     goalType: NutritionGoals;
   };
+  primaryDiet: PrimaryDietType;
 }
 
 export interface PhysicalStatsValues {
@@ -60,6 +62,14 @@ export interface NutritionGoalResponse {
   additionalData: object;
 }
 
+export interface PrimaryDietResponse {
+  success: boolean;
+  total: number;
+  data: User['primaryDiet'];
+  message: string;
+  additionalData: object;
+}
+
 export interface NutritionGoal {
   userId?: string;
   calories: number;
@@ -67,6 +77,10 @@ export interface NutritionGoal {
   carbTarget: Range;
   fatTarget: Range;
   goalType: string | undefined;
+}
+
+export interface PrimaryDietArgs {
+  primaryDiet: PrimaryDietType;
 }
 
 export interface PhysicalStat {

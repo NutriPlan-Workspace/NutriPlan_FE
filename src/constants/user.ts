@@ -33,3 +33,47 @@ export const ACTIVITY_LEVEL = [
 ];
 
 export type ActivityLevel = (typeof ACTIVITY_LEVEL)[number]['key'];
+
+export const PRIMARY_DIET = [
+  {
+    key: 'anything',
+    label: 'Anything',
+    excludes: ['Nothing'],
+  },
+  {
+    key: 'keto',
+    label: 'Keto',
+    excludes: ['Legumes', 'Starchy', 'Vegetables', 'High-carb Grains'],
+  },
+  {
+    key: 'mediterranean',
+    label: 'Mediterranean',
+    excludes: ['Red Meat', 'Fruit juice', 'Starchy Vegetables'],
+  },
+  {
+    key: 'paleo',
+    label: 'Paleo',
+    excludes: ['Dairy', 'Grains', 'Legumes', 'Soy', 'Starchy Vegetables'],
+  },
+  {
+    key: 'vegan',
+    label: 'Vegan',
+    excludes: [
+      'Red Meat',
+      'Poultry',
+      'Fish',
+      'Shellfish',
+      'Dairy',
+      'Eggs',
+      'Mayo',
+      'Honey',
+    ],
+  },
+  {
+    key: 'vegetarian',
+    label: 'Vegetarian',
+    excludes: ['Red Meat', 'Poultry', 'Fish', 'Shellfish'],
+  },
+];
+
+export type PrimaryDietType = (typeof PRIMARY_DIET)[number]['key'];

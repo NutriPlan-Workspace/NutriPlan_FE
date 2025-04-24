@@ -32,13 +32,13 @@ export const PATH = {
 
   DIET_NUTRITION: '/diet-nutrition',
   NUTRITION_TARGETS: '/nutrition-targets',
-  PRIMARY_DIET: '/diet-nutrition/primary-diet',
-  FOOD_EXCLUSIONS: '/diet-nutrition/food-exclusions',
-  RATED_FOODS: '/diet-nutrition/rated-foods',
+  PRIMARY_DIET: '/primary-diet',
+  FOOD_EXCLUSIONS: '/food-exclusions',
+  RATED_FOODS: '/rated-foods',
 
   MEALS_SCHEDULE: '/meals-schedule',
-  MEAL_SETTINGS: '/meals-schedule/meal-settings',
-  LEFTOVERS: '/meals-schedule/leftovers',
+  MEAL_SETTINGS: '/meal-settings',
+  LEFTOVERS: '/leftovers',
 
   PHYSICAL_STATS: '/physical-stats',
   WEIGHT_GOAL: '/weight-goal',

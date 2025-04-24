@@ -4,6 +4,8 @@ import type {
   NutritionGoalResponse,
   PhysicalStat,
   PhysicalStatResponse,
+  PrimaryDietArgs,
+  PrimaryDietResponse,
 } from '@/types/user';
 
 export const userApi = baseApi.injectEndpoints({
@@ -49,6 +51,19 @@ export const userApi = baseApi.injectEndpoints({
         body: physicalStat,
       }),
     }),
+    getPrimaryDiet: builder.query<PrimaryDietResponse, void>({
+      query: () => ({
+        url: '/user/primary-diet',
+        method: 'GET',
+      }),
+    }),
+    updatePrimaryDiet: builder.mutation<PrimaryDietResponse, PrimaryDietArgs>({
+      query: (primaryDiet) => ({
+        url: '/user/primary-diet',
+        method: 'PUT',
+        body: primaryDiet,
+      }),
+    }),
   }),
 });
 
@@ -58,4 +73,6 @@ export const {
   useGetNewNutritionTargetQuery,
   useUpdatePhysicalStatsMutation,
   useUpdateNutritionTargetMutation,
+  useGetPrimaryDietQuery,
+  useUpdatePrimaryDietMutation,
 } = userApi;
