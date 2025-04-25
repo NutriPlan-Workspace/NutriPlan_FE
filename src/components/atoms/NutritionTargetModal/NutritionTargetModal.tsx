@@ -19,7 +19,6 @@ const NutritionTargetModal: React.FC<NutritionTargetModalProps> = ({
   handleSave,
 }) => (
   <Modal
-    className='detail-modal'
     title='Update Nutrition Targets'
     open={isModalVisible}
     onCancel={onCancel}

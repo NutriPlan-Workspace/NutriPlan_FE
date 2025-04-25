@@ -20,6 +20,7 @@ import { Route as PhysicalStatsIndexImport } from './routes/physical-stats/index
 import { Route as NutritionTargetsIndexImport } from './routes/nutrition-targets/index'
 import { Route as MealPlanIndexImport } from './routes/meal-plan/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as FoodExclusionsIndexImport } from './routes/food-exclusions/index'
 import { Route as CollectionsIndexImport } from './routes/collections/index'
 import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
@@ -80,6 +81,12 @@ const MealPlanIndexRoute = MealPlanIndexImport.update({
 const LoginIndexRoute = LoginIndexImport.update({
   id: '/login/',
   path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FoodExclusionsIndexRoute = FoodExclusionsIndexImport.update({
+  id: '/food-exclusions/',
+  path: '/food-exclusions/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -172,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsIndexImport
       parentRoute: typeof rootRoute
     }
+    '/food-exclusions/': {
+      id: '/food-exclusions/'
+      path: '/food-exclusions'
+      fullPath: '/food-exclusions'
+      preLoaderRoute: typeof FoodExclusionsIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -241,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
+  '/food-exclusions': typeof FoodExclusionsIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
@@ -259,6 +274,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
+  '/food-exclusions': typeof FoodExclusionsIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
@@ -278,6 +294,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/browse-foods/': typeof BrowseFoodsIndexRoute
   '/collections/': typeof CollectionsIndexRoute
+  '/food-exclusions/': typeof FoodExclusionsIndexRoute
   '/login/': typeof LoginIndexRoute
   '/meal-plan/': typeof MealPlanIndexRoute
   '/nutrition-targets/': typeof NutritionTargetsIndexRoute
@@ -298,6 +315,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/browse-foods'
     | '/collections'
+    | '/food-exclusions'
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
@@ -315,6 +333,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/browse-foods'
     | '/collections'
+    | '/food-exclusions'
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
@@ -332,6 +351,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/browse-foods/'
     | '/collections/'
+    | '/food-exclusions/'
     | '/login/'
     | '/meal-plan/'
     | '/nutrition-targets/'
@@ -351,6 +371,7 @@ export interface RootRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
+  FoodExclusionsIndexRoute: typeof FoodExclusionsIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   MealPlanIndexRoute: typeof MealPlanIndexRoute
   NutritionTargetsIndexRoute: typeof NutritionTargetsIndexRoute
@@ -369,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
+  FoodExclusionsIndexRoute: FoodExclusionsIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   MealPlanIndexRoute: MealPlanIndexRoute,
   NutritionTargetsIndexRoute: NutritionTargetsIndexRoute,
@@ -396,6 +418,7 @@ export const routeTree = rootRoute
         "/admin/",
         "/browse-foods/",
         "/collections/",
+        "/food-exclusions/",
         "/login/",
         "/meal-plan/",
         "/nutrition-targets/",
@@ -426,6 +449,9 @@ export const routeTree = rootRoute
     },
     "/collections/": {
       "filePath": "collections/index.tsx"
+    },
+    "/food-exclusions/": {
+      "filePath": "food-exclusions/index.tsx"
     },
     "/login/": {
       "filePath": "login/index.tsx"

@@ -1,5 +1,7 @@
 import { baseApi } from '@/redux/query/apis/baseApi';
 import type {
+  FoodExclusionsArgs,
+  FoodExclusionsResponse,
   NutritionGoal,
   NutritionGoalResponse,
   PhysicalStat,
@@ -64,6 +66,22 @@ export const userApi = baseApi.injectEndpoints({
         body: primaryDiet,
       }),
     }),
+    getFoodExclusions: builder.query<FoodExclusionsResponse, void>({
+      query: () => ({
+        url: '/user/food-exclusions',
+        method: 'GET',
+      }),
+    }),
+    updateFoodExclusions: builder.mutation<
+      FoodExclusionsResponse,
+      FoodExclusionsArgs
+    >({
+      query: (excluded) => ({
+        url: '/user/food-exclusions',
+        method: 'PUT',
+        body: excluded,
+      }),
+    }),
   }),
 });
 
@@ -75,4 +93,6 @@ export const {
   useUpdateNutritionTargetMutation,
   useGetPrimaryDietQuery,
   useUpdatePrimaryDietMutation,
+  useGetFoodExclusionsQuery,
+  useUpdateFoodExclusionsMutation,
 } = userApi;

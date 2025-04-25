@@ -30,6 +30,23 @@ export interface User {
     goalType: NutritionGoals;
   };
   primaryDiet: PrimaryDietType;
+  excluded: {
+    categories: number[];
+    foods: string[];
+  };
+}
+
+export interface FoodExclusionsResponse {
+  success: boolean;
+  total: number;
+  data: User['excluded'];
+  message: string;
+  additionalData: object;
+}
+
+export interface FoodExclusionsArgs {
+  categories: number[];
+  foods: string[];
 }
 
 export interface UserAuth {
