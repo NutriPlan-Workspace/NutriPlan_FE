@@ -7,6 +7,7 @@ import type { ApiResponse } from '@/types/apiResponse';
 import type {
   GetMealPlanDayRangeQueryArgs,
   GetMealPlanSingleDayQueryArgs,
+  GroceriesResponse,
   MealPlanDay,
   MealPlanSingleDayResponse,
   PostMealPlanQueryArgs,
@@ -116,6 +117,15 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
         method: 'DELETE',
       }),
     }),
+    getGroceries: builder.query<
+      GroceriesResponse,
+      GetMealPlanDayRangeQueryArgs
+    >({
+      query: ({ from, to }) => {
+        const params = new URLSearchParams({ from, to }).toString();
+        return `/planner/groceries?${params}`;
+      },
+    }),
   }),
 });
 
@@ -127,4 +137,5 @@ export const {
   useCreateMealPlanMutation,
   useGetLatestMealPlanMutation,
   useRemoveMealPlanMutation,
+  useGetGroceriesQuery,
 } = mealPlanApi;

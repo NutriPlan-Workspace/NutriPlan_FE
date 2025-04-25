@@ -4,7 +4,11 @@ import { PLAN_TYPES } from '@/constants/plans';
 import { useDate } from '@/contexts/DateContext';
 import { getDisplayMonthYear, getDisplayWeekRange } from '@/utils/dateUtils';
 
-const DateDisplay: React.FC = () => {
+interface DateDisplayProps {
+  isGroceries?: boolean;
+}
+
+const DateDisplay: React.FC<DateDisplayProps> = ({ isGroceries = false }) => {
   const { rangeDate, selectedPlan, selectedDate } = useDate();
   const [dateText, setDateText] = useState<string>('');
 
@@ -18,8 +22,14 @@ const DateDisplay: React.FC = () => {
 
   return (
     <div className='flex flex-wrap gap-x-3 pb-[10px] text-2xl tracking-[0.3px]'>
-      <p className='text-primary'>Meal Planner</p>
-      <p className='text-black'>{dateText}</p>
+      {isGroceries ? (
+        <p className='text-black'>Groceries for {dateText}</p>
+      ) : (
+        <>
+          <p className='text-primary'>Meal Planner</p>
+          <p className='text-black'>{dateText}</p>
+        </>
+      )}
     </div>
   );
 };

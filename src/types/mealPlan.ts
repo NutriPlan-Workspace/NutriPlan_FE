@@ -137,3 +137,40 @@ export interface UpdateMealPlanResponse {
   message: string;
   additionalData: object;
 }
+
+export interface GroceriesResponse {
+  success: boolean;
+  code: number;
+  data: IngreResponse[];
+  message: string;
+}
+
+export interface IngreResponse {
+  id: string;
+  name: string;
+  totalAmount: number;
+  unit: {
+    id: string;
+    amount: number;
+    description: string;
+  };
+  units: {
+    id: string;
+    amount: number;
+    description: string;
+  }[];
+  imgUrls: string[];
+  nutrition: {
+    calories: number;
+    carbs: number;
+    fats: number;
+    proteins: number;
+  };
+  foodDetails: {
+    name: string;
+    date: string;
+    imgUrls: string[];
+    amount: number;
+    description: string;
+  }[];
+}

@@ -6,6 +6,7 @@ import {
   format,
   isSameDay as isSameDayDateFns,
   isWithinInterval,
+  parseISO,
   startOfDay,
   startOfWeek,
 } from 'date-fns';
@@ -111,3 +112,8 @@ export const getDiffDays = (date1: Date, date2: Date): number => {
     ),
   );
 };
+
+export function formatToDayAndDate(dateString: string): string {
+  const date = parseISO(dateString);
+  return format(date, 'EEEE, MMM d');
+}
