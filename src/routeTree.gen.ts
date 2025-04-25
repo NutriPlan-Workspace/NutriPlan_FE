@@ -20,11 +20,14 @@ import { Route as PhysicalStatsIndexImport } from './routes/physical-stats/index
 import { Route as NutritionTargetsIndexImport } from './routes/nutrition-targets/index'
 import { Route as MealPlanIndexImport } from './routes/meal-plan/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as GroceriesIndexImport } from './routes/groceries/index'
 import { Route as FoodExclusionsIndexImport } from './routes/food-exclusions/index'
+import { Route as CustomRecipesIndexImport } from './routes/custom-recipes/index'
 import { Route as CollectionsIndexImport } from './routes/collections/index'
 import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as AccountIndexImport } from './routes/account/index'
+import { Route as CustomRecipesIdImport } from './routes/custom-recipes/$id'
 import { Route as CollectionsCreateImport } from './routes/collections/create'
 import { Route as CollectionsIdImport } from './routes/collections/$id'
 
@@ -84,9 +87,21 @@ const LoginIndexRoute = LoginIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const GroceriesIndexRoute = GroceriesIndexImport.update({
+  id: '/groceries/',
+  path: '/groceries/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const FoodExclusionsIndexRoute = FoodExclusionsIndexImport.update({
   id: '/food-exclusions/',
   path: '/food-exclusions/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CustomRecipesIndexRoute = CustomRecipesIndexImport.update({
+  id: '/custom-recipes/',
+  path: '/custom-recipes/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -111,6 +126,12 @@ const AdminIndexRoute = AdminIndexImport.update({
 const AccountIndexRoute = AccountIndexImport.update({
   id: '/account/',
   path: '/account/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CustomRecipesIdRoute = CustomRecipesIdImport.update({
+  id: '/custom-recipes/$id',
+  path: '/custom-recipes/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -151,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsCreateImport
       parentRoute: typeof rootRoute
     }
+    '/custom-recipes/$id': {
+      id: '/custom-recipes/$id'
+      path: '/custom-recipes/$id'
+      fullPath: '/custom-recipes/$id'
+      preLoaderRoute: typeof CustomRecipesIdImport
+      parentRoute: typeof rootRoute
+    }
     '/account/': {
       id: '/account/'
       path: '/account'
@@ -179,11 +207,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsIndexImport
       parentRoute: typeof rootRoute
     }
+    '/custom-recipes/': {
+      id: '/custom-recipes/'
+      path: '/custom-recipes'
+      fullPath: '/custom-recipes'
+      preLoaderRoute: typeof CustomRecipesIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/food-exclusions/': {
       id: '/food-exclusions/'
       path: '/food-exclusions'
       fullPath: '/food-exclusions'
       preLoaderRoute: typeof FoodExclusionsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/groceries/': {
+      id: '/groceries/'
+      path: '/groceries'
+      fullPath: '/groceries'
+      preLoaderRoute: typeof GroceriesIndexImport
       parentRoute: typeof rootRoute
     }
     '/login/': {
@@ -251,11 +293,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
+  '/custom-recipes/$id': typeof CustomRecipesIdRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
+  '/custom-recipes': typeof CustomRecipesIndexRoute
   '/food-exclusions': typeof FoodExclusionsIndexRoute
+  '/groceries': typeof GroceriesIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
@@ -270,11 +315,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
+  '/custom-recipes/$id': typeof CustomRecipesIdRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
+  '/custom-recipes': typeof CustomRecipesIndexRoute
   '/food-exclusions': typeof FoodExclusionsIndexRoute
+  '/groceries': typeof GroceriesIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
@@ -290,11 +338,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
+  '/custom-recipes/$id': typeof CustomRecipesIdRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/browse-foods/': typeof BrowseFoodsIndexRoute
   '/collections/': typeof CollectionsIndexRoute
+  '/custom-recipes/': typeof CustomRecipesIndexRoute
   '/food-exclusions/': typeof FoodExclusionsIndexRoute
+  '/groceries/': typeof GroceriesIndexRoute
   '/login/': typeof LoginIndexRoute
   '/meal-plan/': typeof MealPlanIndexRoute
   '/nutrition-targets/': typeof NutritionTargetsIndexRoute
@@ -311,11 +362,14 @@ export interface FileRouteTypes {
     | '/'
     | '/collections/$id'
     | '/collections/create'
+    | '/custom-recipes/$id'
     | '/account'
     | '/admin'
     | '/browse-foods'
     | '/collections'
+    | '/custom-recipes'
     | '/food-exclusions'
+    | '/groceries'
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
@@ -329,11 +383,14 @@ export interface FileRouteTypes {
     | '/'
     | '/collections/$id'
     | '/collections/create'
+    | '/custom-recipes/$id'
     | '/account'
     | '/admin'
     | '/browse-foods'
     | '/collections'
+    | '/custom-recipes'
     | '/food-exclusions'
+    | '/groceries'
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
@@ -347,11 +404,14 @@ export interface FileRouteTypes {
     | '/'
     | '/collections/$id'
     | '/collections/create'
+    | '/custom-recipes/$id'
     | '/account/'
     | '/admin/'
     | '/browse-foods/'
     | '/collections/'
+    | '/custom-recipes/'
     | '/food-exclusions/'
+    | '/groceries/'
     | '/login/'
     | '/meal-plan/'
     | '/nutrition-targets/'
@@ -367,11 +427,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CollectionsIdRoute: typeof CollectionsIdRoute
   CollectionsCreateRoute: typeof CollectionsCreateRoute
+  CustomRecipesIdRoute: typeof CustomRecipesIdRoute
   AccountIndexRoute: typeof AccountIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
   BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
+  CustomRecipesIndexRoute: typeof CustomRecipesIndexRoute
   FoodExclusionsIndexRoute: typeof FoodExclusionsIndexRoute
+  GroceriesIndexRoute: typeof GroceriesIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   MealPlanIndexRoute: typeof MealPlanIndexRoute
   NutritionTargetsIndexRoute: typeof NutritionTargetsIndexRoute
@@ -386,11 +449,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CollectionsIdRoute: CollectionsIdRoute,
   CollectionsCreateRoute: CollectionsCreateRoute,
+  CustomRecipesIdRoute: CustomRecipesIdRoute,
   AccountIndexRoute: AccountIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
   BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
+  CustomRecipesIndexRoute: CustomRecipesIndexRoute,
   FoodExclusionsIndexRoute: FoodExclusionsIndexRoute,
+  GroceriesIndexRoute: GroceriesIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   MealPlanIndexRoute: MealPlanIndexRoute,
   NutritionTargetsIndexRoute: NutritionTargetsIndexRoute,
@@ -414,11 +480,14 @@ export const routeTree = rootRoute
         "/",
         "/collections/$id",
         "/collections/create",
+        "/custom-recipes/$id",
         "/account/",
         "/admin/",
         "/browse-foods/",
         "/collections/",
+        "/custom-recipes/",
         "/food-exclusions/",
+        "/groceries/",
         "/login/",
         "/meal-plan/",
         "/nutrition-targets/",
@@ -438,6 +507,9 @@ export const routeTree = rootRoute
     "/collections/create": {
       "filePath": "collections/create.tsx"
     },
+    "/custom-recipes/$id": {
+      "filePath": "custom-recipes/$id.tsx"
+    },
     "/account/": {
       "filePath": "account/index.tsx"
     },
@@ -450,8 +522,14 @@ export const routeTree = rootRoute
     "/collections/": {
       "filePath": "collections/index.tsx"
     },
+    "/custom-recipes/": {
+      "filePath": "custom-recipes/index.tsx"
+    },
     "/food-exclusions/": {
       "filePath": "food-exclusions/index.tsx"
+    },
+    "/groceries/": {
+      "filePath": "groceries/index.tsx"
     },
     "/login/": {
       "filePath": "login/index.tsx"

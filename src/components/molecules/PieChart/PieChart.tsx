@@ -22,17 +22,17 @@ const PieChart: React.FC<PieChartProps> = ({
   const chartData = [
     {
       name: 'C',
-      value: nutritionData.carbs,
+      value: nutritionData?.carbs ?? 0,
       color: NUTRITION_HEX_COLOR.CARBS,
     },
     {
       name: 'F',
-      value: nutritionData.fats,
+      value: nutritionData?.fats ?? 0,
       color: NUTRITION_HEX_COLOR.FATS,
     },
     {
       name: 'P',
-      value: nutritionData.proteins,
+      value: nutritionData?.proteins ?? 0,
       color: NUTRITION_HEX_COLOR.PROTEINS,
     },
   ];

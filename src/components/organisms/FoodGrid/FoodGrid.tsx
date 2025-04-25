@@ -10,8 +10,9 @@ import type { Food } from '@/types/food';
 interface FoodGridProps {
   foods: Food[];
   isFetching: boolean;
-  onLoadMore: () => void;
-  isLastPage: boolean;
+  onLoadMore?: () => void;
+  showPopover?: boolean;
+  isLastPage?: boolean;
 }
 
 const FoodGrid: React.FC<FoodGridProps> = ({
@@ -19,13 +20,14 @@ const FoodGrid: React.FC<FoodGridProps> = ({
   isFetching,
   onLoadMore,
   isLastPage,
+  showPopover = true,
 }) => {
   const noResults = !isFetching && foods.length === 0;
 
   const renderContent = () => {
     const renderedFoods = foods.map((food) => (
       <Col key={food._id} xs={24} sm={12} md={8} lg={6} xl={6}>
-        <FoodCard foodItem={food} />
+        <FoodCard foodItem={food} showPopover={showPopover} />
       </Col>
     ));
 
@@ -45,27 +47,29 @@ const FoodGrid: React.FC<FoodGridProps> = ({
       <Row gutter={[30, 40]} className={cn('justify-center p-4')}>
         {renderContent()}
       </Row>
-      <div className='flex justify-center pt-10 pb-5'>
-        {noResults ? (
-          <p className='text-lg text-gray-500 italic'>
-            No food items found matching your filters.
-          </p>
-        ) : !isLastPage ? (
-          <Button
-            className='border-none bg-[#ffc84e] px-7 py-6 text-[16px] font-bold text-black hover:bg-[#ffb81c] hover:underline'
-            onClick={onLoadMore}
-            disabled={isFetching}
-          >
-            View More
-          </Button>
-        ) : (
-          !isFetching && (
-            <p className='text-base text-gray-500'>
-              You&apos;ve reached the end of the list.
+      {showPopover && (
+        <div className='flex justify-center pt-10 pb-5'>
+          {noResults ? (
+            <p className='text-lg text-gray-500 italic'>
+              No food items found matching your filters.
             </p>
-          )
-        )}
-      </div>
+          ) : !isLastPage ? (
+            <Button
+              className='border-none bg-[#ffc84e] px-7 py-6 text-[16px] font-bold text-black hover:bg-[#ffb81c] hover:underline'
+              onClick={onLoadMore}
+              disabled={isFetching}
+            >
+              View More
+            </Button>
+          ) : (
+            !isFetching && (
+              <p className='text-base text-gray-500'>
+                You&apos;ve reached the end of the list.
+              </p>
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 };

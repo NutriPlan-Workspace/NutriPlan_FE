@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import { cn } from '@/helpers/helpers';
 import type { MenuItemDropdown } from '@/types/menuItem';
 
 import DropdownMenu from './DropdownMenu';
@@ -8,7 +9,8 @@ const DropdownMenuWrapper: React.FC<{
   items: MenuItemDropdown[];
   defaultSelectedKey: string;
   onSelect: (selectedKey: string) => void;
-}> = ({ items, defaultSelectedKey, onSelect }) => {
+  className?: string;
+}> = ({ items, defaultSelectedKey, onSelect, className }) => {
   const [, setSelectedKey] = useState<string>(defaultSelectedKey);
 
   useEffect(() => {
@@ -24,7 +26,7 @@ const DropdownMenuWrapper: React.FC<{
     <DropdownMenu
       items={items}
       onSelect={handleSelect}
-      className='min-w-[120px]'
+      className={cn('min-w-[120px]', className)}
     />
   );
 };
