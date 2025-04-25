@@ -14,20 +14,24 @@ const nutritionOptions = [
 interface NutritionFocusSectionProps {
   activeOptions: string[];
   setActiveOptions: React.Dispatch<React.SetStateAction<string[]>>;
+  onFilterChange: (hasFilter: boolean) => void;
 }
 
 const NutritionFocusSection: React.FC<NutritionFocusSectionProps> = ({
   activeOptions,
   setActiveOptions,
+  onFilterChange,
 }) => {
   const toggleOption = (option: string) => {
-    setActiveOptions((prev) =>
-      prev.includes(option)
+    setActiveOptions((prev) => {
+      const updatedOptions = prev.includes(option)
         ? prev.filter((o) => o !== option)
-        : [...prev, option],
-    );
-  };
+        : [...prev, option];
+      onFilterChange(updatedOptions.length > 0);
 
+      return updatedOptions;
+    });
+  };
   return (
     <div className='flex flex-wrap gap-4'>
       {nutritionOptions.map((option) => {
@@ -37,7 +41,8 @@ const NutritionFocusSection: React.FC<NutritionFocusSectionProps> = ({
             key={option}
             onClick={() => toggleOption(option)}
             className={cn('rounded-md border border-gray-300 text-gray-700', {
-              'bg-primary border-none text-black': isActive,
+              'bg-primary border-transparentn hover:border-primary text-black':
+                isActive,
             })}
           >
             {option}

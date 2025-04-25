@@ -4,21 +4,24 @@ import { IoCloudUpload } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 import { useParams } from '@tanstack/react-router';
 import { useRouter } from '@tanstack/react-router';
-import { Image, Typography } from 'antd';
+import { Image, Modal, Typography } from 'antd';
 import { motion } from 'framer-motion';
 
 import { Button } from '@/atoms/Button';
 import { CollectionSkeleton } from '@/atoms/CollectionSkeleton';
-import { ERROR_MESSAGES } from '@/constants/message';
+import { CollectionForm } from '@/atoms/CreateCollection';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/constants/message';
 import { useToast } from '@/contexts/ToastContext';
 import { ActionButtons } from '@/molecules/ActionButtons';
 import { FoodsSection } from '@/molecules/FoodsSection';
 import { PopupUpload } from '@/molecules/PopupUpload';
 import {
+  useDeleteCollectionMutation,
   useGetCollectionDetailQuery,
   useUpdateCollectionMutation,
 } from '@/redux/query/apis/collection/collectionApi';
 import { userSelector } from '@/redux/slices/user';
+import type { CreateCollectionFormValues } from '@/schemas/collectionSchema';
 import type { CollectionFood } from '@/types/collection';
 import type { MenuItemDropdown } from '@/types/menuItem';
 
@@ -32,13 +35,15 @@ const { Title, Paragraph } = Typography;
 const CollectionDetail: React.FC = () => {
   const { id } = useParams({ strict: false });
   const [foods, setFoods] = useState<CollectionFood[]>([]);
-  const { data, isLoading } = useGetCollectionDetailQuery(id!);
+  const { data, isLoading, refetch } = useGetCollectionDetailQuery(id!);
   const [upload, setUpload] = useState(false);
   const [updateCollection] = useUpdateCollectionMutation();
   const user = useSelector(userSelector).user;
-  const { showToastError } = useToast();
+  const [deleteCollection] = useDeleteCollectionMutation();
+  const { showToastError, showToastSuccess } = useToast();
   const [img, setImg] = useState<string | undefined>(undefined);
   const router = useRouter();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (data?.data?.foods) {
@@ -50,16 +55,24 @@ const CollectionDetail: React.FC = () => {
   }, [data]);
 
   const handleEdit = () => {
-    console.log('Edit clicked');
+    setIsEditModalOpen(true);
   };
 
   const handleSetAsRecurring = () => {
     console.log('Set as recurring clicked');
   };
 
-  const handleDelete = () => {
-    console.log('Delete clicked');
-  };
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      await deleteCollection(id).unwrap();
+      showToastSuccess(SUCCESS_MESSAGES.COLLECTION_DELETE_SUCCESS);
+      router.history.back();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      showToastError(ERROR_MESSAGES.DELETE_COLLECTION_FAILED);
+    }
+  }
 
   const handleUploaded = async (url: string) => {
     if (!id) return;
@@ -74,6 +87,58 @@ const CollectionDetail: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       showToastError(ERROR_MESSAGES.IMAGE_UPLOAD_FAILED);
+    }
+  };
+
+  const handleAddFood = async (foodId: string) => {
+    if (!data?.data) return;
+    if (!id) return;
+
+    const isFoodAlreadyAdded = foods.some(
+      (item) =>
+        (typeof item.food === 'string' ? item.food : item.food._id) === foodId,
+    );
+    if (isFoodAlreadyAdded) {
+      showToastError(ERROR_MESSAGES.FOOD_ALREADY_IN_COLLECTION);
+      return;
+    }
+
+    const updatedFoods = [
+      ...foods.map((item) => ({
+        food: typeof item.food === 'string' ? item.food : item.food._id,
+        date: item.date,
+      })),
+      { food: foodId, date: new Date().toISOString() },
+    ];
+
+    try {
+      await updateCollection({
+        id,
+        data: {
+          foods: updatedFoods,
+        },
+      }).unwrap();
+
+      refetch();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      showToastError(ERROR_MESSAGES.ADD_FOOD_FAILED);
+    }
+  };
+
+  const onSubmit = async (data: CreateCollectionFormValues) => {
+    if (!id) return;
+    try {
+      await updateCollection({
+        id: id,
+        data,
+      }).unwrap();
+      setIsEditModalOpen(false);
+      refetch();
+      showToastSuccess('Update successful!');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      showToastError('Update failed!');
     }
   };
 
@@ -144,10 +209,10 @@ const CollectionDetail: React.FC = () => {
               <Paragraph className='m-0'>Upload</Paragraph>
             </Button>
             <PopupUpload
-            isModalOpen={upload}
-            setModalOpen={setUpload}
-            onUploaded={handleUploaded}
-          />
+              isModalOpen={upload}
+              setModalOpen={setUpload}
+              onUploaded={handleUploaded}
+            />
           </div>
           <div className='mt-4 flex flex-col justify-between gap-14'>
             <div>
@@ -170,7 +235,25 @@ const CollectionDetail: React.FC = () => {
           dropdownItems={dropdownItems}
           foods={foods}
           onRemoveFood={handleRemoveFood}
+          onAddFood={handleAddFood}
         />
+        <Modal
+          title='Edit Collection'
+          open={isEditModalOpen}
+          onCancel={() => setIsEditModalOpen(false)}
+          footer={null}
+          destroyOnClose
+        >
+          <CollectionForm
+            isCreate={false}
+            isLoading={false}
+            defaultValues={{
+              title: data?.data?.title || '',
+              description: data?.data?.description || '',
+            }}
+            onSubmit={onSubmit}
+          />
+        </Modal>
       </div>
     </motion.div>
   );

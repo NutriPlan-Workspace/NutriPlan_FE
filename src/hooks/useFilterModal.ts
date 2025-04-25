@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { CheckboxChangeEvent } from 'antd';
 
@@ -21,6 +21,7 @@ export const useFilterModal = (
     newFilters: Partial<FoodFilterQuery>,
     keysToRemove?: (keyof FoodFilterQuery)[],
   ) => void,
+  isFilterCollection?: boolean,
 ) => {
   const { user } = useSelector(userSelector);
   const [searchValue, setSearchValue] = useState('');
@@ -44,6 +45,7 @@ export const useFilterModal = (
 
   const handleCheckboxChange = (e: CheckboxChangeEvent) => {
     setApplyExclusions(e.target.checked);
+    onFilterChange?.(true);
   };
 
   const handleSearch = () => {
@@ -77,6 +79,55 @@ export const useFilterModal = (
     onClose?.();
   };
 
+  const autoSubmitFilters = useCallback(() => {
+    if (isFilterCollection && onFiltersSubmit) {
+      let combinedFilters: Partial<FoodFilterQuery> = {};
+      if (dishType) combinedFilters.dishType = dishType;
+      if (preferredFoodTypes.length > 0)
+        combinedFilters.preferredFoodTypes = preferredFoodTypes;
+      if (selectedCategories.length > 0)
+        combinedFilters.filters = selectedCategories;
+      if (selectedCollectionIds.length > 0)
+        combinedFilters.collectionIds = selectedCollectionIds;
+      if (searchCollections) combinedFilters.searchCollections = true;
+
+      Object.assign(combinedFilters, nutritionFilters);
+
+      activeOptions.forEach((option) => {
+        Object.assign(combinedFilters, nutritionMap[option]);
+      });
+
+      combinedFilters = { applyExclusions, ...combinedFilters };
+      onFiltersSubmit(combinedFilters);
+    }
+  }, [
+    isFilterCollection,
+    onFiltersSubmit,
+    dishType,
+    preferredFoodTypes,
+    selectedCategories,
+    selectedCollectionIds,
+    searchCollections,
+    nutritionFilters,
+    activeOptions,
+    applyExclusions,
+  ]);
+
+  useEffect(() => {
+    autoSubmitFilters();
+  }, [
+    searchValue,
+    applyExclusions,
+    activeOptions,
+    dishType,
+    preferredFoodTypes,
+    selectedCategories,
+    selectedCollectionIds,
+    searchCollections,
+    nutritionFilters,
+    autoSubmitFilters,
+  ]);
+
   const handleReset = () => {
     setResetTrigger((prev) => !prev);
     setApplyExclusions(false);
@@ -89,6 +140,9 @@ export const useFilterModal = (
     setNutritionFilters({});
     onFilterChange?.(false);
     setSearchValue('');
+    if (isFilterCollection) {
+      onFiltersSubmit?.({});
+    }
   };
 
   return {
@@ -104,6 +158,8 @@ export const useFilterModal = (
     nutritionFilters,
     searchValue,
 
+    setSearchValue,
+    setApplyExclusions,
     setActiveOptions,
     setDishType,
     setPreferredFoodTypes,
@@ -111,11 +167,9 @@ export const useFilterModal = (
     setSelectedCollectionIds,
     setSearchCollections,
     setNutritionFilters,
-    setSearchValue,
 
     handleSearch,
     handleReset,
     handleCheckboxChange,
-    setApplyExclusions,
   };
 };

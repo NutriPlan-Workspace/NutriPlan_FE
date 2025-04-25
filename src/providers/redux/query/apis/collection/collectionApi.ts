@@ -41,10 +41,7 @@ export const collectionApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    deleteCollection: builder.mutation<
-      ApiResponse<null>,
-      string // id
-    >({
+    deleteCollection: builder.mutation<ApiResponse<null>, string>({
       query: (id) => ({
         url: `${COLLECTIONS_ENDPOINT}/${id}`,
         method: 'DELETE',

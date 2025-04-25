@@ -32,11 +32,13 @@ const filterKeysMap: Record<
 interface NutritionPerServingSectionProps {
   onFilterChange: (filters: Partial<FoodFilterQuery>) => void;
   resetTrigger: boolean;
+  isFilterCollection?: boolean;
 }
 
 const NutritionPerServingSection: React.FC<NutritionPerServingSectionProps> = ({
   onFilterChange,
   resetTrigger,
+  isFilterCollection = false,
 }) => {
   const [activeSliders, setActiveSliders] = useState<
     Record<string, { from: number; to: number }>
@@ -119,6 +121,7 @@ const NutritionPerServingSection: React.FC<NutritionPerServingSectionProps> = ({
                 value={value}
                 maxValue={item.max}
                 onChange={(val) => handleSliderChange(key, val)}
+                isFilterCollection={isFilterCollection}
               />
             </motion.div>
           );

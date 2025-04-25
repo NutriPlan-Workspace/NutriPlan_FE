@@ -4,19 +4,21 @@ import { Image, Popover, Typography } from 'antd';
 
 import { Button } from '@/atoms/Button';
 import { cn } from '@/helpers/helpers';
-import { NutritionPopoverFoodOverride } from '@/molecules/NutritionPopoverFood';
+import { NutritionPopoverFood } from '@/molecules/NutritionPopoverFood';
 import type { Food } from '@/types/food';
 
 const { Link } = Typography;
 
 interface FoodCardCollectionProps {
   food: Food;
-  onRemoveFood: (foodId: string) => void;
+  onRemoveFood?: (foodId: string) => void;
+  onClick?: (food: Food) => void;
 }
 
 const FoodCardCollection: React.FC<FoodCardCollectionProps> = ({
   food,
   onRemoveFood,
+  onClick,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const handleEnterHover = () => setIsHovered(true);
@@ -33,7 +35,7 @@ const FoodCardCollection: React.FC<FoodCardCollectionProps> = ({
           overflow: 'hidden',
         },
       }}
-      content={<NutritionPopoverFoodOverride food={food} showIngredient />}
+      content={<NutritionPopoverFood mealItem={food} />}
     >
       <div
         className={cn(
@@ -42,6 +44,7 @@ const FoodCardCollection: React.FC<FoodCardCollectionProps> = ({
         )}
         onMouseEnter={handleEnterHover}
         onMouseLeave={handleLeaveHover}
+        onClick={() => onClick?.(food)}
       >
         <Image
           src={food.imgUrls[0]}
@@ -52,12 +55,14 @@ const FoodCardCollection: React.FC<FoodCardCollectionProps> = ({
             {food.name}
           </Link>
         </div>
-        <Button
-          className='hover:bg-primary-200 flex items-center justify-center rounded-full border-none p-2 hover:text-black'
-          onClick={() => onRemoveFood?.(food._id)}
-        >
-          <MdDelete />
-        </Button>
+        {onRemoveFood && (
+          <Button
+            className='hover:bg-primary-200 flex items-center justify-center rounded-full border-none p-2 hover:text-black'
+            onClick={() => onRemoveFood?.(food._id)}
+          >
+            <MdDelete />
+          </Button>
+        )}
       </div>
     </Popover>
   );

@@ -7,10 +7,13 @@ import { FoodCardCollection } from '@/molecules/FoodCardCollection';
 import type { CollectionFood } from '@/types/collection';
 import type { MenuItemDropdown } from '@/types/menuItem';
 
+import { AddFoodCollectionModal } from '../AddFoodCollectionModal';
+
 interface FoodsSectionProps {
   dropdownItems: MenuItemDropdown[];
   foods: CollectionFood[];
   onRemoveFood: (foodId: string) => void;
+  onAddFood: (foodName: string) => void;
 }
 
 const { Title, Paragraph } = Typography;
@@ -19,9 +22,11 @@ const FoodsSection: React.FC<FoodsSectionProps> = ({
   dropdownItems,
   foods,
   onRemoveFood,
+  onAddFood,
 }) => {
   const [selectedKey, setSelectedKey] = useState<string>('1');
   const [sortedFoods, setSortedFoods] = useState<CollectionFood[]>(foods);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     if (selectedKey === '1') {
@@ -39,6 +44,11 @@ const FoodsSection: React.FC<FoodsSectionProps> = ({
 
   const handleSelect = (key: string) => {
     setSelectedKey(key);
+  };
+
+  const handleAddFood = (foodName: string) => {
+    onAddFood(foodName);
+    setModalVisible(false);
   };
 
   return (
@@ -71,10 +81,18 @@ const FoodsSection: React.FC<FoodsSectionProps> = ({
           There are no items in this collection. Add some foods to get started!
         </Paragraph>
       )}
-      <Button className='flex w-[150px] items-center gap-2'>
+      <Button
+        className='flex w-[150px] items-center gap-2'
+        onClick={() => setModalVisible(true)}
+      >
         <IoMdAddCircleOutline />
         <Paragraph className='m-0'>Add Food</Paragraph>
       </Button>
+      <AddFoodCollectionModal
+        visible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+        onAddFood={handleAddFood}
+      />
     </div>
   );
 };

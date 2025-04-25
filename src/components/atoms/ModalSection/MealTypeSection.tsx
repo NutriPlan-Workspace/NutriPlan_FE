@@ -70,9 +70,9 @@ const MealTypeSection: React.FC<MealTypeSectionProps> = ({
         <Button
           onClick={() => toggleDishType('Main Dish')}
           className={cn(
-            'hover:border-primary rounded-l-full rounded-r-none border-r-0',
+            'hover:border-primary rounded-l-full rounded-r-none',
             selectedDishType === 'Main Dish'
-              ? 'bg-primary text-black'
+              ? 'bg-primary border-transparent text-black'
               : 'border border-gray-300 text-gray-700',
           )}
         >
@@ -99,7 +99,7 @@ const MealTypeSection: React.FC<MealTypeSectionProps> = ({
               key={option}
               onClick={() => toggleMealType(option)}
               className={cn('rounded-md border border-gray-300 text-gray-700', {
-                'bg-primary border-none text-black': isActive,
+                'bg-primary border-transparent text-black': isActive,
               })}
             >
               {option.charAt(0).toUpperCase() + option.slice(1)}

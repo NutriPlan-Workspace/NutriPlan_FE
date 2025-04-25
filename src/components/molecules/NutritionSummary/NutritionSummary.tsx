@@ -3,6 +3,7 @@ import { Button } from 'antd';
 
 import { useScale } from '@/contexts/ScaleContext';
 import { useScaleIngre } from '@/contexts/ScaleIngreContext';
+import { cn } from '@/helpers/helpers';
 import ModalNutritionDetail from '@/organisms/ModalNutritionDetail/ModalNutritionDetail';
 import type { NutritionFields } from '@/types/food';
 import { calculateNutrition } from '@/utils/calculateNutrition';
@@ -12,9 +13,14 @@ import { NutritionChart } from '../NutritionChart';
 interface NutritionSummaryProp {
   nutrition: NutritionFields;
   type: string;
+  isDetailCollection?: boolean;
 }
 
-const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition, type }) => {
+const NutritionSummary: FC<NutritionSummaryProp> = ({
+  nutrition,
+  type,
+  isDetailCollection = false,
+}) => {
   const { amount, unit, conversionFactor } = useScale();
   const { amountIngre, unitIngre, conversionFactorIngre } = useScaleIngre();
   const dataNutriSummary = [
@@ -47,8 +53,16 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition, type }) => {
   return (
     <div className='mt-6'>
       <span className='pb-3 text-xl font-semibold'>Nutrition Info</span>
-      <div className='flex items-center justify-center'>
-        <NutritionChart nutrition={nutrition} type={type} />
+      <div
+        className={cn('flex flex-col items-center space-y-2', {
+          'flex-row items-center space-x-4': isDetailCollection,
+        })}
+      >
+        <NutritionChart
+          nutrition={nutrition}
+          type={type}
+          isDetailCollection={isDetailCollection}
+        />
       </div>
       <div className='flex flex-col space-y-2'>
         <div className='flex justify-between'>
@@ -75,17 +89,21 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({ nutrition, type }) => {
             </span>
           </div>
         ))}
-        <Button
-          className='mt-2 border-gray-400 text-gray-600 hover:border-gray-400 hover:bg-gray-200 hover:text-black'
-          onClick={showModal}
-        >
-          Detailed Nutrition Information
-        </Button>
-        <ModalNutritionDetail
-          nutrition={nutrition}
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-        />
+        {!isDetailCollection && (
+          <>
+            <Button
+              className='mt-2 border-gray-400 text-gray-600 hover:border-gray-400 hover:bg-gray-200 hover:text-black'
+              onClick={showModal}
+            >
+              Detailed Nutrition Information
+            </Button>
+            <ModalNutritionDetail
+              nutrition={nutrition}
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+            />
+          </>
+        )}
       </div>
     </div>
   );

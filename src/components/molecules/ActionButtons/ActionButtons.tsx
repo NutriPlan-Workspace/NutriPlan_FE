@@ -19,13 +19,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   isFavorite,
 }) => (
   <div className='mt-8 flex items-center gap-2'>
-    <Button
-      className='hover:border-primary flex items-center gap-2 hover:text-black'
-      onClick={onEdit}
-    >
-      <FaPencil />
-      <Paragraph className='m-0 text-sm font-thin'>Edit</Paragraph>
-    </Button>
+    {!isFavorite && (
+      <Button
+        className='hover:border-primary flex items-center gap-2 hover:text-black'
+        onClick={onEdit}
+      >
+        <FaPencil />
+        <Paragraph className='m-0 text-sm font-thin'>Edit</Paragraph>
+      </Button>
+    )}
     <Button
       className='hover:border-primary flex items-center gap-2 hover:text-black'
       onClick={onSetAsRecurring}

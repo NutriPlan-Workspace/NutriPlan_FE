@@ -26,9 +26,13 @@ export const ERROR_MESSAGES = {
   REMOVE_FOOD_FAILED: 'Failed to remove food from collection!',
   IMAGE_UPLOAD_FAILED: 'Image upload failed! Please try again.',
   CREATE_COLLECTION_FAILED: 'Failed to create collection!',
+  ADD_FOOD_FAILED: 'Failed to add food!',
+  FOOD_ALREADY_IN_COLLECTION: 'This food is already in the collection.',
+  DELETE_COLLECTION_FAILED: 'Failed to delete collection.',
 };
 
 export const SUCCESS_MESSAGES = {
   REGISTRATION_SUCCESS: 'Registration successful! Redirecting to login...',
   UPDATE_NUTRITION_SUCCESS: 'Update nutrition target success!',
+  COLLECTION_DELETE_SUCCESS: 'Collection deleted successfully!',
 };
