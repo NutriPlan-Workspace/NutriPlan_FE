@@ -6,7 +6,6 @@ import { PLAN_TYPES } from '@/constants/plans';
 import { useDate } from '@/contexts/DateContext';
 import { MealPlanContent } from '@/organisms/MealPlanContent';
 import { MealTrack } from '@/organisms/MealTrack';
-import { LayoutLogined } from '@/templates/LayoutLogined';
 import { MealPlanWeek } from '@/templates/MealPlanWeek';
 import { handleUserRoute } from '@/utils/route';
 
@@ -24,13 +23,11 @@ const MealPlanPageContent: React.FC = () => {
 };
 
 const MealPlanPage: React.FC = () => (
-  <LayoutLogined>
-    {(isSidebarOpen) => (
-      <MealPlanContent isSidebarOpen={isSidebarOpen}>
-        <MealPlanPageContent />
-      </MealPlanContent>
-    )}
-  </LayoutLogined>
+  <div>
+    <MealPlanContent>
+      <MealPlanPageContent />
+    </MealPlanContent>
+  </div>
 );
 
 export const Route = createFileRoute(PATH.MEAL_PLAN as keyof FileRoutesByPath)({

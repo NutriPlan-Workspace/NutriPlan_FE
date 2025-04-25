@@ -106,6 +106,7 @@
   font-size: 20px;
   padding: 0px;
 }
+
 .ant-tabs-nav {
   position: sticky;
   top: 0;
@@ -139,6 +140,7 @@
 .direction-list ul.ant-list-items li:hover {
   background: #dcdde1;
 }
+
 .direction-list ul.ant-list-items li:before {
   content: counter(li);
   counter-increment: li;
@@ -182,4 +184,13 @@
 
 .direction-list ul.ant-list-items li.completed:hover:after {
   border-left-color: #dcdde1;
+}
+
+.ant-tabs-tab {
+  margin-right: 18px;
+  margin-left: 2px;
+}
+
+.ant-skeleton {
+  font-size: 0;
 }

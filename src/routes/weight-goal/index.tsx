@@ -1,14 +1,12 @@
 import React from 'react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, FileRoutesByPath } from '@tanstack/react-router';
 
+import { PATH } from '@/constants/path';
 import { WeightAndGoal } from '@/organisms/WeightAndGoal';
-import { LayoutLogined } from '@/templates/LayoutLogined';
 
-const WeightAndGoalPage: React.FC = () => (
-  <LayoutLogined>
-    <WeightAndGoal />;
-  </LayoutLogined>
-);
-export const Route = createFileRoute('/weight-goal/')({
+const WeightAndGoalPage: React.FC = () => <WeightAndGoal />;
+export const Route = createFileRoute(
+  PATH.WEIGHT_GOAL as keyof FileRoutesByPath,
+)({
   component: WeightAndGoalPage,
 });

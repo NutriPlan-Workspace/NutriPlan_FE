@@ -5,10 +5,9 @@ import { Header } from '@/molecules/Header';
 
 const LayoutGuest: React.FC<{
   children: React.ReactNode;
-  mealPlanRef?: React.RefObject<HTMLDivElement | null>;
-}> = ({ children, mealPlanRef }) => (
+}> = ({ children }) => (
   <div className='flex min-h-screen flex-col'>
-    <Header mealPlanRef={mealPlanRef} />
+    <Header />
 
     <main className='flex-grow bg-[#f8f8f8]'>{children}</main>
 

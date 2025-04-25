@@ -3,14 +3,9 @@ import { createFileRoute, FileRoutesByPath } from '@tanstack/react-router';
 
 import { PATH } from '@/constants/path';
 import { Collection } from '@/organisms/Collection';
-import { LayoutLogined } from '@/templates/LayoutLogined';
 import { handleUserRoute } from '@/utils/route';
 
-const CollectionsPage: React.FC = () => (
-  <LayoutLogined>
-    <Collection />
-  </LayoutLogined>
-);
+const CollectionsPage: React.FC = () => <Collection />;
 
 export const Route = createFileRoute(
   PATH.COLLECTIONS as keyof FileRoutesByPath,

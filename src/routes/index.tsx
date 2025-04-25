@@ -1,18 +1,11 @@
-import { useRef } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { LandingContent } from '@/organisms/LandingContent';
-import { LayoutGuest } from '@/templates/LayoutGuest';
+import { handlePublicRoute } from '@/utils/route';
 
-const LandingPage = () => {
-  const mealPlanRef = useRef<HTMLDivElement | null>(null);
-  return (
-    <LayoutGuest mealPlanRef={mealPlanRef}>
-      <LandingContent mealPlanRef={mealPlanRef} />
-    </LayoutGuest>
-  );
-};
+const LandingPage = () => <LandingContent />;
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
+  beforeLoad: handlePublicRoute,
 });

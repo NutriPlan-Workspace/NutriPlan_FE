@@ -1,8 +1,10 @@
 import React from 'react';
 import { IoMenu } from 'react-icons/io5';
+import { useSelector } from 'react-redux';
 
 import { Button } from '@/atoms/Button';
 import { cn } from '@/helpers/helpers';
+import { userSelector } from '@/redux/slices/user';
 
 interface SidebarTopProps {
   onClickMenu: () => void;
@@ -14,40 +16,43 @@ const SidebarTop: React.FC<SidebarTopProps> = ({
   onClickMenu,
   onClickAvatar,
   isCollapsed,
-}) => (
-  <div
-    className={cn('w-full', {
-      'flex flex-col items-center justify-center': isCollapsed,
-    })}
-  >
-    <div className='mb-4 flex h-[40px] items-center justify-between'>
-      <Button
-        onClick={onClickMenu}
-        className='border-primary hover:bg-primary-50 flex h-[40px] w-[40px] cursor-pointer items-center justify-center rounded-full border border-[1px] p-2'
-      >
-        <IoMenu className='text-primary h-10 w-10' />
-      </Button>
-    </div>
+}) => {
+  const user = useSelector(userSelector).user;
 
-    {!isCollapsed && (
-      <div className='flex items-center gap-2'>
+  return (
+    <div
+      className={cn('w-full', {
+        'flex flex-col items-center justify-center': isCollapsed,
+      })}
+    >
+      <div className='mb-4 flex h-[40px] items-center justify-between'>
         <Button
-          onClick={onClickAvatar}
-          className='h-[40px] w-[40px] rounded-full border-none p-0 outline-none'
+          onClick={onClickMenu}
+          className='border-primary hover:bg-primary-50 flex h-[40px] w-[40px] cursor-pointer items-center justify-center rounded-full border border-[1px] p-2'
         >
-          <img
-            src='https://asoiafchineselit.wordpress.com/wp-content/uploads/2021/02/1showname.png?w=1024'
-            alt=''
-            className='h-full w-full rounded-full'
-          />
+          <IoMenu className='text-primary h-10 w-10' />
         </Button>
-        <div className='flex flex-col gap-0.5'>
-          {/* TODO: Get user information throught localstorage or redux */}
-          <p className='font-display font-semibold'>Full Name</p>
-        </div>
       </div>
-    )}
-  </div>
-);
+
+      {!isCollapsed && (
+        <div className='flex items-center gap-2'>
+          <Button
+            onClick={onClickAvatar}
+            className='h-[40px] w-[40px] rounded-full border-none p-0 outline-none'
+          >
+            <img
+              src='https://asoiafchineselit.wordpress.com/wp-content/uploads/2021/02/1showname.png?w=1024'
+              alt=''
+              className='h-full w-full rounded-full'
+            />
+          </Button>
+          <div className='flex flex-col gap-0.5'>
+            <p className='font-display font-semibold'>{user.fullName}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default SidebarTop;

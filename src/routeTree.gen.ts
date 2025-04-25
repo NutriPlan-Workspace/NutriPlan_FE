@@ -15,7 +15,6 @@ import { Route as IndexImport } from './routes/index'
 import { Route as WeightGoalIndexImport } from './routes/weight-goal/index'
 import { Route as UnauthorizedIndexImport } from './routes/unauthorized/index'
 import { Route as RegisterIndexImport } from './routes/register/index'
-import { Route as ProfileIndexImport } from './routes/profile/index'
 import { Route as PrimaryDietIndexImport } from './routes/primary-diet/index'
 import { Route as PhysicalStatsIndexImport } from './routes/physical-stats/index'
 import { Route as NutritionTargetsIndexImport } from './routes/nutrition-targets/index'
@@ -24,6 +23,7 @@ import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as CollectionsIndexImport } from './routes/collections/index'
 import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
+import { Route as AccountIndexImport } from './routes/account/index'
 import { Route as CollectionsCreateImport } from './routes/collections/create'
 import { Route as CollectionsIdImport } from './routes/collections/$id'
 
@@ -50,12 +50,6 @@ const UnauthorizedIndexRoute = UnauthorizedIndexImport.update({
 const RegisterIndexRoute = RegisterIndexImport.update({
   id: '/register/',
   path: '/register/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ProfileIndexRoute = ProfileIndexImport.update({
-  id: '/profile/',
-  path: '/profile/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -107,6 +101,12 @@ const AdminIndexRoute = AdminIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AccountIndexRoute = AccountIndexImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const CollectionsCreateRoute = CollectionsCreateImport.update({
   id: '/collections/create',
   path: '/collections/create',
@@ -142,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/collections/create'
       fullPath: '/collections/create'
       preLoaderRoute: typeof CollectionsCreateImport
+      parentRoute: typeof rootRoute
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountIndexImport
       parentRoute: typeof rootRoute
     }
     '/admin/': {
@@ -200,13 +207,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrimaryDietIndexImport
       parentRoute: typeof rootRoute
     }
-    '/profile/': {
-      id: '/profile/'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileIndexImport
-      parentRoute: typeof rootRoute
-    }
     '/register/': {
       id: '/register/'
       path: '/register'
@@ -237,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
+  '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
@@ -245,7 +246,6 @@ export interface FileRoutesByFullPath {
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
   '/physical-stats': typeof PhysicalStatsIndexRoute
   '/primary-diet': typeof PrimaryDietIndexRoute
-  '/profile': typeof ProfileIndexRoute
   '/register': typeof RegisterIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
   '/weight-goal': typeof WeightGoalIndexRoute
@@ -255,6 +255,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
+  '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
@@ -263,7 +264,6 @@ export interface FileRoutesByTo {
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
   '/physical-stats': typeof PhysicalStatsIndexRoute
   '/primary-diet': typeof PrimaryDietIndexRoute
-  '/profile': typeof ProfileIndexRoute
   '/register': typeof RegisterIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
   '/weight-goal': typeof WeightGoalIndexRoute
@@ -274,6 +274,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
+  '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/browse-foods/': typeof BrowseFoodsIndexRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -282,7 +283,6 @@ export interface FileRoutesById {
   '/nutrition-targets/': typeof NutritionTargetsIndexRoute
   '/physical-stats/': typeof PhysicalStatsIndexRoute
   '/primary-diet/': typeof PrimaryDietIndexRoute
-  '/profile/': typeof ProfileIndexRoute
   '/register/': typeof RegisterIndexRoute
   '/unauthorized/': typeof UnauthorizedIndexRoute
   '/weight-goal/': typeof WeightGoalIndexRoute
@@ -294,6 +294,7 @@ export interface FileRouteTypes {
     | '/'
     | '/collections/$id'
     | '/collections/create'
+    | '/account'
     | '/admin'
     | '/browse-foods'
     | '/collections'
@@ -302,7 +303,6 @@ export interface FileRouteTypes {
     | '/nutrition-targets'
     | '/physical-stats'
     | '/primary-diet'
-    | '/profile'
     | '/register'
     | '/unauthorized'
     | '/weight-goal'
@@ -311,6 +311,7 @@ export interface FileRouteTypes {
     | '/'
     | '/collections/$id'
     | '/collections/create'
+    | '/account'
     | '/admin'
     | '/browse-foods'
     | '/collections'
@@ -319,7 +320,6 @@ export interface FileRouteTypes {
     | '/nutrition-targets'
     | '/physical-stats'
     | '/primary-diet'
-    | '/profile'
     | '/register'
     | '/unauthorized'
     | '/weight-goal'
@@ -328,6 +328,7 @@ export interface FileRouteTypes {
     | '/'
     | '/collections/$id'
     | '/collections/create'
+    | '/account/'
     | '/admin/'
     | '/browse-foods/'
     | '/collections/'
@@ -336,7 +337,6 @@ export interface FileRouteTypes {
     | '/nutrition-targets/'
     | '/physical-stats/'
     | '/primary-diet/'
-    | '/profile/'
     | '/register/'
     | '/unauthorized/'
     | '/weight-goal/'
@@ -347,6 +347,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CollectionsIdRoute: typeof CollectionsIdRoute
   CollectionsCreateRoute: typeof CollectionsCreateRoute
+  AccountIndexRoute: typeof AccountIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
   BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
@@ -355,7 +356,6 @@ export interface RootRouteChildren {
   NutritionTargetsIndexRoute: typeof NutritionTargetsIndexRoute
   PhysicalStatsIndexRoute: typeof PhysicalStatsIndexRoute
   PrimaryDietIndexRoute: typeof PrimaryDietIndexRoute
-  ProfileIndexRoute: typeof ProfileIndexRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
   UnauthorizedIndexRoute: typeof UnauthorizedIndexRoute
   WeightGoalIndexRoute: typeof WeightGoalIndexRoute
@@ -365,6 +365,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CollectionsIdRoute: CollectionsIdRoute,
   CollectionsCreateRoute: CollectionsCreateRoute,
+  AccountIndexRoute: AccountIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
   BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
@@ -373,7 +374,6 @@ const rootRouteChildren: RootRouteChildren = {
   NutritionTargetsIndexRoute: NutritionTargetsIndexRoute,
   PhysicalStatsIndexRoute: PhysicalStatsIndexRoute,
   PrimaryDietIndexRoute: PrimaryDietIndexRoute,
-  ProfileIndexRoute: ProfileIndexRoute,
   RegisterIndexRoute: RegisterIndexRoute,
   UnauthorizedIndexRoute: UnauthorizedIndexRoute,
   WeightGoalIndexRoute: WeightGoalIndexRoute,
@@ -392,6 +392,7 @@ export const routeTree = rootRoute
         "/",
         "/collections/$id",
         "/collections/create",
+        "/account/",
         "/admin/",
         "/browse-foods/",
         "/collections/",
@@ -400,7 +401,6 @@ export const routeTree = rootRoute
         "/nutrition-targets/",
         "/physical-stats/",
         "/primary-diet/",
-        "/profile/",
         "/register/",
         "/unauthorized/",
         "/weight-goal/"
@@ -414,6 +414,9 @@ export const routeTree = rootRoute
     },
     "/collections/create": {
       "filePath": "collections/create.tsx"
+    },
+    "/account/": {
+      "filePath": "account/index.tsx"
     },
     "/admin/": {
       "filePath": "admin/index.tsx"
@@ -438,9 +441,6 @@ export const routeTree = rootRoute
     },
     "/primary-diet/": {
       "filePath": "primary-diet/index.tsx"
-    },
-    "/profile/": {
-      "filePath": "profile/index.tsx"
     },
     "/register/": {
       "filePath": "register/index.tsx"

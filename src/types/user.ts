@@ -32,6 +32,13 @@ export interface User {
   primaryDiet: PrimaryDietType;
 }
 
+export interface UserAuth {
+  id: string;
+  fullName: string;
+  email: string;
+  role: Role;
+}
+
 export interface PhysicalStatsValues {
   height: number | null;
   weight: number | null;

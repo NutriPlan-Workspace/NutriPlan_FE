@@ -91,10 +91,9 @@ const SideAddFood: React.FC<SideAddFoodProps> = ({ setFilterFood }) => {
 
   return (
     <div
-      className={cn(
-        'scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent mt-2 ml-2 flex h-full max-h-[calc(100vh-130px)] w-[400px] max-w-[450px] min-w-[400px] flex-col gap-2 overflow-y-scroll rounded-sm',
-        { 'sticky top-10 left-0': isWeekly },
-      )}
+      className={cn('w-full flex-col gap-2 rounded-sm py-1 pl-2', {
+        'sticky top-10 left-0': isWeekly,
+      })}
     >
       <div className='flex w-full items-center justify-between gap-2 p-1'>
         <AntdInput
@@ -111,23 +110,25 @@ const SideAddFood: React.FC<SideAddFoodProps> = ({ setFilterFood }) => {
           <IoClose className='h-5 w-5' />
         </Button>
       </div>
-      <div className='relative flex w-full items-start gap-2'>
-        <Tabs
-          activeKey={activeTabKey}
-          items={items}
-          onChange={(key: string) => setActiveTabKey(key)}
-          className='w-full'
-          tabBarExtraContent={
-            <TabActionMenu
-              dropDownRef={dropDownRef}
-              menuRef={menuRef}
-              menuItem={menuItem}
-              setMenuItem={setMenuItem}
-              selectedTabLabel={selectedTabLabel}
-              onSelect={handleMenuSelect}
-            />
-          }
-        />
+      <div className='scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent ml-2 flex h-full max-h-[calc(100vh-180px)] max-w-[285px] min-w-[150px] flex-col gap-2 overflow-y-scroll rounded-sm pr-1'>
+        <div className='relative flex w-full items-start gap-2'>
+          <Tabs
+            activeKey={activeTabKey}
+            items={items}
+            onChange={(key: string) => setActiveTabKey(key)}
+            className='w-full'
+            tabBarExtraContent={
+              <TabActionMenu
+                dropDownRef={dropDownRef}
+                menuRef={menuRef}
+                menuItem={menuItem}
+                setMenuItem={setMenuItem}
+                selectedTabLabel={selectedTabLabel}
+                onSelect={handleMenuSelect}
+              />
+            }
+          />
+        </div>
       </div>
     </div>
   );

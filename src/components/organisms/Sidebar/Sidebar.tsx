@@ -36,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div
       ref={sidebarRef}
-      className='scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex max-h-screen w-full flex-col gap-4 overflow-y-auto bg-white pt-4'
+      className='scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex h-full w-full flex-col gap-4 overflow-y-auto border-r border-r-gray-200 bg-white pt-4'
       style={{ maxHeight }}
     >
       <div className='px-5'>
@@ -52,10 +52,10 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {!isCollapsed && (
-        <div className='mb-4 flex items-center justify-center'>
+        <div className='mb-4 flex flex-1 items-end justify-center'>
           {/* Logo in here */}
           <Button className='h-[40px] w-[90%] cursor-pointer rounded-2xl border-none hover:bg-gray-300 hover:text-black'>
-            <Link to={PATH.MEAL_PLAN}>Nutri Plan</Link>
+            <Link to={PATH.HOME}>Nutri Plan</Link>
           </Button>
         </div>
       )}

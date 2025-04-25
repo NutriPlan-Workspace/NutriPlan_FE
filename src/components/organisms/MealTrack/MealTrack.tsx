@@ -56,22 +56,20 @@ const MealTrack: React.FC = () => {
   );
 
   return (
-    <div ref={parentRef} className='w-full'>
-      <div className='w-full overflow-x-hidden'>
-        <Slider ref={sliderRef} {...settings} className='w-full'>
-          {viewingMealPlans.map(({ mealDate, mealPlanDay }, index) => (
-            <DayBox
-              key={mealDate}
-              mealPlanDay={mealPlanDay}
-              mealDate={new Date(mealDate)}
-              isLoading={isLoadingList[index]}
-              isSingleDay={isSingleDay}
-              onCreateBlank={handleCreateBlank}
-              onCopyPreviousDay={handleCopyPreviousDay}
-            />
-          ))}
-        </Slider>
-      </div>
+    <div ref={parentRef}>
+      <Slider ref={sliderRef} {...settings}>
+        {viewingMealPlans.map(({ mealDate, mealPlanDay }, index) => (
+          <DayBox
+            key={mealDate}
+            mealPlanDay={mealPlanDay}
+            mealDate={new Date(mealDate)}
+            isLoading={isLoadingList[index]}
+            isSingleDay={isSingleDay}
+            onCreateBlank={handleCreateBlank}
+            onCopyPreviousDay={handleCopyPreviousDay}
+          />
+        ))}
+      </Slider>
     </div>
   );
 };

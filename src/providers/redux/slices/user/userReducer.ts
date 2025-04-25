@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { Role } from '@/constants/role';
-import type { User } from '@/types/user';
+import type { UserAuth } from '@/types/user';
 
 export type UserState = {
-  user: User;
+  user: UserAuth;
 };
 
 export const userInitialState: UserState = {
@@ -20,7 +20,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState: userInitialState,
   reducers: {
-    setUser: (state, action: PayloadAction<User>) => {
+    setUser: (state, action: PayloadAction<UserAuth>) => {
       state.user = action.payload;
     },
     removeUser: (state) => {

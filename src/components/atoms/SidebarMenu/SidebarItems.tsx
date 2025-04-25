@@ -75,18 +75,8 @@ export const fullMenuItems: MenuItem[] = [
   },
   {
     key: PATH.MEALS_SCHEDULE,
-    label: 'Meals & Schedule',
+    label: <Link to={PATH.MEALS_SCHEDULE}>Meal & Schedule</Link>,
     icon: <FaRegClock className={iconClass} />,
-    children: [
-      {
-        key: PATH.MEAL_SETTINGS,
-        label: <Link to={PATH.MEAL_SETTINGS}>Meal Settings</Link>,
-      },
-      {
-        key: PATH.LEFTOVERS,
-        label: <Link to={PATH.LEFTOVERS}>Leftovers</Link>,
-      },
-    ],
   },
   {
     key: PATH.PHYSICAL_STATS,
@@ -101,7 +91,7 @@ export const fullMenuItems: MenuItem[] = [
   },
   {
     key: PATH.ACCOUNT,
-    label: <Link to={PATH.CREDENTIALS}>Account</Link>,
+    label: <Link to={PATH.ACCOUNT}>Account</Link>,
     icon: <FaRegUser className={iconClass} />,
   },
   {

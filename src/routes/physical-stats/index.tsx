@@ -2,13 +2,8 @@ import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { PhysicalStats } from '@/organisms/PhysicalStats';
-import { LayoutLogined } from '@/templates/LayoutLogined';
 
-const PhysicalStatsPage: React.FC = () => (
-  <LayoutLogined>
-    <PhysicalStats />
-  </LayoutLogined>
-);
+const PhysicalStatsPage: React.FC = () => <PhysicalStats />;
 export const Route = createFileRoute('/physical-stats/')({
   component: PhysicalStatsPage,
 });

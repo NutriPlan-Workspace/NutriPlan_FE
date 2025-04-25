@@ -1,11 +1,11 @@
-import type { User } from './user';
+import type { UserAuth } from './user';
 
 export interface AuthResponse {
   success: boolean;
   message: string;
   code: number;
   data: {
-    payload: User;
+    payload: UserAuth;
   };
 }
 

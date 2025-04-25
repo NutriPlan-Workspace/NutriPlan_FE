@@ -12,11 +12,7 @@ import { DIET_LABELS } from '@/constants/dietLabels';
 import { PATH } from '@/constants/path';
 import { MealPlanFormData, mealPlanSchema } from '@/schemas/mealPlan.schema';
 
-interface MealPlanProps {
-  mealPlanRef?: React.RefObject<HTMLDivElement | null>;
-}
-
-const MealPlan: React.FC<MealPlanProps> = ({ mealPlanRef }) => {
+const MealPlan: React.FC = () => {
   const methods = useForm<MealPlanFormData>({
     resolver: zodResolver(mealPlanSchema),
     defaultValues: {
@@ -37,7 +33,7 @@ const MealPlan: React.FC<MealPlanProps> = ({ mealPlanRef }) => {
   };
   return (
     <div
-      ref={mealPlanRef}
+      id='try-plan'
       className='flex flex-col items-center justify-center lg:px-4 xl:px-24'
     >
       <h2 className='font-rossanova mb-6 text-[40px] font-bold'>

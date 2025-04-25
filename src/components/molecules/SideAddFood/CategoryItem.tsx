@@ -25,14 +25,14 @@ const getItems = ({
 }: ItemsProps) => [
   {
     key: '1',
-    label: 'All',
+    label: <span className='text-[13px]'>All</span>,
     children: (
       <AllFoodsTab onViewMore={handleViewMore} searchText={debouncedSearch} />
     ),
   },
   {
     key: '2',
-    label: 'Favorites',
+    label: <span className='text-[13px]'>Favorite</span>,
     children: (
       <CategoryFood
         foods={dataFavorite?.['favorites']?.foods || []}
@@ -43,7 +43,7 @@ const getItems = ({
   },
   {
     key: '3',
-    label: selectedTabLabel,
+    label: <span className='text-[13px]'>{selectedTabLabel}</span>,
     children: (
       <CategoryFood
         foods={data?.[filter]?.foods || []}

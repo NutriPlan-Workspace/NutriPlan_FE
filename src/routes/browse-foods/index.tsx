@@ -6,6 +6,7 @@ import { useGetFoodsQuery } from '@/redux/query/apis/food/foodApis';
 import BrowseFoodTemplate from '@/templates/BrowseFoodTemplate/BrowseFoodTemplate';
 import type { Food } from '@/types/food';
 import type { FoodFilterQuery } from '@/types/foodFilterQuery';
+import { handlePublicRoute } from '@/utils/route';
 
 const BrowseFoodPage = () => {
   const [page, setPage] = useState(1);
@@ -64,4 +65,5 @@ export const Route = createFileRoute(
   PATH.BROWSE_FOODS as keyof FileRoutesByPath,
 )({
   component: BrowseFoodPage,
+  beforeLoad: handlePublicRoute,
 });

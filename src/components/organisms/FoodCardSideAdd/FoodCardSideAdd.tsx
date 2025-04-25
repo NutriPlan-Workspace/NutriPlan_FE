@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { IoMdAdd } from 'react-icons/io';
 import { useDispatch } from 'react-redux';
-import { Button, Image, Popover, Typography } from 'antd';
+import { Image, Popover, Typography } from 'antd';
 
 import { cn } from '@/helpers/helpers';
 import { useFoodCardSideAddDrag } from '@/hooks/useFoodCardSideAddDrag';
@@ -70,14 +69,6 @@ const FoodCardSideAdd: React.FC<FoodCardSideAddProps> = ({ food }) => {
               {food.name}
             </Link>
           </div>
-          <Button
-            className={cn(
-              'hover:bg-primary mr-2 flex h-[40px] w-[40px] items-center justify-center rounded-sm border-2 border-transparent px-2 py-0 hover:text-black',
-              { 'border-primary-400': isHovered },
-            )}
-          >
-            <IoMdAdd className='h-5 w-5 hover:text-black' />
-          </Button>
         </div>
       </Popover>
     </div>

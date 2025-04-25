@@ -8,7 +8,6 @@ export type MealPlanState = {
   viewingMealPlans: MealPlanWithDate[];
   draggingCardHeight: number;
   isDragging: boolean;
-  isDraggingOverCard: boolean;
 };
 
 export const mealPlanInitialState: MealPlanState = {
@@ -16,7 +15,6 @@ export const mealPlanInitialState: MealPlanState = {
   viewingMealPlans: [],
   draggingCardHeight: 0,
   isDragging: false,
-  isDraggingOverCard: false,
 };
 
 const mealPlanSlice = createSlice({
@@ -98,12 +96,6 @@ const mealPlanSlice = createSlice({
     setIsDragging: (state, action: PayloadAction<{ isDragging: boolean }>) => {
       state.isDragging = action.payload.isDragging;
     },
-    setIsDraggingOverCard: (
-      state,
-      action: PayloadAction<{ isDraggingOverCard: boolean }>,
-    ) => {
-      state.isDraggingOverCard = action.payload.isDraggingOverCard;
-    },
   },
 });
 
@@ -116,6 +108,5 @@ export const {
   updateCacheMealPlanByDate,
   setDraggingCardHeight,
   setIsDragging,
-  setIsDraggingOverCard,
 } = mealPlanSlice.actions;
 export default mealPlanSlice.reducer;

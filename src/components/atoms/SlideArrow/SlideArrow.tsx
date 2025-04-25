@@ -21,10 +21,10 @@ const SlideArrow: React.FC<ArrowProps> = ({ direction }) => {
   return (
     <Button
       className={cn(
-        'absolute top-0 z-1 flex h-full w-[30px] items-start justify-center border-none bg-transparent p-0 pt-[20px] opacity-20 transition-all duration-300 hover:opacity-60',
+        'absolute top-0 z-1 flex h-full min-h-[calc(100vh-120px)] w-[30px] items-start justify-center border-none bg-transparent p-0 pt-[20px] opacity-20 transition-all duration-300 hover:opacity-40',
         direction === 'prev'
-          ? 'left-0 bg-gradient-to-l from-transparent to-black/60'
-          : 'right-0 bg-gradient-to-r from-transparent to-black/60',
+          ? 'left-0 bg-gradient-to-l from-transparent to-black/50'
+          : 'right-0 bg-gradient-to-r from-transparent to-black/50',
       )}
       onClick={handleArrowClick}
     >

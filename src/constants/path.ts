@@ -21,13 +21,12 @@ export const PATH = {
   FOR_PROFESSIONALS: '/for-professionals',
   ABOUT_US: '/about-us',
   MEAL_PLAN: '/meal-plan',
-  LOGINED: '/logined',
 
   GROCERIES: '/groceries',
   DISCOVER: '/discover',
   CUSTOM_RECIPES: '/custom-recipes',
   COLLECTIONS: '/collections',
-  COLLECTIOND_ID: '/collections/$id',
+  COLLECTION_ID: '/collections/$id',
   SAVED_PLANS: '/saved-plans',
 
   DIET_NUTRITION: '/diet-nutrition',
@@ -43,7 +42,7 @@ export const PATH = {
   PHYSICAL_STATS: '/physical-stats',
   WEIGHT_GOAL: '/weight-goal',
 
-  CREDENTIALS: '/profile',
+  ACCOUNT: '/account',
 
   LOGOUT: '/logout',
   CREATE_COLLECTION: '/collections/create',

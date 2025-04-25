@@ -11,7 +11,6 @@ export const getUserData = async () => {
   if (data?.data) {
     return data.data;
   }
-
   return null;
 };
 
@@ -32,6 +31,10 @@ export const handleUserRoute = async () => {
     throw redirect({ to: PATH.LOGIN, search: { redirect: location.href } });
 
   return {};
+};
+
+export const handlePublicRoute = async () => {
+  await getUserData();
 };
 
 export const handleLoginRoute = async () => {

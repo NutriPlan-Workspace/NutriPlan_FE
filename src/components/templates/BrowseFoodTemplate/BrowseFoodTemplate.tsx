@@ -1,8 +1,6 @@
 import React from 'react';
 
 import SearchInput from '@/molecules/BrowseFoodContent/SearchInput';
-import { Footer } from '@/molecules/Footer';
-import { Header } from '@/molecules/Header';
 import FoodGrid from '@/organisms/FoodGrid/FoodGrid';
 import type { Food } from '@/types/food';
 import type { FoodFilterQuery } from '@/types/foodFilterQuery';
@@ -25,8 +23,7 @@ const BrowseFoodTemplate: React.FC<BrowseFoodTemplateProps> = ({
   onFilterChange,
   isLastPage,
 }) => (
-  <div className='flex min-h-screen flex-col'>
-    <Header />
+  <div className='mt-10 flex min-h-screen flex-col'>
     <div className='flex h-auto items-center justify-center'>
       <div className='relative mt-4 flex h-[355px] w-[1115px] items-center justify-center overflow-hidden'>
         <img
@@ -64,9 +61,6 @@ const BrowseFoodTemplate: React.FC<BrowseFoodTemplateProps> = ({
         />
       </div>
     </div>
-    <footer className='bg-black px-0 py-6 text-white lg:px-4 xl:px-24'>
-      <Footer />
-    </footer>
   </div>
 );
 
