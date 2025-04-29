@@ -13,6 +13,7 @@ interface ModalFilterProps {
     newFilters: Partial<FoodFilterQuery>,
     keysToRemove?: (keyof FoodFilterQuery)[],
   ) => void;
+  onResetFilters?: () => void;
 }
 
 const ModalFilter: React.FC<ModalFilterProps> = ({
@@ -21,7 +22,17 @@ const ModalFilter: React.FC<ModalFilterProps> = ({
   onFilterChange,
   onFiltersSubmit,
 }) => (
-  <Modal open={open} onCancel={onClose} footer={null} width={800}>
+  <Modal
+    open={open}
+    onCancel={onClose}
+    footer={null}
+    width={800}
+    centered
+    bodyStyle={{
+      maxHeight: '85vh',
+      overflowY: 'auto',
+    }}
+  >
     <FilterModalContent
       onClose={onClose}
       onFilterChange={onFilterChange}

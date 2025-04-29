@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { Spin } from 'antd';
 
@@ -12,13 +12,17 @@ import { getMealDate } from '@/utils/dateUtils';
 
 const GroceriesContent: React.FC = () => {
   const { rangeDate, setSelectedPlan } = useDate();
-  setSelectedPlan(PLAN_TYPES.WEEKLY_VIEW);
+  useEffect(() => {
+    setSelectedPlan(PLAN_TYPES.WEEKLY_VIEW);
+  }, [setSelectedPlan]);
+
   const { from, to } =
     rangeDate?.from && rangeDate?.to
       ? { from: getMealDate(rangeDate.from), to: getMealDate(rangeDate.to) }
       : {};
 
   const { data } = useGetGroceriesQuery(from && to ? { from, to } : skipToken);
+
   return (
     <div>
       <div className='flex'>

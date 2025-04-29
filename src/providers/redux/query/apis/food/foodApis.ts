@@ -49,4 +49,5 @@ export const {
   useGetFoodByIdQuery,
   useLazyGetFoodByIdQuery,
   useSearchFoodQuery,
+  useLazyGetFoodsQuery,
 } = foodsApi;

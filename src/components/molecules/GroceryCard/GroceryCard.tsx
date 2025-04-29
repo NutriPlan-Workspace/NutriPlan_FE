@@ -16,9 +16,9 @@ const GroceryCard: React.FC<MealCardProps> = ({ data }) => (
   <div className='h-[calc(100vh-50px)] overflow-y-auto'>
     {data.length ? (
       <div className='grid grid-cols-1 gap-4 p-4 md:grid-cols-2'>
-        {data.map((ingredient) => (
+        {data.map((ingredient, index) => (
           <div
-            key={ingredient.id}
+            key={index}
             className='rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-lg'
           >
             <div className='flex p-3'>
@@ -64,7 +64,7 @@ const GroceryCard: React.FC<MealCardProps> = ({ data }) => (
                     className='w-32'
                   >
                     {ingredient.units?.map((unit) => (
-                      <Select.Option key={unit.id} value={unit.description}>
+                      <Select.Option key={unit._id} value={unit.description}>
                         {unit.description}
                       </Select.Option>
                     ))}

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { useDate } from '@/contexts/DateContext';
+import { useCopyPreviousMealPlan } from '@/hooks/useCopyPreviousMealPlan';
 import { useCreateBlankMealPlan } from '@/hooks/useCreateBlankMealPlan';
 import { useMealTrackDragDrop } from '@/hooks/useMealTrackDragDrop';
 import { EmptyMealDay } from '@/molecules/EmptyMealDay';
@@ -14,9 +15,12 @@ import { getMealDate } from '@/utils/dateUtils';
 
 const MealPlanWeek: React.FC = () => {
   const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
+  const mealRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const isFirstRender = useRef(true);
   const { rangeDate, selectedDate } = useDate();
   const { handleCreateBlank } = useCreateBlankMealPlan();
-  const mealRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const { handleCopyPreviousDay } = useCopyPreviousMealPlan();
+  useMealTrackDragDrop();
 
   const { from, to } =
     rangeDate?.from && rangeDate?.to
@@ -34,27 +38,38 @@ const MealPlanWeek: React.FC = () => {
   }, [from, to, refetch]);
 
   useEffect(() => {
+    if (!isFetching && viewingMealPlans.length > 0) {
+      mealRefs.current = {};
+
+      viewingMealPlans.forEach(({ mealDate }) => {
+        const element = document.getElementById(`meal-day-${mealDate}`);
+        if (element) {
+          mealRefs.current[mealDate] = element as HTMLDivElement;
+        }
+      });
+    }
+  }, [viewingMealPlans, isFetching]);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const today = getMealDate(new Date());
     const selectedMealDate = selectedDate ? getMealDate(selectedDate) : today;
     const ref = mealRefs.current[selectedMealDate];
     if (ref) {
       ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, [selectedDate, viewingMealPlans]);
-
-  useMealTrackDragDrop();
-
-  // TODO: implement when task copy previous in progress
-  const onCopyPreviousDay = () => {};
+  }, [selectedDate]);
 
   return (
     <div className='flex flex-wrap gap-4 space-y-5 border-t-4 border-t-black/10'>
       {viewingMealPlans.map(({ mealDate, mealPlanDay }) => (
         <div
           key={mealDate}
-          ref={(el) => {
-            mealRefs.current[mealDate] = el;
-          }}
+          id={`meal-day-${mealDate}`}
           className='mx-[15px] mt-4 w-full border-b-3 border-b-black/10 pb-4'
         >
           <MealPlanHeader mealDate={mealDate} />
@@ -77,7 +92,7 @@ const MealPlanWeek: React.FC = () => {
               mealDate={getMealDate(new Date(mealDate))}
               isWeekly={true}
               onCreateBlank={handleCreateBlank}
-              onCopyPreviousDay={onCopyPreviousDay}
+              onCopyPreviousDay={handleCopyPreviousDay}
             />
           )}
         </div>

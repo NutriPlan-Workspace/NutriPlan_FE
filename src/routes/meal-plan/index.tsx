@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createFileRoute, FileRoutesByPath } from '@tanstack/react-router';
 
 import { PATH } from '@/constants/path';
@@ -16,7 +16,10 @@ const PLAN_COMPONENTS: Record<string, React.FC> = {
 };
 
 const MealPlanPageContent: React.FC = () => {
-  const { selectedPlan } = useDate();
+  const { selectedPlan, setSelectedPlan } = useDate();
+  useEffect(() => {
+    setSelectedPlan(PLAN_TYPES.SINGLE_DAY);
+  }, [setSelectedPlan]);
   const SelectedComponent = PLAN_COMPONENTS[selectedPlan] || MealTrack;
 
   return <SelectedComponent />;

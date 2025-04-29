@@ -146,16 +146,16 @@ export interface GroceriesResponse {
 }
 
 export interface IngreResponse {
-  id: string;
+  _id: string;
   name: string;
   totalAmount: number;
   unit: {
-    id: string;
+    _id: string;
     amount: number;
     description: string;
   };
   units: {
-    id: string;
+    _id: string;
     amount: number;
     description: string;
   }[];
