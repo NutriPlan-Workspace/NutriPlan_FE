@@ -2,7 +2,7 @@ import React from 'react';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { useRouter } from '@tanstack/react-router';
 import { Typography } from 'antd';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 import { HTTP_STATUS } from '@/constants/httpStatus';
 import { ERROR_MESSAGES } from '@/constants/message';

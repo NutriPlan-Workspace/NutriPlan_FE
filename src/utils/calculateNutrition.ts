@@ -1,4 +1,5 @@
 import type { NutritionFields } from '@/types/food';
+import { IngredientDisplay } from '@/types/ingredient';
 import type { MealPlanFood } from '@/types/mealPlan';
 
 import { roundNumber } from './roundNumber';
@@ -122,3 +123,28 @@ export const calculateNutrition = (
   amount: number,
   conversionFactor: number,
 ) => roundNumber((value * amount) / conversionFactor, 2);
+
+export const calculateTotalNutrition = (
+  ingredients: IngredientDisplay[],
+): NutritionFields => {
+  const total: NutritionFields = Object.keys(
+    ingredients[0]?.food.nutrition || {},
+  ).reduce((acc, key) => {
+    acc[key as keyof NutritionFields] = 0;
+    return acc;
+  }, {} as NutritionFields);
+
+  for (const ingredient of ingredients) {
+    const { food, amount, unit } = ingredient;
+    const unitInfo = food.units[unit]; // lấy thông tin đơn vị
+    const unitAmount = unitInfo?.amount ?? 1;
+
+    for (const key in total) {
+      const k = key as keyof NutritionFields;
+      const value = food.nutrition[k] || 0;
+      total[k] += value * amount * unitAmount;
+    }
+  }
+
+  return total;
+};

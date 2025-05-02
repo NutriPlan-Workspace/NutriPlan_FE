@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { Typography } from 'antd';
 
 import { Button } from '@/atoms/Button';
@@ -12,6 +13,8 @@ import { debounceValue } from '@/utils/debounce';
 const { Title, Paragraph } = Typography;
 
 const CustomeRecipe: React.FC = () => {
+  const navigate = useNavigate();
+  const router = useRouter();
   const [searchValue, setSearchValue] = useState('');
   const [sortOption, setSortOption] = useState<string>('1');
   const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | null>(null);
@@ -19,11 +22,15 @@ const CustomeRecipe: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { data, isFetching } = useGetFoodsQuery({
+  const { data, isFetching, refetch } = useGetFoodsQuery({
     page: 1,
     limit: 20,
     filters: ['customFood', 'customRecipe'],
   });
+
+  useEffect(() => {
+    refetch();
+  }, [router, refetch]);
 
   useEffect(() => {
     if (Array.isArray(data?.data)) {
@@ -89,6 +96,10 @@ const CustomeRecipe: React.FC = () => {
     return filteredFoods;
   }, [foods, debouncedSearch, sortOption, activeTab]);
 
+  const handleCreateRecipeClick = () => {
+    navigate({ to: '/custom-recipes/create-recipe' });
+  };
+
   return (
     <div className='flex flex-col gap-4 p-5'>
       <div>
@@ -107,7 +118,10 @@ const CustomeRecipe: React.FC = () => {
             Create Custom Food
           </Paragraph>
         </Button>
-        <Button className='bg-primary flex items-center gap-2 border-transparent p-5 hover:border-transparent'>
+        <Button
+          className='bg-primary flex items-center gap-2 border-transparent p-5 hover:border-transparent'
+          onClick={handleCreateRecipeClick}
+        >
           <FaPlus className='text-white' />
           <Paragraph className='m-0 font-thin text-white'>
             Create Custom Recipe

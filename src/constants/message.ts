@@ -29,6 +29,10 @@ export const ERROR_MESSAGES = {
   ADD_FOOD_FAILED: 'Failed to add food!',
   FOOD_ALREADY_IN_COLLECTION: 'This food is already in the collection.',
   DELETE_COLLECTION_FAILED: 'Failed to delete collection.',
+  NAME_REQUIRED: 'Name is required',
+  INVALID_IMAGE_URL: 'Each image URL must be a valid URL',
+  INVALID_VIDEO_URL: 'Video URL must be a valid URL',
+  INGREDIENTS_MINIMUM_REQUIRED: 'You must add at least one ingredient.',
 };
 
 export const SUCCESS_MESSAGES = {

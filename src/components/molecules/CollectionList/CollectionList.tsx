@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Col, Image, Row, Typography } from 'antd';
 
+import defaultImage from '@/assets/default_img.svg';
 import type { Collection } from '@/types/collection';
 
 const { Paragraph } = Typography;
@@ -31,10 +32,7 @@ const CollectionList: React.FC<CollectionListProps> = ({ collections }) => {
         >
           <div className='flex min-w-[160px] flex-col gap-2 p-2'>
             <Image
-              src={
-                collection.img ||
-                'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-              }
+              src={collection.img || defaultImage}
               className='h-auto w-full min-w-[160px] rounded-md object-cover'
               preview={false}
             />

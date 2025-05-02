@@ -21,8 +21,8 @@ interface SideAddFoodProps {
 const SideAddFood: React.FC<SideAddFoodProps> = ({ setFilterFood }) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [menuItem, setMenuItem] = useState(false);
-  const [selectedTabLabel, setSelectedTabLabel] = useState('Recent Foods');
-  const [filter, setFilter] = useState<string>('recent');
+  const [selectedTabLabel, setSelectedTabLabel] = useState('Collection Foods');
+  const [filter, setFilter] = useState<string>('collectionFoods');
   const [activeTabKey, setActiveTabKey] = useState('1');
   const [searchText, setSearchText] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');

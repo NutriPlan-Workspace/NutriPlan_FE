@@ -1,5 +1,6 @@
 import { FOODS_ENDPOINT, SEARCH_FOOD_ENDPOINT } from '@/constants/endpoints';
 import { baseApi } from '@/redux/query/apis/baseApi';
+import { FoodFormSchema } from '@/schemas/recipeSchema';
 import type { ApiResponse } from '@/types/apiResponse';
 import type { DetailedFoodResponse, Food, FoodCategory } from '@/types/food';
 import type { FoodFilterQuery } from '@/types/foodFilterQuery';
@@ -41,6 +42,13 @@ export const foodsApi = baseApi.injectEndpoints({
         return `${SEARCH_FOOD_ENDPOINT}?${params.toString()}`;
       },
     }),
+    createCustomRecipe: builder.mutation<ApiResponse<Food>, FoodFormSchema>({
+      query: (data) => ({
+        url: FOODS_ENDPOINT,
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -50,4 +58,5 @@ export const {
   useLazyGetFoodByIdQuery,
   useSearchFoodQuery,
   useLazyGetFoodsQuery,
+  useCreateCustomRecipeMutation,
 } = foodsApi;

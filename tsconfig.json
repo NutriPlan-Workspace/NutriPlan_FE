@@ -52,7 +52,7 @@
       "@/schemas/*": ["schemas/*"],
       "@/services": ["services"],
       "@/services/*": ["services/*"],
-      "@/data/*": ["data/*"]
+      "@/data/*": ["data/*"],
     }
   },
   "include": ["src", "vite-env.d.ts"]

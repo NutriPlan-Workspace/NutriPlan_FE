@@ -3,6 +3,8 @@ export const CATEGORY_KEY_LABELS = {
   customFood: 'customFood',
   recipe: 'recipe',
   customRecipe: 'customRecipe',
+  collectionFoods: 'collectionFoods',
+  favorites: 'favorites',
 } as const;
 
 export type CategoryKey = keyof typeof CATEGORY_KEY_LABELS;
@@ -16,6 +18,8 @@ export const CATEGORY_KEYS = {
   CUSTOM_RECIPE: '7',
   BASIC_FOOD: '8',
   CUSTOM_FOOD: '11',
+  COLLECTION_FOOD: '3',
+  FAVORITES: '2',
 };
 
 export const categoryKeysMap: Record<string, CategoryKey> = {
@@ -23,4 +27,6 @@ export const categoryKeysMap: Record<string, CategoryKey> = {
   [CATEGORY_KEYS.CUSTOM_RECIPE]: CATEGORY_KEY_LABELS.customRecipe,
   [CATEGORY_KEYS.BASIC_FOOD]: CATEGORY_KEY_LABELS.basicFood,
   [CATEGORY_KEYS.CUSTOM_FOOD]: CATEGORY_KEY_LABELS.customFood,
+  [CATEGORY_KEYS.COLLECTION_FOOD]: CATEGORY_KEY_LABELS.collectionFoods,
+  [CATEGORY_KEYS.FAVORITES]: CATEGORY_KEY_LABELS.favorites,
 };

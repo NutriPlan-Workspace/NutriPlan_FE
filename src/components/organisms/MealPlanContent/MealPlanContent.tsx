@@ -41,7 +41,7 @@ const MealPlanContent: React.FC<MealPlanContentProps> = ({ children }) => {
           onClick={() => setFilterFood(true)}
         >
           <FaSearch />
-          <p>Search Food</p>
+          <p>Add Food</p>
         </Button>
       )}
     </div>

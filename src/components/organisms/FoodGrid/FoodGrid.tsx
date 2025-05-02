@@ -62,7 +62,8 @@ const FoodGrid: React.FC<FoodGridProps> = ({
               View More
             </Button>
           ) : (
-            !isFetching && (
+            !isFetching &&
+            showPopover && (
               <p className='text-base text-gray-500'>
                 You&apos;ve reached the end of the list.
               </p>

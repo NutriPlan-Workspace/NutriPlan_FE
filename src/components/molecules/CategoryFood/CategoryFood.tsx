@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Button } from '@/atoms/Button';
+import { cn } from '@/helpers/helpers';
 import { CategoryFoodSkeleton } from '@/molecules/CategoryFoodSkeleton';
 import { FoodCardSideAdd } from '@/organisms/FoodCardSideAdd';
 import type { Food } from '@/types/food';
@@ -27,7 +28,12 @@ const CategoryFood: React.FC<CategoryFoodProps> = ({
   const displayedFoods = isAllCategory ? foods.slice(0, 5) : foods;
 
   return (
-    <div className='my-3 flex flex-col gap-2 border-b border-b-black/10 pb-3'>
+    <div
+      className={cn(
+        'my-3 flex flex-col gap-2 border-b border-b-black/10 pb-3',
+        !isAllCategory && 'min-h-[400px]',
+      )}
+    >
       <h1 className='text-[18px] font-semibold'>{title}</h1>
       <div className='flex flex-col justify-center gap-2'>
         {!displayedFoods.length ? (

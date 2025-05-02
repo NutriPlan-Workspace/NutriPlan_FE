@@ -7,6 +7,7 @@ import { useRouter } from '@tanstack/react-router';
 import { Image, Modal, Typography } from 'antd';
 import { motion } from 'framer-motion';
 
+import defaultImage from '@/assets/default_img.svg';
 import { Button } from '@/atoms/Button';
 import { CollectionSkeleton } from '@/atoms/CollectionSkeleton';
 import { CollectionForm } from '@/atoms/CreateCollection';
@@ -72,7 +73,7 @@ const CollectionDetail: React.FC = () => {
     } catch (err) {
       showToastError(ERROR_MESSAGES.DELETE_COLLECTION_FAILED);
     }
-  }
+  };
 
   const handleUploaded = async (url: string) => {
     if (!id) return;
@@ -194,13 +195,7 @@ const CollectionDetail: React.FC = () => {
         </div>
         <div className='flex items-start gap-6'>
           <div className='flex w-[200px] flex-col gap-2'>
-            <Image
-              src={
-                img ||
-                'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-              }
-              className='rounded-md'
-            />
+            <Image src={img || defaultImage} className='rounded-md' />
             <Button
               className='my-2 flex items-center gap-2'
               onClick={() => setUpload(!upload)}

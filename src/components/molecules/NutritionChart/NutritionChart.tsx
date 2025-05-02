@@ -38,8 +38,8 @@ const NutritionChart: FC<NutritionChartProps> = ({
     };
   });
 
-  const chartSize = isDetailCollection ? 300 : 240;
-  const outerRadius = isDetailCollection ? 120 : 100;
+  const chartSize = isDetailCollection ? 220 : 240;
+  const outerRadius = isDetailCollection ? 90 : 100;
 
   return (
     <PieChart width={chartSize} height={chartSize}>

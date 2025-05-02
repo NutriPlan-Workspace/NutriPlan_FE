@@ -28,6 +28,7 @@ import { Route as CollectionsIndexImport } from './routes/collections/index'
 import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as AccountIndexImport } from './routes/account/index'
+import { Route as CustomRecipesCreateRecipeImport } from './routes/custom-recipes/create-recipe'
 import { Route as CustomRecipesIdImport } from './routes/custom-recipes/$id'
 import { Route as CollectionsCreateImport } from './routes/collections/create'
 import { Route as CollectionsIdImport } from './routes/collections/$id'
@@ -136,6 +137,12 @@ const AccountIndexRoute = AccountIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const CustomRecipesCreateRecipeRoute = CustomRecipesCreateRecipeImport.update({
+  id: '/custom-recipes/create-recipe',
+  path: '/custom-recipes/create-recipe',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const CustomRecipesIdRoute = CustomRecipesIdImport.update({
   id: '/custom-recipes/$id',
   path: '/custom-recipes/$id',
@@ -184,6 +191,13 @@ declare module '@tanstack/react-router' {
       path: '/custom-recipes/$id'
       fullPath: '/custom-recipes/$id'
       preLoaderRoute: typeof CustomRecipesIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/custom-recipes/create-recipe': {
+      id: '/custom-recipes/create-recipe'
+      path: '/custom-recipes/create-recipe'
+      fullPath: '/custom-recipes/create-recipe'
+      preLoaderRoute: typeof CustomRecipesCreateRecipeImport
       parentRoute: typeof rootRoute
     }
     '/account/': {
@@ -308,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
   '/custom-recipes/$id': typeof CustomRecipesIdRoute
+  '/custom-recipes/create-recipe': typeof CustomRecipesCreateRecipeRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
@@ -331,6 +346,7 @@ export interface FileRoutesByTo {
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
   '/custom-recipes/$id': typeof CustomRecipesIdRoute
+  '/custom-recipes/create-recipe': typeof CustomRecipesCreateRecipeRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
@@ -355,6 +371,7 @@ export interface FileRoutesById {
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
   '/custom-recipes/$id': typeof CustomRecipesIdRoute
+  '/custom-recipes/create-recipe': typeof CustomRecipesCreateRecipeRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/browse-foods/': typeof BrowseFoodsIndexRoute
@@ -380,6 +397,7 @@ export interface FileRouteTypes {
     | '/collections/$id'
     | '/collections/create'
     | '/custom-recipes/$id'
+    | '/custom-recipes/create-recipe'
     | '/account'
     | '/admin'
     | '/browse-foods'
@@ -402,6 +420,7 @@ export interface FileRouteTypes {
     | '/collections/$id'
     | '/collections/create'
     | '/custom-recipes/$id'
+    | '/custom-recipes/create-recipe'
     | '/account'
     | '/admin'
     | '/browse-foods'
@@ -424,6 +443,7 @@ export interface FileRouteTypes {
     | '/collections/$id'
     | '/collections/create'
     | '/custom-recipes/$id'
+    | '/custom-recipes/create-recipe'
     | '/account/'
     | '/admin/'
     | '/browse-foods/'
@@ -448,6 +468,7 @@ export interface RootRouteChildren {
   CollectionsIdRoute: typeof CollectionsIdRoute
   CollectionsCreateRoute: typeof CollectionsCreateRoute
   CustomRecipesIdRoute: typeof CustomRecipesIdRoute
+  CustomRecipesCreateRecipeRoute: typeof CustomRecipesCreateRecipeRoute
   AccountIndexRoute: typeof AccountIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
   BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
@@ -471,6 +492,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsIdRoute: CollectionsIdRoute,
   CollectionsCreateRoute: CollectionsCreateRoute,
   CustomRecipesIdRoute: CustomRecipesIdRoute,
+  CustomRecipesCreateRecipeRoute: CustomRecipesCreateRecipeRoute,
   AccountIndexRoute: AccountIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
   BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
@@ -503,6 +525,7 @@ export const routeTree = rootRoute
         "/collections/$id",
         "/collections/create",
         "/custom-recipes/$id",
+        "/custom-recipes/create-recipe",
         "/account/",
         "/admin/",
         "/browse-foods/",
@@ -532,6 +555,9 @@ export const routeTree = rootRoute
     },
     "/custom-recipes/$id": {
       "filePath": "custom-recipes/$id.tsx"
+    },
+    "/custom-recipes/create-recipe": {
+      "filePath": "custom-recipes/create-recipe.tsx"
     },
     "/account/": {
       "filePath": "account/index.tsx"
