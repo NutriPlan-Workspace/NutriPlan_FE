@@ -7,3 +7,4 @@ export const SEARCH_FOOD_ENDPOINT = '/foods/search';
 export const FOODS_ENDPOINT = '/foods';
 export const NUTRITION_TARGET_ENDPOINT = '/user/nutrition-target';
 export const COLLECTIONS_ENDPOINT = '/collections';
+export const AUTO_GENERATE = '/auto-generate';

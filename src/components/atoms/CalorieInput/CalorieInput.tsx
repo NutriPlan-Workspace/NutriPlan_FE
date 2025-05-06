@@ -51,28 +51,35 @@ const CalorieInput: React.FC = () => {
         )}
       />
 
-      <div className='flex items-center justify-center gap-2 text-[14px]'>
-        <p>Not sure?</p>
-        <a href='#' className='hover:underline'>
-          Try our Calorie Calculator
-        </a>
-      </div>
-
       <Controller
         name='meals'
         control={control}
         render={({ field }) => (
-          <div className='flex items-center gap-2'>
-            <label className='text-[16px] font-medium'>in</label>
-            <Select
-              {...field}
-              className='w-[60px] text-center'
-              options={Array.from({ length: 5 }, (_, i) => ({
-                value: String(i + 1),
-                label: String(i + 1),
-              }))}
-            />
-            <span className='text-[16px] font-medium'>meals</span>
+          <div className='flex flex-col items-center'>
+            <div className='flex items-center gap-2'>
+              <label className='text-[16px] font-medium'>in</label>
+              <Tooltip
+                title={String(errors.meals?.message)}
+                open={!!errors.meals}
+              >
+                <div>
+                  <Select
+                    {...field}
+                    className={cn(
+                      'w-[60px] text-center',
+                      errors.meals ? 'border-red-500' : '',
+                    )}
+                    options={[{ value: '3', label: '3' }]}
+                  />
+                </div>
+              </Tooltip>
+              <span className='text-[16px] font-medium'>meals</span>
+            </div>
+            {errors.meals && (
+              <span className='mt-1 text-sm text-red-500'>
+                {String(errors.meals?.message)}
+              </span>
+            )}
           </div>
         )}
       />

@@ -7,8 +7,10 @@ import {
 import { HiOutlineArrowPath } from 'react-icons/hi2';
 
 import { Button } from '@/atoms/Button';
+import { useToast } from '@/contexts/ToastContext';
 import { cn } from '@/helpers/helpers';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
+import { useAutoGenerateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import { getDayOfWeek } from '@/utils/dateUtils';
 
 interface EmptyMealDayProps {
@@ -25,14 +27,29 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
   isWeekly = false,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [autoGenerateMealPlan] = useAutoGenerateMealPlanMutation();
+  const { showToastError } = useToast();
 
   const handleAction = async (action: () => Promise<void>) => {
     setIsLoading(true);
     try {
       await action();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      showToastError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGenerate = async () => {
+    await handleAction(async () => {
+      // Format date to ISO string to match datetime format
+      const formattedDate = new Date(mealDate).toISOString();
+      await autoGenerateMealPlan({
+        date: formattedDate,
+      }).unwrap();
+    });
   };
 
   if (isLoading) {
@@ -74,7 +91,7 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
           color='gold'
           className='bg-primary hover:bg-primary-400 active:bg-primary-500 transition-bg text-black duration-300'
           icon={<HiOutlineArrowPath size={20} />}
-          onClick={() => handleAction(() => onCreateBlank(mealDate))}
+          onClick={handleGenerate}
         >
           Generate
         </Button>

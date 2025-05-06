@@ -84,7 +84,11 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
         >
           {getDateOfMonth(mealDate)}
         </Typography>
-        <PairButton isHovered={isHovered} menuItems={menuItems} />
+        <PairButton
+          isHovered={isHovered}
+          menuItems={menuItems}
+          mealDate={mealDate}
+        />
       </div>
 
       <Modal

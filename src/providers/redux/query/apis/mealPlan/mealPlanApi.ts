@@ -1,7 +1,11 @@
+import { AUTO_GENERATE } from '@/constants/endpoints';
+import { PrimaryDiet } from '@/constants/primaryDiet';
 import { baseApiWithAuth } from '@/redux/query/apis/baseApi';
 import {
   addCacheMealPlans,
   setViewingMealPlans,
+  updateCacheMealPlanByDate,
+  updateViewingMealPlanByDate,
 } from '@/redux/slices/mealPlan';
 import type { ApiResponse } from '@/types/apiResponse';
 import type {
@@ -35,7 +39,7 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
               mealPlanWithDates: [
                 {
                   mealDate: date,
-                  mealPlanDay: data.data[0],
+                  mealPlanDay: data.data,
                 },
               ],
             }),
@@ -126,6 +130,37 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
         return `/planner/groceries?${params}`;
       },
     }),
+    autoGenerateMealPlan: builder.mutation<
+      ApiResponse<MealPlanDay>,
+      {
+        date?: string;
+        preferences?: {
+          type: PrimaryDiet;
+          calories: number;
+          carbs: number;
+          protein: number;
+          fat: number;
+        };
+      }
+    >({
+      query: (params) => ({
+        url: `/planner${AUTO_GENERATE}`,
+        method: 'POST',
+        body: params,
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        const { data } = await queryFulfilled;
+        if (data.data) {
+          const mealPlan = data.data;
+          const mealPlanWithDate = {
+            mealDate: mealPlan.mealDate,
+            mealPlanDay: mealPlan,
+          };
+          dispatch(updateViewingMealPlanByDate({ mealPlanWithDate }));
+          dispatch(updateCacheMealPlanByDate({ mealPlanWithDate }));
+        }
+      },
+    }),
   }),
 });
 
@@ -138,4 +173,5 @@ export const {
   useGetLatestMealPlanMutation,
   useRemoveMealPlanMutation,
   useGetGroceriesQuery,
+  useAutoGenerateMealPlanMutation,
 } = mealPlanApi;

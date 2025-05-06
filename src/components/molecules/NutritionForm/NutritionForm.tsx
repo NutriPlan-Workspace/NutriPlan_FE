@@ -67,7 +67,7 @@ const NutritionForm: React.FC<NutritionFormProps> = ({ nutritionData }) => {
 
   return (
     <form
-      className='flex max-w-[690px] flex-col gap-4'
+      className='flex max-w-[720px] flex-col gap-4'
       onSubmit={handleSubmit(onSubmit)}
     >
       <NutritionTitle control={control} errors={errors} />

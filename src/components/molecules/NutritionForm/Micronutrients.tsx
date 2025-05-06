@@ -14,8 +14,8 @@ interface MicronutrientsProps {
 }
 
 const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
-  const [limitSodium, setLimitSodium] = useState(false);
-  const [limitCholesterol, setLimitCholesterol] = useState(false);
+  const [limitSodium, setLimitSodium] = useState(true);
+  const [limitCholesterol, setLimitCholesterol] = useState(true);
 
   const handleSwitchChange = (
     setLimit: React.Dispatch<React.SetStateAction<boolean>>,

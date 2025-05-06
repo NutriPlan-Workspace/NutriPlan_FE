@@ -1,10 +1,10 @@
 export const CATEGORY_KEY_LABELS = {
-  basicFood: 'basicFood',
-  customFood: 'customFood',
   recipe: 'recipe',
-  customRecipe: 'customRecipe',
-  collectionFoods: 'collectionFoods',
+  basicFood: 'basicFood',
   favorites: 'favorites',
+  collectionFoods: 'collectionFoods',
+  customFood: 'customFood',
+  customRecipe: 'customRecipe',
 } as const;
 
 export type CategoryKey = keyof typeof CATEGORY_KEY_LABELS;

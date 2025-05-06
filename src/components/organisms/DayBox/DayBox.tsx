@@ -77,7 +77,7 @@ const DayBox: React.FC<DayBoxProps> = ({
     >
       {isSingleDay ? (
         <div
-          className={cn('flex w-full justify-end', {
+          className={cn('flex w-full justify-center', {
             'justify-center': !mealItems || !allDayMealItems?.length,
           })}
         >

@@ -2,6 +2,7 @@ import React from 'react';
 import { IoMenu } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 
+import avatarDefault from '@/assets/avatarDefault.png';
 import { Button } from '@/atoms/Button';
 import { cn } from '@/helpers/helpers';
 import { userSelector } from '@/redux/slices/user';
@@ -41,7 +42,7 @@ const SidebarTop: React.FC<SidebarTopProps> = ({
             className='h-[40px] w-[40px] rounded-full border-none p-0 outline-none'
           >
             <img
-              src='https://asoiafchineselit.wordpress.com/wp-content/uploads/2021/02/1showname.png?w=1024'
+              src={avatarDefault}
               alt=''
               className='h-full w-full rounded-full'
             />

@@ -23,7 +23,9 @@ const Navigation: React.FC = () => (
       {menuItems.map(({ label, path }, index) => (
         <li
           key={index}
-          className='text-[14px] font-thin text-[#4d4d4f] hover:underline'
+          className={`text-[14px] font-thin text-[#4d4d4f] hover:underline ${
+            path !== PATH.BROWSE_FOODS ? 'text-white' : ''
+          }`}
         >
           <Link to={path}>{label}</Link>
         </li>

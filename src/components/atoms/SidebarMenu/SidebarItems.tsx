@@ -1,8 +1,6 @@
 import { CiLogout } from 'react-icons/ci';
 import {
-  FaRegBookmark,
   FaRegCalendarAlt,
-  FaRegClock,
   FaRegCompass,
   FaRegUser,
   FaSearch,
@@ -47,11 +45,6 @@ export const fullMenuItems: MenuItem[] = [
     key: PATH.COLLECTIONS,
     label: <Link to={PATH.COLLECTIONS}>Collections</Link>,
     icon: <FaRegStar className={iconClass} />,
-  },
-  {
-    key: PATH.SAVED_PLANS,
-    label: <Link to={PATH.SAVED_PLANS}>Saved Plans</Link>,
-    icon: <FaRegBookmark className={iconClass} />,
     className: 'mb-4',
   },
   {
@@ -72,11 +65,6 @@ export const fullMenuItems: MenuItem[] = [
         label: <Link to={PATH.FOOD_EXCLUSIONS}>Food Exclusions</Link>,
       },
     ],
-  },
-  {
-    key: PATH.MEALS_SCHEDULE,
-    label: <Link to={PATH.MEALS_SCHEDULE}>Meal & Schedule</Link>,
-    icon: <FaRegClock className={iconClass} />,
   },
   {
     key: PATH.PHYSICAL_STATS,

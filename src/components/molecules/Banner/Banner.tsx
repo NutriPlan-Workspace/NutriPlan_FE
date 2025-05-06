@@ -15,9 +15,7 @@ const Banner: React.FC = () => (
         budget, and schedule. Reach your diet and nutritional goals with our
         calorie calculator, weekly meal plans, grocery lists, and more.
       </p>
-      <p className='font-display mb-[12px] text-[14px] leading-[150%] font-bold text-[#199861] not-italic'>
-        Put your diet on NutriPlan now!
-      </p>
+      <p className='font-display mb-[12px] text-[14px] leading-[150%] font-bold text-[#199861] not-italic'></p>
     </div>
 
     <div className='flex w-1/2 justify-end'>

@@ -5,11 +5,11 @@ import { PATH } from '@/constants/path';
 import { CustomRecipe } from '@/organisms/CustomRecipe';
 import { handleUserRoute } from '@/utils/route';
 
-const CustomeRecipePage: React.FC = () => <CustomRecipe />;
+const CustomRecipePage: React.FC = () => <CustomRecipe />;
 
 export const Route = createFileRoute(
   PATH.CUSTOM_RECIPES as keyof FileRoutesByPath,
 )({
-  component: CustomeRecipePage,
+  component: CustomRecipePage,
   beforeLoad: handleUserRoute,
 });

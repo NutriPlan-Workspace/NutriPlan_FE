@@ -136,13 +136,17 @@ export const calculateTotalNutrition = (
 
   for (const ingredient of ingredients) {
     const { food, amount, unit } = ingredient;
-    const unitInfo = food.units[unit]; // lấy thông tin đơn vị
+    const unitInfo = food.units[unit];
     const unitAmount = unitInfo?.amount ?? 1;
+    const defaultUnit = food.units[food.defaultUnit];
+    const defaultUnitAmount = defaultUnit.amount;
+
+    const multiply = (amount / unitAmount) * defaultUnitAmount;
 
     for (const key in total) {
       const k = key as keyof NutritionFields;
       const value = food.nutrition[k] || 0;
-      total[k] += value * amount * unitAmount;
+      total[k] += value * multiply * 100;
     }
   }
 
