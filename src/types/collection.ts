@@ -18,6 +18,11 @@ export interface CollectionFood {
   _id: string;
 }
 
+export interface CollectionFoodBrief {
+  food: string;
+  date: string;
+}
+
 export interface Collection {
   _id: string;
   userId: string;

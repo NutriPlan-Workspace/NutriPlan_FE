@@ -42,6 +42,7 @@ export const foodsApi = baseApi.injectEndpoints({
         }
         return `${SEARCH_FOOD_ENDPOINT}?${params.toString()}`;
       },
+      providesTags: ['Favorites'],
     }),
     createCustomRecipe: builder.mutation<ApiResponse<Food>, FoodFormSchema>({
       query: (data) => ({

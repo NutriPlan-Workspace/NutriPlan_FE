@@ -88,7 +88,7 @@ export const nutritionFieldGroup = [
     field: [
       { key: 'calories', title: 'Calories', unit: '' },
       { key: 'carbs', title: 'Carbs', unit: 'g' },
-      { key: 'fat', title: 'Fat', unit: 'g' },
+      { key: 'fat', title: 'Fats', unit: 'g' },
       { key: 'proteins', title: 'Protein', unit: 'g' },
       { key: 'netCarbs', title: 'Net Carbs', unit: 'g' },
       { key: 'fiber', title: 'Fiber', unit: 'g' },

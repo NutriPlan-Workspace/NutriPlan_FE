@@ -1,8 +1,9 @@
 import React from 'react';
 import { Control, FieldErrors } from 'react-hook-form';
 import { IoCloudUploadOutline } from 'react-icons/io5';
-import { Button, Typography } from 'antd';
+import { Image, Typography } from 'antd';
 
+import { Button } from '@/atoms/Button';
 import {
   ControlledInput,
   ControlledTextArea,
@@ -49,7 +50,7 @@ const RecipeBasicInfoSection: React.FC<Props> = ({
 
     <FormRow label='Image' isEnd={true}>
       <div className='flex flex-col items-center gap-4'>
-        <img
+        <Image
           src={
             img ||
             'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/k52mpavgekiqflwmk9ex.avif'

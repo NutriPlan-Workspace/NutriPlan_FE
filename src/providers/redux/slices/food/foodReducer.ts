@@ -7,12 +7,14 @@ interface FoodState {
   isModalDetailOpen: boolean;
   viewingDetailFood: Food | MealPlanFood | null;
   previousViewingDetailFood: Food | MealPlanFood | null;
+  currentCustomFood: Food | null;
 }
 
 const initialState: FoodState = {
   isModalDetailOpen: false,
   viewingDetailFood: null,
   previousViewingDetailFood: null,
+  currentCustomFood: null,
 };
 
 const foodSlice = createSlice({
@@ -40,6 +42,12 @@ const foodSlice = createSlice({
     removePreviousViewingDetailFood: (state) => {
       state.previousViewingDetailFood = null;
     },
+    setCurrentCustomFood: (state, action: PayloadAction<Food | null>) => {
+      state.currentCustomFood = action.payload;
+    },
+    removeCurrentCustomFood: (state) => {
+      state.currentCustomFood = null;
+    },
   },
 });
 
@@ -49,5 +57,7 @@ export const {
   removeViewingDetailFood,
   setPreviousViewingDetailFood,
   removePreviousViewingDetailFood,
+  setCurrentCustomFood,
+  removeCurrentCustomFood,
 } = foodSlice.actions;
 export default foodSlice.reducer;

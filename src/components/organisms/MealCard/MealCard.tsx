@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useCallback, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { EyeOutlined } from '@ant-design/icons';
 import { Image, Popover, Typography } from 'antd';
 
@@ -9,6 +9,12 @@ import { cn } from '@/helpers/helpers';
 import { useMealCardDrag } from '@/hooks/useMealCardDrag';
 import { AmountSelector } from '@/molecules/AmountSelector';
 import { NutritionPopoverFood } from '@/molecules/NutritionPopoverFood';
+import { useUpdateFavoriteFoodsMutation } from '@/redux/query/apis/collection/collectionApi';
+import {
+  addToFavoriteList,
+  collectionSelector,
+  removeFromFavoriteList,
+} from '@/redux/slices/collection';
 import {
   setIsModalDetailOpen,
   setViewingDetailFood,
@@ -48,6 +54,13 @@ const MealCard: React.FC<MealCardProps> = ({
   const handleEnterHover = () => setIsHovered(true);
   const handleLeaveHover = () => setIsHovered(false);
 
+  const favoriteList = useSelector(collectionSelector).favoriteList;
+  const isFavorite = favoriteList.some(
+    (item) => item.food === mealItem.foodId._id,
+  );
+
+  const [updateFavoriteFoods] = useUpdateFavoriteFoodsMutation();
+
   const { dragState, mealCardRef, closestEdge, draggingCardHeight } =
     useMealCardDrag({
       mealDate,
@@ -58,7 +71,28 @@ const MealCard: React.FC<MealCardProps> = ({
 
   const food = isMealPlanFood(mealItem) ? mealItem.foodId : mealItem;
 
+  const onAddToFavorite = useCallback(() => {
+    const newFavoriteFood = {
+      food: food._id,
+      date: new Date().toISOString(),
+    };
+    const newFavoriteList = [...favoriteList, newFavoriteFood];
+    updateFavoriteFoods({ data: newFavoriteList });
+    dispatch(addToFavoriteList(newFavoriteFood));
+  }, [dispatch, favoriteList, food._id, updateFavoriteFoods]);
+
+  const onRemoveFromFavorite = useCallback(() => {
+    const newFavoriteList = favoriteList.filter(
+      (item) => item.food !== food._id,
+    );
+    updateFavoriteFoods({ data: newFavoriteList });
+    dispatch(removeFromFavoriteList(food._id));
+  }, [dispatch, favoriteList, food._id, updateFavoriteFoods]);
+
   const menuItems = getMenuItems({
+    isFavorite,
+    onAddToFavorite: onAddToFavorite,
+    onRemoveFromFavorite: onRemoveFromFavorite,
     onRemoveFood,
     onDuplicateFood,
     index,

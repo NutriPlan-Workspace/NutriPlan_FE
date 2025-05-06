@@ -1,7 +1,12 @@
 import { COLLECTIONS_ENDPOINT } from '@/constants/endpoints';
-import { baseApi } from '@/redux/query/apis/baseApi';
 import type { ApiResponse } from '@/types/apiResponse';
-import type { Collection, CollectionDetail } from '@/types/collection';
+import type {
+  Collection,
+  CollectionDetail,
+  CollectionFoodBrief,
+} from '@/types/collection';
+
+import { baseApi } from '../baseApi';
 
 export const collectionApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -20,6 +25,7 @@ export const collectionApi = baseApi.injectEndpoints({
         url: `${COLLECTIONS_ENDPOINT}/${id}`,
         method: 'GET',
       }),
+      providesTags: ['Favorites'],
     }),
     createCollection: builder.mutation<
       ApiResponse<Collection>,
@@ -40,12 +46,31 @@ export const collectionApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
+      invalidatesTags: ['Favorites'],
     }),
     deleteCollection: builder.mutation<ApiResponse<null>, string>({
       query: (id) => ({
         url: `${COLLECTIONS_ENDPOINT}/${id}`,
         method: 'DELETE',
       }),
+    }),
+    getFavoriteFoods: builder.query<ApiResponse<CollectionFoodBrief[]>, void>({
+      query: () => ({
+        url: `${COLLECTIONS_ENDPOINT}/favorites`,
+        method: 'GET',
+      }),
+      providesTags: ['Favorites'],
+    }),
+    updateFavoriteFoods: builder.mutation<
+      ApiResponse<CollectionFoodBrief[]>,
+      { data: CollectionFoodBrief[] }
+    >({
+      query: ({ data }) => ({
+        url: `${COLLECTIONS_ENDPOINT}/favorites`,
+        method: 'PUT',
+        body: { foods: data },
+      }),
+      invalidatesTags: ['Favorites'],
     }),
   }),
 });
@@ -56,4 +81,6 @@ export const {
   useCreateCollectionMutation,
   useUpdateCollectionMutation,
   useDeleteCollectionMutation,
+  useGetFavoriteFoodsQuery,
+  useUpdateFavoriteFoodsMutation,
 } = collectionApi;

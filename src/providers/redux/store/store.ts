@@ -5,6 +5,7 @@ import { cloudinaryApi } from '@/redux/query/apis/cloudinary/cloudinaryApi';
 import { foodReducer } from '@/redux/slices/food';
 import { userReducer } from '@/redux/slices/user';
 
+import { collectionReducer } from '../slices/collection';
 import { mealPlanReducer } from '../slices/mealPlan';
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
     user: userReducer,
     food: foodReducer,
     mealPlan: mealPlanReducer,
+    collection: collectionReducer,
     [baseApi.reducerPath]: baseApi.reducer,
     [cloudinaryApi.reducerPath]: cloudinaryApi.reducer,
     [baseApiWithAuth.reducerPath]: baseApiWithAuth.reducer,

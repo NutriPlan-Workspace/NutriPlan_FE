@@ -39,7 +39,9 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
               mealPlanWithDates: [
                 {
                   mealDate: date,
-                  mealPlanDay: data.data,
+                  mealPlanDay: Array.isArray(data.data)
+                    ? data.data[0]
+                    : undefined,
                 },
               ],
             }),

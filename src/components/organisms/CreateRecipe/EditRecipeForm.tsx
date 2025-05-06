@@ -1,17 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { FaTrashAlt } from 'react-icons/fa';
+import { GrDocumentUpdate } from 'react-icons/gr';
 import { IoSearch } from 'react-icons/io5';
+import { LoadingOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useParams, useRouter } from '@tanstack/react-router';
+import { useCanGoBack, useParams, useRouter } from '@tanstack/react-router';
+import { Modal, Spin } from 'antd';
 
 import { Button } from '@/atoms/Button';
 import { HTTP_STATUS } from '@/constants/httpStatus';
+import { ERROR_MESSAGES } from '@/constants/message';
 import {
   mealOptions,
   propertyKeysMap,
   timeFields,
 } from '@/constants/recipeForm';
 import { useToast } from '@/contexts/ToastContext';
+import { cn } from '@/helpers/helpers';
 import { NutritionSummary } from '@/molecules/NutritionSummary';
 import {
   AddIngredientModal,
@@ -21,17 +27,19 @@ import {
   RecipePropertiesSection,
 } from '@/organisms/CreateRecipe';
 import {
-  useGetFoodByIdQuery,
+  useGetFoodsQuery,
+  useRemoveCustomFoodMutation,
   useUpdateCustomFoodMutation,
 } from '@/redux/query/apis/food/foodApis';
 import { FoodFormSchema, FoodSchema } from '@/schemas/recipeSchema';
-import type { Food } from '@/types/food';
+import type { DetailedFoodResponse, Food } from '@/types/food';
 import type { IngredientDisplay, IngredientInput } from '@/types/ingredient';
 import { calculateTotalNutrition } from '@/utils/calculateNutrition';
 
-const EditRecipeForm: React.FC = () => {
-  const { id } = useParams({ strict: false });
-  const { data, isLoading: isFetching } = useGetFoodByIdQuery(id!);
+interface EditRecipeFormProps {
+  data: DetailedFoodResponse;
+}
+const EditRecipeForm: React.FC<EditRecipeFormProps> = ({ data }) => {
   const [updateCustomRecipe, { isLoading }] = useUpdateCustomFoodMutation();
 
   const {
@@ -45,6 +53,7 @@ const EditRecipeForm: React.FC = () => {
     resolver: zodResolver(FoodSchema),
   });
 
+  const canGoBack = useCanGoBack();
   const { showToastError, showToastSuccess } = useToast();
   const [upload, setUpload] = useState(false);
   const [img, setImg] = useState<string | undefined>(undefined);
@@ -53,8 +62,16 @@ const EditRecipeForm: React.FC = () => {
   const [ingredientDisplay, setIngredientDisplay] = useState<
     IngredientDisplay[]
   >([]);
+  const [removeCustomFood] = useRemoveCustomFoodMutation();
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const { id } = useParams({ strict: false });
 
   const router = useRouter();
+  const { refetch } = useGetFoodsQuery({
+    page: 1,
+    limit: 20,
+    filters: ['customFood', 'customRecipe'],
+  });
 
   useEffect(() => {
     if (data?.data) {
@@ -66,6 +83,13 @@ const EditRecipeForm: React.FC = () => {
       reset({
         ...mainFood,
         directions: transformedDirections,
+        ingredients: mainFood.ingredients.map((ingredient) => ({
+          ...ingredient,
+          ingredientFoodId:
+            typeof ingredient.ingredientFoodId === 'object'
+              ? ingredient.ingredientFoodId._id
+              : ingredient.ingredientFoodId,
+        })),
       });
 
       setImg(mainFood.imgUrls?.[0]);
@@ -100,6 +124,7 @@ const EditRecipeForm: React.FC = () => {
     try {
       const response = await updateCustomRecipe(payload).unwrap();
       if (response.code === HTTP_STATUS.OK) {
+        await refetch();
         showToastSuccess('Recipe updated successfully!');
         router.history.back();
       }
@@ -148,6 +173,28 @@ const EditRecipeForm: React.FC = () => {
     );
   };
 
+  const handleCancelClick = () => {
+    if (canGoBack) {
+      router.history.back();
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    handleRemove();
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleRemove = async () => {
+    try {
+      await removeCustomFood(id).unwrap();
+      await refetch();
+      handleCancelClick();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      showToastError(ERROR_MESSAGES.IMAGE_UPLOAD_FAILED);
+    }
+  };
+
   useEffect(() => {
     const ingredientsInput = getValues('ingredients') ?? [];
 
@@ -178,89 +225,146 @@ const EditRecipeForm: React.FC = () => {
   }, [ingredient, getValues]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='w-[60vw]'>
-      <RecipeBasicInfoSection
-        control={control}
-        errors={errors}
-        img={img}
-        upload={upload}
-        setUpload={setUpload}
-        handleUploaded={handleUploaded}
-      />
-      <RecipePropertiesSection
-        control={control}
-        timeFields={timeFields}
-        setValue={setValue}
-        selectedMainDish={selectedMainDish}
-        selectedMeals={selectedMeals}
-        handleMealChange={handleMealChange}
-      />
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className='w-[900px] px-[40px]'>
+          <RecipeBasicInfoSection
+            control={control}
+            errors={errors}
+            img={img}
+            upload={upload}
+            setUpload={setUpload}
+            handleUploaded={handleUploaded}
+          />
+          <RecipePropertiesSection
+            control={control}
+            timeFields={timeFields}
+            setValue={setValue}
+            selectedMainDish={selectedMainDish}
+            selectedMeals={selectedMeals}
+            handleMealChange={handleMealChange}
+          />
 
-      {!!ingredientDisplay.length && (
-        <div className='mt-4 flex gap-4'>
-          <div className='flex flex-1 flex-col gap-2'>
-            {ingredientDisplay.map((ingredient) => (
-              <IngredientItem
-                key={ingredient.ingredientFoodId}
-                ingredient={ingredient}
-                onRemove={handleRemoveIngredient}
-              />
-            ))}
+          {!!ingredientDisplay.length && (
+            <div className='mt-4 flex gap-4'>
+              <div className='flex flex-1 flex-col gap-2'>
+                {ingredientDisplay.map((ingredient) => (
+                  <IngredientItem
+                    key={ingredient.ingredientFoodId}
+                    ingredient={ingredient}
+                    onRemove={handleRemoveIngredient}
+                  />
+                ))}
+                <Button
+                  className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
+                  onClick={() => setIngredientModalOpen(true)}
+                >
+                  <IoSearch />
+                  <p>Add Ingredient</p>
+                </Button>
+              </div>
+
+              <div className='flex-1 pl-10'>
+                <NutritionSummary
+                  nutrition={calculateTotalNutrition(ingredientDisplay)}
+                  type='food'
+                />
+              </div>
+            </div>
+          )}
+
+          {ingredientDisplay.length === 0 && (
+            <div className='flex flex-col gap-2'>
+              {errors.ingredients && (
+                <p className='text-sm text-red-500'>
+                  {errors.ingredients.message}
+                </p>
+              )}
+              <Button
+                className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
+                onClick={() => setIngredientModalOpen(true)}
+              >
+                <IoSearch />
+                <p>Add Ingredient</p>
+              </Button>
+            </div>
+          )}
+
+          <AddIngredientModal
+            open={isIngredientModalOpen}
+            onClose={() => setIngredientModalOpen(false)}
+            onAdd={handleAddIngredient}
+            setIngredient={setIngredient}
+          />
+
+          <DirectionsInputList control={control} />
+        </div>
+
+        <div className='sticky bottom-0 z-10 bg-white py-4 shadow-inner'>
+          <div className='flex w-[860px] justify-end gap-4'>
             <Button
-              className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
-              onClick={() => setIngredientModalOpen(true)}
+              onClick={() => {
+                if (canGoBack) {
+                  router.history.back();
+                }
+              }}
+              className='px-4 py-5 text-[16px]'
             >
-              <IoSearch />
-              <p>Add Ingredient</p>
+              Cancel
+            </Button>
+            <Button
+              className={cn(
+                `flex w-[160px] items-center gap-2 border-none px-4 py-5 text-[16px] text-white ${
+                  isLoading
+                    ? 'cursor-not-allowed bg-gray-400'
+                    : 'bg-primary-400 hover:bg-primary-500'
+                }`,
+              )}
+              htmlType='submit'
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Spin
+                  indicator={<LoadingOutlined spin />}
+                  size='small'
+                  className='text-white'
+                />
+              ) : (
+                <span className='flex items-center gap-2'>
+                  <GrDocumentUpdate className='text-[18px]' />
+                  Save
+                </span>
+              )}
             </Button>
           </div>
-
-          <div className='flex-1 pl-10'>
-            <NutritionSummary
-              nutrition={calculateTotalNutrition(ingredientDisplay)}
-              type='food'
-            />
-          </div>
         </div>
-      )}
-
-      {ingredientDisplay.length === 0 && (
-        <div className='flex flex-col gap-2'>
-          {errors.ingredients && (
-            <p className='text-sm text-red-500'>{errors.ingredients.message}</p>
-          )}
-          <Button
-            className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
-            onClick={() => setIngredientModalOpen(true)}
-          >
-            <IoSearch />
-            <p>Add Ingredient</p>
-          </Button>
-        </div>
-      )}
-
-      <AddIngredientModal
-        open={isIngredientModalOpen}
-        onClose={() => setIngredientModalOpen(false)}
-        onAdd={handleAddIngredient}
-        setIngredient={setIngredient}
-      />
-
-      <DirectionsInputList control={control} />
-
-      <div className='mt-2 flex items-center gap-4'>
-        <Button className='rounded-full border-none px-20 py-4 text-blue-500 transition-all hover:border-none hover:bg-blue-50'>
-          Cancel
-        </Button>
+      </form>
+      <div className='mb-10 ml-[40px]'>
+        <p className='text-[25px]'>Danger Zone</p>
+        <p>Deleting this food will permanently remove it.</p>
         <Button
-          htmlType='submit'
-          loading={isLoading || isFetching}
-          className='bg-primary hover:bg-primary-300 rounded-full border-transparent px-20 py-4 text-white transition-all hover:border-transparent hover:text-white'
+          className='bg-secondary-400 hover:bg-secondary-500 mt-5 px-4 py-5 text-[16px] text-white'
+          onClick={() => setIsConfirmModalOpen(!isConfirmModalOpen)}
         >
-          Save
+          <FaTrashAlt />
+          {`Delete ${getValues('name')}`}
         </Button>
+        <Modal
+          open={isConfirmModalOpen}
+          onOk={handleConfirmDelete}
+          onCancel={() => setIsConfirmModalOpen(false)}
+          okText='Yes'
+          cancelText='Cancel'
+          okButtonProps={{ danger: true }}
+          cancelButtonProps={{
+            className:
+              'bg-gray-400 text-white hover:bg-gray-500 border-none focus:outline-none',
+          }}
+        >
+          <p>{`Are you sure you want to delete ${getValues('name')} ?`}</p>
+        </Modal>
       </div>
-    </form>
+    </>
   );
 };
 

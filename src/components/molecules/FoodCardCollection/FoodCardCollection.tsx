@@ -48,7 +48,13 @@ const FoodCardCollection: React.FC<FoodCardCollectionProps> = ({
         onClick={() => onClick?.(food)}
       >
         <Image
-          src={food.imgUrls[0]}
+          src={
+            food.imgUrls.length > 0
+              ? food.imgUrls[0]
+              : food.isRecipe
+                ? 'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/k52mpavgekiqflwmk9ex.avif'
+                : 'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/whuexhkydv7ubiqh5rxe.jpg'
+          }
           className={`h-[50px] w-[50px] max-w-[50px] rounded-[10px] object-cover transition-all duration-200 ${isHovered ? 'border-primary-400 border-2' : 'border-2 border-transparent'}`}
         />
         <div className='ml-[10px] flex w-full flex-col justify-center gap-[3px] pr-[10px]'>

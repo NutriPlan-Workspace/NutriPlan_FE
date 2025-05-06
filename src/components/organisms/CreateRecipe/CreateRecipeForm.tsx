@@ -1,9 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { GrDocumentUpdate } from 'react-icons/gr';
 import { IoSearch } from 'react-icons/io5';
+import { useDispatch, useSelector } from 'react-redux';
+import { LoadingOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCanGoBack, useRouter } from '@tanstack/react-router';
-import { motion } from 'motion/react';
+import { Spin } from 'antd';
 
 import { Button } from '@/atoms/Button';
 import { HTTP_STATUS } from '@/constants/httpStatus';
@@ -15,12 +18,18 @@ import {
 } from '@/constants/recipeForm';
 import { useToast } from '@/contexts/ToastContext';
 import { NutritionSummary } from '@/molecules/NutritionSummary';
-import { AddIngredientModal } from '@/organisms/CreateRecipe';
-import { DirectionsInputList } from '@/organisms/CreateRecipe';
-import { IngredientItem } from '@/organisms/CreateRecipe';
-import { RecipeBasicInfoSection } from '@/organisms/CreateRecipe';
-import { RecipePropertiesSection } from '@/organisms/CreateRecipe';
-import { useCreateCustomRecipeMutation } from '@/redux/query/apis/food/foodApis';
+import {
+  AddIngredientModal,
+  DirectionsInputList,
+  IngredientItem,
+  RecipeBasicInfoSection,
+  RecipePropertiesSection,
+} from '@/organisms/CreateRecipe';
+import {
+  useCreateCustomRecipeMutation,
+  useGetFoodsQuery,
+} from '@/redux/query/apis/food/foodApis';
+import { foodSelector, removeCurrentCustomFood } from '@/redux/slices/food';
 import { FoodFormSchema, FoodSchema } from '@/schemas/recipeSchema';
 import type { Food } from '@/types/food';
 import type { IngredientDisplay, IngredientInput } from '@/types/ingredient';
@@ -54,9 +63,9 @@ const CreateRecipeForm: React.FC = () => {
       },
     },
   });
-
+  const dispatch = useDispatch();
+  const currentCustomFood = useSelector(foodSelector).currentCustomFood;
   const { showToastError, showToastSuccess } = useToast();
-
   const [createCustomRecipe, { isLoading }] = useCreateCustomRecipeMutation();
   const [upload, setUpload] = useState(false);
   const [img, setImg] = useState<string | undefined>(undefined);
@@ -69,37 +78,72 @@ const CreateRecipeForm: React.FC = () => {
   const router = useRouter();
   const canGoBack = useCanGoBack();
 
+  const { refetch } = useGetFoodsQuery({
+    page: 1,
+    limit: 20,
+    filters: ['customFood', 'customRecipe'],
+  });
+
+  useEffect(() => {
+    if (currentCustomFood) {
+      const transformedDirections =
+        currentCustomFood.directions?.map((d) => ({ step: d })) ?? [];
+
+      const transformedIngredients =
+        currentCustomFood.ingredients?.map((ingredient) => ({
+          ...ingredient,
+          ingredientFoodId:
+            typeof ingredient.ingredientFoodId === 'object'
+              ? ingredient.ingredientFoodId._id
+              : ingredient.ingredientFoodId,
+        })) ?? [];
+
+      reset({
+        ...currentCustomFood,
+        directions: transformedDirections,
+        ingredients: transformedIngredients,
+        property: {
+          ...currentCustomFood.property,
+          mainDish: currentCustomFood.property?.mainDish ?? true,
+          isBreakfast: currentCustomFood.property?.isBreakfast ?? true,
+          isLunch: currentCustomFood.property?.isLunch ?? true,
+          isDinner: currentCustomFood.property?.isDinner ?? true,
+          isSnack: currentCustomFood.property?.isSnack ?? true,
+          isDessert: currentCustomFood.property?.isDessert ?? true,
+        },
+      });
+
+      setImg(currentCustomFood.imgUrls?.[0]);
+      setIngredient(currentCustomFood.ingredientList ?? []);
+
+      setIngredientDisplay(
+        transformedIngredients.map((ingredient) => ({
+          ...ingredient,
+          food: currentCustomFood.ingredientList?.find(
+            (f) => f._id === ingredient.ingredientFoodId,
+          ),
+        })),
+      );
+    }
+  }, [currentCustomFood, reset]);
+
   const onSubmit = async (data: FoodFormSchema) => {
     try {
       const response = await createCustomRecipe(data).unwrap();
-      console.log(data);
-      if (response.code == HTTP_STATUS.OK) {
-        setImg(undefined);
-        setIngredient([]);
-        setIngredientDisplay([]);
+      if (response.code === HTTP_STATUS.OK) {
+        await refetch();
+        showToastSuccess('Recipe created successfully!');
+        dispatch(removeCurrentCustomFood());
         reset();
-        if (canGoBack) {
-          router.history.back();
-        }
-        showToastSuccess('Create Custom recipe success!');
+        router.history.back();
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-      showToastError('Create Custom recipe failure!');
+    } catch {
+      showToastError('Failed to create recipe!');
     }
   };
 
-  const handleUploaded = async (url: string) => {
-    setValue('imgUrls', [url]);
-    setImg(url);
-  };
-
-  const selectedMainDish = useWatch({
-    control,
-    name: 'property.mainDish',
-  });
-
   const property = useWatch({ control, name: 'property' });
+  const selectedMainDish = useWatch({ control, name: 'property.mainDish' });
 
   const selectedMeals = useMemo(
     () => mealOptions.filter((meal) => property?.[propertyKeysMap[meal]]),
@@ -111,6 +155,11 @@ const CreateRecipeForm: React.FC = () => {
       const key = propertyKeysMap[meal];
       setValue(`property.${key}`, checkedValues.includes(meal));
     });
+  };
+
+  const handleUploaded = async (url: string) => {
+    setValue('imgUrls', [url]);
+    setImg(url);
   };
 
   const handleAddIngredient = (ingredient: IngredientInput) => {
@@ -133,7 +182,7 @@ const CreateRecipeForm: React.FC = () => {
   };
 
   useEffect(() => {
-    const ingredientsInput = getValues('ingredients');
+    const ingredientsInput = getValues('ingredients') ?? [];
 
     const mergedMap = new Map<string, IngredientDisplay>();
 
@@ -141,7 +190,6 @@ const CreateRecipeForm: React.FC = () => {
       const matchedFood = ingredient.find(
         (food) => food._id === input.ingredientFoodId,
       );
-
       if (!matchedFood) continue;
 
       if (mergedMap.has(input.ingredientFoodId)) {
@@ -158,38 +206,63 @@ const CreateRecipeForm: React.FC = () => {
         });
       }
     }
+
     setIngredientDisplay(Array.from(mergedMap.values()));
   }, [ingredient, getValues]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='w-[60vw]'>
-      <RecipeBasicInfoSection
-        control={control}
-        errors={errors}
-        img={img}
-        upload={upload}
-        setUpload={setUpload}
-        handleUploaded={handleUploaded}
-      />
-      <RecipePropertiesSection
-        control={control}
-        timeFields={timeFields}
-        setValue={setValue}
-        selectedMainDish={selectedMainDish}
-        selectedMeals={selectedMeals}
-        handleMealChange={handleMealChange}
-      />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className='w-[900px] px-[40px]'>
+        <RecipeBasicInfoSection
+          control={control}
+          errors={errors}
+          img={img}
+          upload={upload}
+          setUpload={setUpload}
+          handleUploaded={handleUploaded}
+        />
 
-      {!!ingredientDisplay.length && (
-        <div className='mt-4 flex gap-4'>
-          <div className='flex flex-1 flex-col gap-2'>
-            {ingredientDisplay.map((ingredient) => (
-              <IngredientItem
-                key={ingredient.ingredientFoodId}
-                ingredient={ingredient}
-                onRemove={handleRemoveIngredient}
+        <RecipePropertiesSection
+          control={control}
+          timeFields={timeFields}
+          setValue={setValue}
+          selectedMainDish={selectedMainDish}
+          selectedMeals={selectedMeals}
+          handleMealChange={handleMealChange}
+        />
+
+        {ingredientDisplay.length ? (
+          <div className='mt-4 flex gap-4'>
+            <div className='flex flex-1 flex-col gap-2'>
+              {ingredientDisplay.map((ingredient) => (
+                <IngredientItem
+                  key={ingredient.ingredientFoodId}
+                  ingredient={ingredient}
+                  onRemove={handleRemoveIngredient}
+                />
+              ))}
+              <Button
+                className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
+                onClick={() => setIngredientModalOpen(true)}
+              >
+                <IoSearch />
+                <p>Add Ingredient</p>
+              </Button>
+            </div>
+            <div className='flex-1 pl-10'>
+              <NutritionSummary
+                nutrition={calculateTotalNutrition(ingredientDisplay)}
+                type='food'
               />
-            ))}
+            </div>
+          </div>
+        ) : (
+          <div className='flex flex-col gap-2'>
+            {errors.ingredients && (
+              <p className='text-sm text-red-500'>
+                {errors.ingredients.message}
+              </p>
+            )}
             <Button
               className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
               onClick={() => setIngredientModalOpen(true)}
@@ -198,59 +271,56 @@ const CreateRecipeForm: React.FC = () => {
               <p>Add Ingredient</p>
             </Button>
           </div>
+        )}
 
-          <div className='flex-1 pl-10'>
-            <NutritionSummary
-              nutrition={calculateTotalNutrition(ingredientDisplay)}
-              type='food'
-            />
-          </div>
-        </div>
-      )}
+        <AddIngredientModal
+          open={isIngredientModalOpen}
+          onClose={() => setIngredientModalOpen(false)}
+          onAdd={handleAddIngredient}
+          setIngredient={setIngredient}
+        />
 
-      {ingredientDisplay.length === 0 && (
-        <div className='flex flex-col gap-2'>
-          {errors.ingredients && (
-            <motion.p
-              className='text-sm text-red-500'
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.3 }}
-            >
-              {errors.ingredients.message}
-            </motion.p>
-          )}
+        <DirectionsInputList control={control} />
+      </div>
 
+      <div className='sticky bottom-0 z-10 bg-white py-4 shadow-inner'>
+        <div className='flex w-[860px] justify-end gap-4'>
           <Button
-            className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
-            onClick={() => setIngredientModalOpen(true)}
+            onClick={() => {
+              dispatch(removeCurrentCustomFood());
+              reset();
+              if (canGoBack) {
+                router.history.back();
+              }
+            }}
+            className='px-4 py-5 text-[16px]'
           >
-            <IoSearch />
-            <p>Add Ingredient</p>
+            Cancel
+          </Button>
+          <Button
+            className={`flex w-[160px] items-center gap-2 border-none px-4 py-5 text-[16px] text-white ${
+              isLoading
+                ? 'cursor-not-allowed bg-gray-400'
+                : 'bg-primary-400 hover:bg-primary-500'
+            }`}
+            htmlType='submit'
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Spin
+                indicator={<LoadingOutlined spin />}
+                size='small'
+                className='text-white'
+              />
+            ) : (
+              <span className='flex items-center gap-2'>
+                {' '}
+                <GrDocumentUpdate className='text-[18px]' />
+                Create
+              </span>
+            )}
           </Button>
         </div>
-      )}
-      <AddIngredientModal
-        open={isIngredientModalOpen}
-        onClose={() => setIngredientModalOpen(false)}
-        onAdd={handleAddIngredient}
-        setIngredient={setIngredient}
-      />
-
-      <DirectionsInputList control={control} />
-
-      <div className='mt-2 flex items-center gap-4'>
-        <Button className='rounded-full border-none px-20 py-4 text-blue-500 transition-all hover:border-none hover:bg-blue-50'>
-          Cancel
-        </Button>
-        <Button
-          htmlType='submit'
-          loading={isLoading}
-          className='bg-primary hover:bg-primary-300 rounded-full border-transparent px-20 py-4 text-white transition-all hover:border-transparent hover:text-white'
-        >
-          Save
-        </Button>
       </div>
     </form>
   );

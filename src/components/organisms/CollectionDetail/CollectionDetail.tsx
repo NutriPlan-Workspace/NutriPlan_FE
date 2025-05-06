@@ -201,7 +201,7 @@ const CollectionDetail: React.FC = () => {
                   ? 'https://img.freepik.com/free-photo/chicken-fajita-chicken-fillet-fried-with-bell-pepper-lavash-with-bread-slices-white-plate_114579-174.jpg?t=st=1746506112~exp=1746509712~hmac=8bddd99a63709df09e8e40e0d7855c1584bcc4c86310d2e1b79ec6e9ae1f4f82&w=740'
                   : 'https://st.depositphotos.com/1809906/1375/v/950/depositphotos_13755635-stock-illustration-food-collection.jpg')
               }
-              className='rounded-md'
+              className='aspect-square w-full rounded-md object-cover'
             />
             <Button
               className='my-2 flex items-center gap-2'

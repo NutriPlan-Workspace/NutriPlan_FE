@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { useNavigate, useRouter } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { Typography } from 'antd';
 
 import { Button } from '@/atoms/Button';
@@ -14,7 +14,6 @@ const { Title, Paragraph } = Typography;
 
 const CustomeRecipe: React.FC = () => {
   const navigate = useNavigate();
-  const router = useRouter();
   const [searchValue, setSearchValue] = useState('');
   const [sortOption, setSortOption] = useState<string>('1');
   const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | null>(null);
@@ -22,15 +21,11 @@ const CustomeRecipe: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { data, isFetching, refetch } = useGetFoodsQuery({
+  const { data, isFetching } = useGetFoodsQuery({
     page: 1,
     limit: 20,
     filters: ['customFood', 'customRecipe'],
   });
-
-  useEffect(() => {
-    refetch();
-  }, [router, refetch]);
 
   useEffect(() => {
     if (Array.isArray(data?.data)) {
@@ -118,7 +113,7 @@ const CustomeRecipe: React.FC = () => {
       <div className='flex items-center gap-2'>
         <Button
           onClick={handleCustomFoodClick}
-          className='bg-primary flex items-center gap-2 border-transparent p-5 hover:border-transparent'
+          className='bg-secondary-400 hover:bg-secondary-500 flex items-center gap-2 border-transparent p-5 hover:border-transparent'
         >
           <FaPlus className='text-white' />
           <Paragraph className='m-0 font-thin text-white'>
@@ -126,7 +121,7 @@ const CustomeRecipe: React.FC = () => {
           </Paragraph>
         </Button>
         <Button
-          className='bg-primary flex items-center gap-2 border-transparent p-5 hover:border-transparent'
+          className='bg-secondary-400 hover:bg-secondary-500 flex items-center gap-2 border-transparent p-5 hover:border-transparent'
           onClick={handleCreateRecipeClick}
         >
           <FaPlus className='text-white' />

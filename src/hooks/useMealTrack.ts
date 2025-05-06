@@ -11,10 +11,12 @@ import { toast } from 'react-toastify';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { ADJUST_DISTANCE, NUM_OF_SLIDES } from '@/constants/mealPlan';
+import { useGetFavoriteFoodsQuery } from '@/redux/query/apis/collection/collectionApi';
 import {
   useGetMealPlanDayRangeQuery,
   useLazyGetMealPlanSingleDayQuery,
 } from '@/redux/query/apis/mealPlan/mealPlanApi';
+import { setFavoriteList } from '@/redux/slices/collection';
 import {
   mealPlanSelector,
   updateViewingMealPlanByIndex,
@@ -41,6 +43,14 @@ export const useMealTrack = (
   const [getMealPlanSingleDay] = useLazyGetMealPlanSingleDayQuery();
   const prevSelectedDateForJumpRef = useRef<Date | null>(null);
   const prevDateRef = useRef<Date | null>(null);
+
+  const { data: favoriteFoods } = useGetFavoriteFoodsQuery();
+
+  useEffect(() => {
+    if (favoriteFoods?.data) {
+      dispatch(setFavoriteList(favoriteFoods.data));
+    }
+  }, [favoriteFoods, dispatch]);
 
   const { from, to } = useMemo(() => {
     if (!selectedDate) return {};
@@ -83,7 +93,7 @@ export const useMealTrack = (
       from: getMealDate(from),
       to: getMealDate(to),
     };
-  }, [selectedDate]);
+  }, [selectedDate, currentSlide, sliderRef]);
 
   const dayRangeArgs = from && to ? { from, to } : skipToken;
 

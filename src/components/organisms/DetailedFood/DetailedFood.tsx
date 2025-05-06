@@ -1,7 +1,9 @@
 import React from 'react';
+import { Image } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 
 import { DirectionsList } from '@/molecules/DirectionList';
+import FoodActionButtons from '@/molecules/FoodActionButtons/FoodActionButtons';
 import { Ingredient } from '@/molecules/Ingredient';
 import { NutritionSummary } from '@/molecules/NutritionSummary';
 import { ScaleRecipe } from '@/molecules/ScaleRecipe';
@@ -20,7 +22,7 @@ const DEFAULT_UNIT = [
 ];
 
 interface DetailedFoodProp {
-  food: Food | undefined;
+  food: Food;
   listIngredient?: Food[];
 }
 const DetailedFood: React.FC<DetailedFoodProp> = ({ food, listIngredient }) => (
@@ -30,17 +32,20 @@ const DetailedFood: React.FC<DetailedFoodProp> = ({ food, listIngredient }) => (
       style={{ backgroundColor: 'white' }}
     >
       <div className='grid grid-cols-[2.3fr_3fr] gap-12'>
-        <div>
-          <div className='aspect-[1.618] w-full overflow-hidden rounded-md'>
-            <img
+        <div className='w-[350px]'>
+          <div className='h-[221px] overflow-hidden rounded-t-md border border-gray-200'>
+            <Image
               src={
                 food?.imgUrls?.[0] ||
-                'https://cdn.vectorstock.com/i/500p/42/11/creative-concept-of-brain-food-symbolized-vector-53434211.jpg'
+                'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/k52mpavgekiqflwmk9ex.avif'
               }
               alt={food?.name}
-              className='h-full w-full object-cover'
+              className='h-[220px] w-[350px] object-cover'
             />
           </div>
+
+          <FoodActionButtons food={food} />
+
           {food?.nutrition ? (
             <NutritionSummary nutrition={food?.nutrition} type='food' />
           ) : (
@@ -49,8 +54,8 @@ const DetailedFood: React.FC<DetailedFoodProp> = ({ food, listIngredient }) => (
         </div>
         <div className='col-span-1'>
           <TimeInfo
-            prepTime={food ? food.property?.prepTime : 0}
-            cookTime={food ? food.property?.cookTime : 0}
+            prepTime={food ? food.property?.prepTime || 0 : 0}
+            cookTime={food ? food.property?.cookTime || 0 : 0}
           />
           <ScaleRecipe units={food?.units || DEFAULT_UNIT} />
           {listIngredient ? (

@@ -23,7 +23,7 @@ const DirectionsInputList: React.FC<DirectionsInputListProps> = ({
   });
 
   return (
-    <div>
+    <div className='pb-6'>
       <Title level={3} className='mt-4 font-thin'>
         Directions
       </Title>
