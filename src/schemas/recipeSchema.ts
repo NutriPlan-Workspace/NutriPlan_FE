@@ -10,6 +10,7 @@ const PropertySchema = z.object({
   expirationTime: z.number().default(0),
   isBasicFood: z.boolean().default(false),
   prepTime: z.number().default(1),
+  cookTime: z.number().default(1),
   waitTime: z.number().default(0),
   totalTime: z.number().default(1),
   isBreakfast: z.boolean().default(true),

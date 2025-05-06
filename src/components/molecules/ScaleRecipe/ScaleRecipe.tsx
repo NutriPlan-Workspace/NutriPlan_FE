@@ -19,8 +19,11 @@ const ScaleRecipe: React.FC<unitScaleProp> = ({ units }) => {
   };
 
   const changeUnit = (value: string) => {
-    const targetUnit = value === 'grams' ? units[0] : units[1];
-    const currentUnit = value === 'grams' ? units[1] : units[0];
+    const targetUnit = units.find((u) => u.description === value);
+    const currentUnit = units.find((u) => u.description === unit);
+
+    if (!targetUnit || !currentUnit) return;
+
     setAmount(
       roundNumber((targetUnit.amount * amount) / currentUnit.amount, 3),
     );
@@ -28,7 +31,7 @@ const ScaleRecipe: React.FC<unitScaleProp> = ({ units }) => {
   };
 
   const handleChangeUnit = (value: string) => {
-    if (unit === value) return null;
+    if (unit === value) return;
     changeUnit(value);
     setUnit(value);
   };
@@ -38,20 +41,18 @@ const ScaleRecipe: React.FC<unitScaleProp> = ({ units }) => {
       <h3 className='mt-6 pb-3 text-xl font-semibold'>Scale recipe</h3>
       <InputNumber
         min={1}
-        defaultValue={units[0].amount}
         value={amount}
         style={{ width: '80px', marginRight: '10px', textAlign: 'right' }}
         onChange={onChangeAmount}
       />
       <Select
-        defaultValue={units[0].description}
-        style={{ width: '100px' }}
-        options={[
-          { value: units[0].description, label: units[0].description },
-          { value: units[1].description, label: units[1].description },
-        ]}
         value={unit}
-        onChange={(value) => handleChangeUnit(value)}
+        style={{ width: '100px' }}
+        options={units.map((u) => ({
+          value: u.description,
+          label: u.description,
+        }))}
+        onChange={handleChangeUnit}
       />
     </div>
   );

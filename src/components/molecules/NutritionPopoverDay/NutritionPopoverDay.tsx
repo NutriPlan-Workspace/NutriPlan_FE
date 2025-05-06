@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HiOutlineAdjustments, HiOutlineX } from 'react-icons/hi';
+import { RiErrorWarningLine } from 'react-icons/ri';
 import { Button, Col, Row, Tooltip, Typography } from 'antd';
 
 import { nutritionFormat, targetKeyMap } from '@/constants/nutritionFormat';
@@ -8,6 +9,7 @@ import { PieChart } from '@/molecules/PieChart';
 import ModalNutritionDetail from '@/organisms/ModalNutritionDetail/ModalNutritionDetail';
 import type { NutritionFields } from '@/types/food';
 import type { NutritionGoal } from '@/types/user';
+import { getInvalidNutritionKeys } from '@/utils/calculateNutrition';
 import { roundNumber } from '@/utils/roundNumber';
 
 const { Title } = Typography;
@@ -28,6 +30,7 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
   isSingleDay = false,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const invalidKeys = getInvalidNutritionKeys(nutritionData, targetNutrition);
 
   return (
     <div
@@ -73,6 +76,14 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
           )}
         </div>
       </div>
+      {invalidKeys.length !== 0 && (
+        <div className='flex items-center'>
+          <p className='my-2 text-center text-[#8C5A09]'>
+            Some targets are not being met
+          </p>
+          <RiErrorWarningLine className='ml-2 text-[20px] text-yellow-500' />
+        </div>
+      )}
       <div className='w-full p-3.5'>
         <Row className='w-full'>
           {/* CURRENT TOTAL */}
@@ -122,12 +133,46 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
             <Row className='w-full'>
               <Col span={14} className='px-2'>
                 <div className='flex justify-between'>
+                  {['Carbs', 'Fats', 'Proteins'].includes(item.label) ? (
+                    <div className='flex items-center gap-2'>
+                      {item.label === 'Carbs' && (
+                        <span className='h-3 w-3 rounded-full bg-yellow-500' />
+                      )}
+                      {item.label === 'Fats' && (
+                        <span className='h-3 w-3 rounded-full bg-blue-500' />
+                      )}
+                      {item.label === 'Proteins' && (
+                        <span className='h-3 w-3 rounded-full bg-purple-500' />
+                      )}
+                      <Typography
+                        className={cn(
+                          { 'text-[16px]': isSingleDay },
+                          invalidKeys.includes(item.key) && 'text-[#8C5A09]',
+                        )}
+                      >
+                        {item.label}
+                      </Typography>
+                    </div>
+                  ) : (
+                    <Typography
+                      className={cn(
+                        { 'text-[16px]': isSingleDay },
+                        invalidKeys.includes(item.key)
+                          ? 'text-[#8C5A09]'
+                          : item.color,
+                      )}
+                    >
+                      {item.label}
+                    </Typography>
+                  )}
+
                   <Typography
-                    className={cn({ 'text-[16px]': isSingleDay }, item.color)}
+                    className={cn(
+                      invalidKeys.includes(item.key)
+                        ? 'text-[#8C5A09]'
+                        : item.color,
+                    )}
                   >
-                    {item.label}:
-                  </Typography>
-                  <Typography className={item.color}>
                     {nutritionData && roundNumber(nutritionData[item.key], 2)}
                     {item.unit}
                   </Typography>
@@ -136,7 +181,13 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
 
               <Col span={10}>
                 <div className='flex justify-center'>
-                  <Typography className='text-black'>
+                  <Typography
+                    className={cn(
+                      invalidKeys.includes(item.key)
+                        ? 'text-[#8C5A09]'
+                        : item.color,
+                    )}
+                  >
                     {item.key === 'calories'
                       ? roundNumber(
                           isNaN(targetNutrition?.[targetKeyMap[item.key]])

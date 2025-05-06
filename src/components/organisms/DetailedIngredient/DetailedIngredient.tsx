@@ -19,15 +19,14 @@ const DetailedIngredient: React.FC<ModalDetailedIngredientProp> = ({
     >
       <div className='grid grid-cols-2 gap-8'>
         <div>
-          {food?.imgUrls[0] ? (
-            <img
-              src={food?.imgUrls[0]}
-              alt={food?.name || 'No Image'}
-              className='h-[35%] w-full rounded-md object-cover'
-            />
-          ) : (
-            <p>No Image Available</p>
-          )}
+          <img
+            src={
+              food?.imgUrls?.[0] ||
+              'https://www.eatthismuch.com/app/_app/immutable/assets/missing_thumbnail.BbdnfBW3.svg'
+            }
+            alt={food?.name || 'No Image'}
+            className='h-[35%] w-full rounded-md object-cover'
+          />
           {food?.nutrition ? (
             <NutritionSummary nutrition={food.nutrition} type='ingredient' />
           ) : (

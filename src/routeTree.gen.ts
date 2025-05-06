@@ -32,6 +32,8 @@ import { Route as CustomRecipesCreateRecipeImport } from './routes/custom-recipe
 import { Route as CustomRecipesIdImport } from './routes/custom-recipes/$id'
 import { Route as CollectionsCreateImport } from './routes/collections/create'
 import { Route as CollectionsIdImport } from './routes/collections/$id'
+import { Route as CustomRecipesCustomFoodIndexImport } from './routes/custom-recipes/custom-food/index'
+import { Route as CustomRecipesCustomFoodIdImport } from './routes/custom-recipes/custom-food/$id'
 
 // Create/Update Routes
 
@@ -158,6 +160,19 @@ const CollectionsCreateRoute = CollectionsCreateImport.update({
 const CollectionsIdRoute = CollectionsIdImport.update({
   id: '/collections/$id',
   path: '/collections/$id',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CustomRecipesCustomFoodIndexRoute =
+  CustomRecipesCustomFoodIndexImport.update({
+    id: '/custom-recipes/custom-food/',
+    path: '/custom-recipes/custom-food/',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const CustomRecipesCustomFoodIdRoute = CustomRecipesCustomFoodIdImport.update({
+  id: '/custom-recipes/custom-food/$id',
+  path: '/custom-recipes/custom-food/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -312,6 +327,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WeightGoalIndexImport
       parentRoute: typeof rootRoute
     }
+    '/custom-recipes/custom-food/$id': {
+      id: '/custom-recipes/custom-food/$id'
+      path: '/custom-recipes/custom-food/$id'
+      fullPath: '/custom-recipes/custom-food/$id'
+      preLoaderRoute: typeof CustomRecipesCustomFoodIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/custom-recipes/custom-food/': {
+      id: '/custom-recipes/custom-food/'
+      path: '/custom-recipes/custom-food'
+      fullPath: '/custom-recipes/custom-food'
+      preLoaderRoute: typeof CustomRecipesCustomFoodIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -339,6 +368,8 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
   '/weight-goal': typeof WeightGoalIndexRoute
+  '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
+  '/custom-recipes/custom-food': typeof CustomRecipesCustomFoodIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -363,6 +394,8 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
   '/weight-goal': typeof WeightGoalIndexRoute
+  '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
+  '/custom-recipes/custom-food': typeof CustomRecipesCustomFoodIndexRoute
 }
 
 export interface FileRoutesById {
@@ -388,6 +421,8 @@ export interface FileRoutesById {
   '/register/': typeof RegisterIndexRoute
   '/unauthorized/': typeof UnauthorizedIndexRoute
   '/weight-goal/': typeof WeightGoalIndexRoute
+  '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
+  '/custom-recipes/custom-food/': typeof CustomRecipesCustomFoodIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -414,6 +449,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/unauthorized'
     | '/weight-goal'
+    | '/custom-recipes/custom-food/$id'
+    | '/custom-recipes/custom-food'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -437,6 +474,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/unauthorized'
     | '/weight-goal'
+    | '/custom-recipes/custom-food/$id'
+    | '/custom-recipes/custom-food'
   id:
     | '__root__'
     | '/'
@@ -460,6 +499,8 @@ export interface FileRouteTypes {
     | '/register/'
     | '/unauthorized/'
     | '/weight-goal/'
+    | '/custom-recipes/custom-food/$id'
+    | '/custom-recipes/custom-food/'
   fileRoutesById: FileRoutesById
 }
 
@@ -485,6 +526,8 @@ export interface RootRouteChildren {
   RegisterIndexRoute: typeof RegisterIndexRoute
   UnauthorizedIndexRoute: typeof UnauthorizedIndexRoute
   WeightGoalIndexRoute: typeof WeightGoalIndexRoute
+  CustomRecipesCustomFoodIdRoute: typeof CustomRecipesCustomFoodIdRoute
+  CustomRecipesCustomFoodIndexRoute: typeof CustomRecipesCustomFoodIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -509,6 +552,8 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterIndexRoute: RegisterIndexRoute,
   UnauthorizedIndexRoute: UnauthorizedIndexRoute,
   WeightGoalIndexRoute: WeightGoalIndexRoute,
+  CustomRecipesCustomFoodIdRoute: CustomRecipesCustomFoodIdRoute,
+  CustomRecipesCustomFoodIndexRoute: CustomRecipesCustomFoodIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -541,7 +586,9 @@ export const routeTree = rootRoute
         "/primary-diet/",
         "/register/",
         "/unauthorized/",
-        "/weight-goal/"
+        "/weight-goal/",
+        "/custom-recipes/custom-food/$id",
+        "/custom-recipes/custom-food/"
       ]
     },
     "/": {
@@ -606,6 +653,12 @@ export const routeTree = rootRoute
     },
     "/weight-goal/": {
       "filePath": "weight-goal/index.tsx"
+    },
+    "/custom-recipes/custom-food/$id": {
+      "filePath": "custom-recipes/custom-food/$id.tsx"
+    },
+    "/custom-recipes/custom-food/": {
+      "filePath": "custom-recipes/custom-food/index.tsx"
     }
   }
 }

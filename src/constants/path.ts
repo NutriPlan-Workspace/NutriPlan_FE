@@ -25,8 +25,11 @@ export const PATH = {
   GROCERIES: '/groceries',
   DISCOVER: '/discover',
   CUSTOM_RECIPES: '/custom-recipes',
+  CREATE_CUSTOM_FOODS: '/custom-food',
   COLLECTIONS: '/collections',
   COLLECTION_ID: '/collections/$id',
+  CUSTOM_FOOD_EDIT: '/custom-food/$id',
+  CUSTOM_FOOD_DETAIL: '/custom-food',
   SAVED_PLANS: '/saved-plans',
 
   DIET_NUTRITION: '/diet-nutrition',

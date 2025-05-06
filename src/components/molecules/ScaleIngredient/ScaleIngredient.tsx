@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { InputNumber, InputNumberProps, Select } from 'antd';
 
 import { useScaleIngre } from '@/contexts/ScaleIngreContext';
@@ -20,37 +20,50 @@ const ScaleIngredient: React.FC<unitScaleProp> = ({ units }) => {
     setConversionFactorIngre,
   } = useScaleIngre();
 
+  useEffect(() => {
+    if (units.length > 0) {
+      setAmountIngre(units[0].amount);
+      setUnitIngre(units[0].description);
+      setConversionFactorIngre(units[0].amount);
+    }
+  }, [units]);
+
   const onChangeAmount: InputNumberProps['onChange'] = (value) => {
     setAmountIngre(value as number);
   };
 
-  const handleChangeUnit = (newUnit: string) => {
-    if (unitIngre !== newUnit) {
-      const currentUnitObj = units.find((u) => u.description === unitIngre);
-      const newUnitObj = units.find((u) => u.description === newUnit);
-      if (currentUnitObj && newUnitObj) {
-        const newAmount =
-          (newUnitObj.amount * amountIngre) / currentUnitObj.amount;
+  const changeUnit = (value: string) => {
+    const targetUnit = units.find((u) => u.description === value);
+    const currentUnit = units.find((u) => u.description === unitIngre);
 
-        setAmountIngre(roundNumber(newAmount, 1));
-        setConversionFactorIngre(newUnitObj.amount);
-        setUnitIngre(newUnit);
-      }
-    }
+    if (!targetUnit || !currentUnit) return;
+
+    setAmountIngre(
+      roundNumber(
+        (targetUnit.amount * (amountIngre || 0)) / currentUnit.amount,
+        3,
+      ),
+    );
+    setConversionFactorIngre(targetUnit.amount);
   };
+
+  const handleChangeUnit = (value: string) => {
+    if (unitIngre === value) return;
+    changeUnit(value);
+    setUnitIngre(value);
+  };
+
   return (
     <div>
       <h3 className='pt-3 pb-3 text-xl font-semibold'>Scale recipe</h3>
       <InputNumber
         min={1}
-        defaultValue={units[0].amount}
         value={amountIngre}
         style={{ width: '80px', marginRight: '10px', textAlign: 'right' }}
         controls={false}
         onChange={onChangeAmount}
       />
       <Select
-        defaultValue={units[0].description}
         style={{ width: '150px' }}
         options={units.map((item) => ({
           value: item.description,

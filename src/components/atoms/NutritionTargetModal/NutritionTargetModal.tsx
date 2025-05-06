@@ -57,21 +57,46 @@ const NutritionTargetModal: React.FC<NutritionTargetModalProps> = ({
           Protein:
         </p>
       </div>
-
-      <div>
+      <div className='text-center'>
         <h3 className='mb-2 text-lg font-semibold'>Current</h3>
-        <p>{oldTarget?.data?.calories}</p>
-        <p>{`${oldTarget?.data?.carbTarget?.from} - ${oldTarget?.data?.carbTarget?.to}g`}</p>
-        <p>{`${oldTarget?.data?.fatTarget?.from} - ${oldTarget?.data?.fatTarget?.to}g`}</p>
-        <p>{`${oldTarget?.data?.proteinTarget?.from} - ${oldTarget?.data?.proteinTarget?.to}g`}</p>
+        <p>{oldTarget?.data?.calories ?? '-'}</p>
+        <p>
+          {oldTarget?.data?.carbTarget?.from && oldTarget?.data?.carbTarget?.to
+            ? `${oldTarget?.data?.carbTarget?.from} - ${oldTarget?.data?.carbTarget?.to}g`
+            : '-'}
+        </p>
+        <p>
+          {oldTarget?.data?.fatTarget?.from && oldTarget?.data?.fatTarget?.to
+            ? `${oldTarget?.data?.fatTarget?.from} - ${oldTarget?.data?.fatTarget?.to}g`
+            : '-'}
+        </p>
+        <p>
+          {oldTarget?.data?.proteinTarget?.from &&
+          oldTarget?.data?.proteinTarget?.to
+            ? `${oldTarget?.data?.proteinTarget?.from} - ${oldTarget?.data?.proteinTarget?.to}g`
+            : '-'}
+        </p>
       </div>
 
-      <div>
+      <div className='text-center'>
         <h3 className='mb-2 text-lg font-semibold'>Suggested</h3>
-        <p>{newTarget?.data?.calories}</p>
-        <p>{`${newTarget?.data?.carbTarget.from} - ${newTarget?.data?.carbTarget?.to}g`}</p>
-        <p>{`${newTarget?.data?.fatTarget.from} - ${newTarget?.data?.fatTarget?.to}g`}</p>
-        <p>{`${newTarget?.data?.proteinTarget.from} - ${newTarget?.data?.proteinTarget?.to}g`}</p>
+        <p>{newTarget?.data?.calories ?? '-'}</p>
+        <p>
+          {newTarget?.data?.carbTarget?.from && newTarget?.data?.carbTarget?.to
+            ? `${newTarget?.data?.carbTarget?.from} - ${newTarget?.data?.carbTarget?.to}g`
+            : '-'}
+        </p>
+        <p>
+          {newTarget?.data?.fatTarget?.from && newTarget?.data?.fatTarget?.to
+            ? `${newTarget?.data?.fatTarget?.from} - ${newTarget?.data?.fatTarget?.to}g`
+            : '-'}
+        </p>
+        <p>
+          {newTarget?.data?.proteinTarget?.from &&
+          newTarget?.data?.proteinTarget?.to
+            ? `${newTarget?.data?.proteinTarget?.from} - ${newTarget?.data?.proteinTarget?.to}g`
+            : '-'}
+        </p>
       </div>
     </div>
   </Modal>

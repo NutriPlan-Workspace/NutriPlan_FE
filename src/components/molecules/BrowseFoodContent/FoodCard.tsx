@@ -1,6 +1,5 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from '@tanstack/react-router';
 import { Popover } from 'antd';
 
 import { PieChart } from '@/molecules/PieChart';
@@ -22,15 +21,7 @@ const FoodCard: React.FC<FoodCardProps> = ({
   showPopover = true,
 }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const id = foodItem._id;
 
-  const handleFoodCardClick = () => {
-    navigate({
-      to: '/custom-recipes/$id',
-      params: { id },
-    });
-  };
   return (
     <>
       <Popover
@@ -59,12 +50,8 @@ const FoodCard: React.FC<FoodCardProps> = ({
         <div
           className='cursor-pointer rounded-lg border-none shadow-md'
           onClick={() => {
-            if (showPopover) {
-              dispatch(setViewingDetailFood(foodItem));
-              dispatch(setIsModalDetailOpen(true));
-            } else {
-              handleFoodCardClick();
-            }
+            dispatch(setViewingDetailFood(foodItem));
+            dispatch(setIsModalDetailOpen(true));
           }}
         >
           <div className='h-full w-full'>

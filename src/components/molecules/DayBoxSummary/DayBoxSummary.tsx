@@ -6,10 +6,10 @@ import { Button, Popover, Typography } from 'antd';
 import { cn } from '@/helpers/helpers';
 import { NutritionPopoverDay } from '@/molecules/NutritionPopoverDay';
 import { PieChart } from '@/molecules/PieChart';
-import { useGetNutritionTargetQuery } from '@/redux/query/apis/user/userApis';
 import type { MealPlanFood } from '@/types/mealPlan';
 import type { NutritionGoal } from '@/types/user';
 import {
+  getInvalidNutritionKeys,
   getTotalCalories,
   getTotalNutrition,
 } from '@/utils/calculateNutrition';
@@ -18,7 +18,8 @@ import { DayBoxSummarySkeleton } from '../DayBoxSummarySkeleton';
 
 interface DayBoxSummaryProps {
   allDayMealItems: MealPlanFood[] | undefined;
-  isLoading: boolean;
+  isLoading?: boolean;
+  isWeekly?: boolean;
   targetNutrition?: NutritionGoal;
 }
 
@@ -26,17 +27,20 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
   allDayMealItems,
   isLoading,
   targetNutrition,
+  isWeekly,
 }) => {
   const [isTotalCaloriesOpen, setIsTotalCaloriesOpen] = useState(false);
-  const { data } = useGetNutritionTargetQuery();
-  const targetCalories = data?.data.calories;
+  const totalNutrition = allDayMealItems
+    ? getTotalNutrition(allDayMealItems)
+    : undefined;
+  const invalidKeys = getInvalidNutritionKeys(totalNutrition, targetNutrition);
   return (
     <Popover
       mouseEnterDelay={0.5}
       open={isTotalCaloriesOpen}
       onOpenChange={setIsTotalCaloriesOpen}
       trigger='click'
-      placement='left'
+      placement={isWeekly ? 'right' : 'left'}
       color='white'
       styles={{
         body: {
@@ -59,7 +63,10 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
       <Button
         className={cn(
           'align-center border-borderGray flex h-[42px] w-full justify-start rounded-md border-1 px-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_8px_8px_rgba(0,0,0,0.05),_0px_0px_8px_rgba(35,31,32,0.1)]',
-          { 'invisible opacity-0': !allDayMealItems && !isLoading },
+          {
+            'border-none shadow-none': isWeekly,
+            'invisible opacity-0': !allDayMealItems && !isLoading,
+          },
         )}
       >
         {isLoading ? (
@@ -73,16 +80,15 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
                 size={25}
                 label={false}
               />
-              <Typography className='inline-flex items-center gap-1'>
+              <Typography
+                className={cn('inline-flex items-center gap-1', {
+                  'cursor-pointer hover:underline': isWeekly,
+                })}
+              >
                 {getTotalCalories(allDayMealItems)} Calories
                 <LuInfo className='text-textGray text-base' />
-                {typeof targetCalories === 'number' &&
-                Math.abs(targetCalories - getTotalCalories(allDayMealItems)) >
-                  10 &&
-                getTotalCalories(allDayMealItems) !== 0 ? (
+                {invalidKeys.length !== 0 && (
                   <IoWarning className='text-[20px] text-yellow-500' />
-                ) : (
-                  <p></p>
                 )}
               </Typography>
             </div>

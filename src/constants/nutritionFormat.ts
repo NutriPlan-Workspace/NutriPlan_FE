@@ -24,19 +24,19 @@ export const nutritionFormat = [
     label: 'Carbs',
     key: 'carbs',
     unit: `g`,
-    color: NUTRITION_TEXT_COLOR.CARBS,
+    color: NUTRITION_TEXT_COLOR.DEFAULT,
   },
   {
     label: 'Fats',
     key: 'fats',
     unit: `g`,
-    color: NUTRITION_TEXT_COLOR.FATS,
+    color: NUTRITION_TEXT_COLOR.DEFAULT,
   },
   {
     label: 'Proteins',
     key: 'proteins',
     unit: `g`,
-    color: NUTRITION_TEXT_COLOR.PROTEINS,
+    color: NUTRITION_TEXT_COLOR.DEFAULT,
   },
   {
     label: 'Fiber',
@@ -88,7 +88,7 @@ export const nutritionFieldGroup = [
     field: [
       { key: 'calories', title: 'Calories', unit: '' },
       { key: 'carbs', title: 'Carbs', unit: 'g' },
-      { key: 'fats', title: 'Fat', unit: 'g' },
+      { key: 'fat', title: 'Fat', unit: 'g' },
       { key: 'proteins', title: 'Protein', unit: 'g' },
       { key: 'netCarbs', title: 'Net Carbs', unit: 'g' },
       { key: 'fiber', title: 'Fiber', unit: 'g' },
@@ -217,3 +217,29 @@ export const targetKeyMap: Record<
   fats: 'fatTarget',
   proteins: 'proteinTarget',
 };
+export const nutritionalValue = [
+  {
+    label: 'Calories',
+    key: 'calories',
+    unit: 'kcal',
+    color: NUTRITION_HEX_COLOR.CARBS,
+  },
+  {
+    label: 'Carbs',
+    key: 'carbs',
+    unit: `g`,
+    color: NUTRITION_HEX_COLOR.CARBS,
+  },
+  {
+    label: 'Fats',
+    key: 'fat',
+    unit: `g`,
+    color: NUTRITION_HEX_COLOR.FATS,
+  },
+  {
+    label: 'Proteins',
+    key: 'proteins',
+    unit: `g`,
+    color: NUTRITION_HEX_COLOR.PROTEINS,
+  },
+] as const;

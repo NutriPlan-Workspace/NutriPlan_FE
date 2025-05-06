@@ -2,31 +2,38 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { IoSearch } from 'react-icons/io5';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCanGoBack, useRouter } from '@tanstack/react-router';
-import { motion } from 'motion/react';
+import { useParams, useRouter } from '@tanstack/react-router';
 
 import { Button } from '@/atoms/Button';
 import { HTTP_STATUS } from '@/constants/httpStatus';
 import {
-  FOOD_TYPE_MAP,
   mealOptions,
   propertyKeysMap,
   timeFields,
 } from '@/constants/recipeForm';
 import { useToast } from '@/contexts/ToastContext';
 import { NutritionSummary } from '@/molecules/NutritionSummary';
-import { AddIngredientModal } from '@/organisms/CreateRecipe';
-import { DirectionsInputList } from '@/organisms/CreateRecipe';
-import { IngredientItem } from '@/organisms/CreateRecipe';
-import { RecipeBasicInfoSection } from '@/organisms/CreateRecipe';
-import { RecipePropertiesSection } from '@/organisms/CreateRecipe';
-import { useCreateCustomRecipeMutation } from '@/redux/query/apis/food/foodApis';
+import {
+  AddIngredientModal,
+  DirectionsInputList,
+  IngredientItem,
+  RecipeBasicInfoSection,
+  RecipePropertiesSection,
+} from '@/organisms/CreateRecipe';
+import {
+  useGetFoodByIdQuery,
+  useUpdateCustomFoodMutation,
+} from '@/redux/query/apis/food/foodApis';
 import { FoodFormSchema, FoodSchema } from '@/schemas/recipeSchema';
 import type { Food } from '@/types/food';
 import type { IngredientDisplay, IngredientInput } from '@/types/ingredient';
 import { calculateTotalNutrition } from '@/utils/calculateNutrition';
 
-const CreateRecipeForm: React.FC = () => {
+const EditRecipeForm: React.FC = () => {
+  const { id } = useParams({ strict: false });
+  const { data, isLoading: isFetching } = useGetFoodByIdQuery(id!);
+  const [updateCustomRecipe, { isLoading }] = useUpdateCustomFoodMutation();
+
   const {
     control,
     reset,
@@ -36,28 +43,9 @@ const CreateRecipeForm: React.FC = () => {
     formState: { errors },
   } = useForm<FoodFormSchema>({
     resolver: zodResolver(FoodSchema),
-    defaultValues: {
-      type: FOOD_TYPE_MAP.customRecipe,
-      directions: [{ step: '' }],
-      ingredients: [],
-      description: '',
-      name: '',
-      units: [{ amount: 1, description: 'serving' }],
-      property: {
-        mainDish: true,
-        sideDish: false,
-        isBreakfast: true,
-        isLunch: true,
-        isDinner: true,
-        isSnack: true,
-        isDessert: true,
-      },
-    },
   });
 
   const { showToastError, showToastSuccess } = useToast();
-
-  const [createCustomRecipe, { isLoading }] = useCreateCustomRecipeMutation();
   const [upload, setUpload] = useState(false);
   const [img, setImg] = useState<string | undefined>(undefined);
   const [isIngredientModalOpen, setIngredientModalOpen] = useState(false);
@@ -67,38 +55,61 @@ const CreateRecipeForm: React.FC = () => {
   >([]);
 
   const router = useRouter();
-  const canGoBack = useCanGoBack();
 
-  const onSubmit = async (data: FoodFormSchema) => {
+  useEffect(() => {
+    if (data?.data) {
+      const mainFood = data.data.mainFood;
+
+      const transformedDirections =
+        mainFood.directions?.map((d) => ({ step: d })) ?? [];
+
+      reset({
+        ...mainFood,
+        directions: transformedDirections,
+      });
+
+      setImg(mainFood.imgUrls?.[0]);
+      setIngredient(data.data.ingredientList);
+
+      setIngredientDisplay(
+        mainFood.ingredients.map((i) => ({
+          ...i,
+          food: data.data.ingredientList?.find(
+            (f) => f._id === i.ingredientFoodId,
+          ),
+        })),
+      );
+    }
+  }, [data, reset]);
+
+  const onSubmit = async (formData: FoodFormSchema) => {
+    if (!id) return;
+
+    const directionsRaw = getValues('directions') ?? [];
+    const directions = directionsRaw
+      .map((d) => d.step?.trim())
+      .filter((step): step is string => !!step);
+
+    const payload = {
+      type: 'customRecipe',
+      _id: id,
+      ...formData,
+      directions,
+    };
+
     try {
-      const response = await createCustomRecipe(data).unwrap();
-      console.log(data);
-      if (response.code == HTTP_STATUS.OK) {
-        setImg(undefined);
-        setIngredient([]);
-        setIngredientDisplay([]);
-        reset();
-        if (canGoBack) {
-          router.history.back();
-        }
-        showToastSuccess('Create Custom recipe success!');
+      const response = await updateCustomRecipe(payload).unwrap();
+      if (response.code === HTTP_STATUS.OK) {
+        showToastSuccess('Recipe updated successfully!');
+        router.history.back();
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      showToastError('Create Custom recipe failure!');
+      showToastError('Failed to update recipe!');
     }
   };
 
-  const handleUploaded = async (url: string) => {
-    setValue('imgUrls', [url]);
-    setImg(url);
-  };
-
-  const selectedMainDish = useWatch({
-    control,
-    name: 'property.mainDish',
-  });
-
+  const selectedMainDish = useWatch({ control, name: 'property.mainDish' });
   const property = useWatch({ control, name: 'property' });
 
   const selectedMeals = useMemo(
@@ -111,6 +122,11 @@ const CreateRecipeForm: React.FC = () => {
       const key = propertyKeysMap[meal];
       setValue(`property.${key}`, checkedValues.includes(meal));
     });
+  };
+
+  const handleUploaded = async (url: string) => {
+    setValue('imgUrls', [url]);
+    setImg(url);
   };
 
   const handleAddIngredient = (ingredient: IngredientInput) => {
@@ -133,7 +149,7 @@ const CreateRecipeForm: React.FC = () => {
   };
 
   useEffect(() => {
-    const ingredientsInput = getValues('ingredients');
+    const ingredientsInput = getValues('ingredients') ?? [];
 
     const mergedMap = new Map<string, IngredientDisplay>();
 
@@ -141,7 +157,6 @@ const CreateRecipeForm: React.FC = () => {
       const matchedFood = ingredient.find(
         (food) => food._id === input.ingredientFoodId,
       );
-
       if (!matchedFood) continue;
 
       if (mergedMap.has(input.ingredientFoodId)) {
@@ -158,6 +173,7 @@ const CreateRecipeForm: React.FC = () => {
         });
       }
     }
+
     setIngredientDisplay(Array.from(mergedMap.values()));
   }, [ingredient, getValues]);
 
@@ -211,17 +227,8 @@ const CreateRecipeForm: React.FC = () => {
       {ingredientDisplay.length === 0 && (
         <div className='flex flex-col gap-2'>
           {errors.ingredients && (
-            <motion.p
-              className='text-sm text-red-500'
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.3 }}
-            >
-              {errors.ingredients.message}
-            </motion.p>
+            <p className='text-sm text-red-500'>{errors.ingredients.message}</p>
           )}
-
           <Button
             className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
             onClick={() => setIngredientModalOpen(true)}
@@ -231,6 +238,7 @@ const CreateRecipeForm: React.FC = () => {
           </Button>
         </div>
       )}
+
       <AddIngredientModal
         open={isIngredientModalOpen}
         onClose={() => setIngredientModalOpen(false)}
@@ -246,7 +254,7 @@ const CreateRecipeForm: React.FC = () => {
         </Button>
         <Button
           htmlType='submit'
-          loading={isLoading}
+          loading={isLoading || isFetching}
           className='bg-primary hover:bg-primary-300 rounded-full border-transparent px-20 py-4 text-white transition-all hover:border-transparent hover:text-white'
         >
           Save
@@ -256,4 +264,4 @@ const CreateRecipeForm: React.FC = () => {
   );
 };
 
-export default CreateRecipeForm;
+export default EditRecipeForm;

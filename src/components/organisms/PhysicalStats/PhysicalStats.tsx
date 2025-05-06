@@ -23,7 +23,11 @@ import type { NutritionGoal, PhysicalStatsValues } from '@/types/user';
 
 const PhysicalStats: React.FC = () => {
   const userId = useSelector(userSelector).user.id;
-  const { data, isLoading } = useGetPhysicalStatsQuery();
+  const {
+    data,
+    isLoading,
+    refetch: refetchPhysicalStats,
+  } = useGetPhysicalStatsQuery();
   const [updatePhysicalStats] = useUpdatePhysicalStatsMutation();
 
   const [physicalStats, setPhysicalStats] =
@@ -195,7 +199,8 @@ const PhysicalStats: React.FC = () => {
         ? [{ weight: weight }]
         : [{ weight: physicalStats.weight }],
     };
-    updatePhysicalStats(payload);
+    await updatePhysicalStats(payload);
+    await refetchPhysicalStats();
     setIsOpen(true);
   };
 

@@ -100,6 +100,10 @@ const CustomeRecipe: React.FC = () => {
     navigate({ to: '/custom-recipes/create-recipe' });
   };
 
+  const handleCustomFoodClick = () => {
+    navigate({ to: '/custom-recipes/custom-food' });
+  };
+
   return (
     <div className='flex flex-col gap-4 p-5'>
       <div>
@@ -112,7 +116,10 @@ const CustomeRecipe: React.FC = () => {
       </div>
 
       <div className='flex items-center gap-2'>
-        <Button className='bg-primary flex items-center gap-2 border-transparent p-5 hover:border-transparent'>
+        <Button
+          onClick={handleCustomFoodClick}
+          className='bg-primary flex items-center gap-2 border-transparent p-5 hover:border-transparent'
+        >
           <FaPlus className='text-white' />
           <Paragraph className='m-0 font-thin text-white'>
             Create Custom Food

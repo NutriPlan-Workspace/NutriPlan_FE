@@ -33,10 +33,17 @@ export const ERROR_MESSAGES = {
   INVALID_IMAGE_URL: 'Each image URL must be a valid URL',
   INVALID_VIDEO_URL: 'Video URL must be a valid URL',
   INGREDIENTS_MINIMUM_REQUIRED: 'You must add at least one ingredient.',
+  CREATE_CUSTOMFOOD_FAILED: 'Failed to create custom food!',
+  EDIT_CUSTOMFOOD_FAILED: 'Failed to edit custom food!',
+  FIELD_REQUIRED: 'Please fill out this field.',
+  NUMBER_REQUIRED: 'Value must be a number.',
+  AMOUNT_MIN: 'Value must be larger than 0',
 };
 
 export const SUCCESS_MESSAGES = {
   REGISTRATION_SUCCESS: 'Registration successful! Redirecting to login...',
   UPDATE_NUTRITION_SUCCESS: 'Update nutrition target success!',
   COLLECTION_DELETE_SUCCESS: 'Collection deleted successfully!',
+  CREATE_SUCCESS: 'Create custom food success!',
+  EDIT_SUCCESS: 'Edit custom food success!',
 };

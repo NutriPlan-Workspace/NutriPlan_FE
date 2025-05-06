@@ -1,12 +1,8 @@
 import React from 'react';
-import {
-  HiOutlineAdjustmentsVertical,
-  HiOutlineArchiveBoxXMark,
-  HiOutlineDocumentDuplicate,
-} from 'react-icons/hi2';
-import { MenuProps, Popover, Typography } from 'antd';
+import { HiOutlineArchiveBoxXMark, HiOutlineArrowPath } from 'react-icons/hi2';
+import { Button, Popover, Typography } from 'antd';
 
-import { PairButton } from '@/atoms/PairButton';
+import { cn } from '@/helpers/helpers';
 import { NutritionPopoverMeal } from '@/molecules/NutritionPopoverMeal';
 import type { NutritionFields } from '@/types/food';
 import type { MealPlanFood } from '@/types/mealPlan';
@@ -27,71 +23,63 @@ const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
   mealItems,
   isHovered,
   onClearMealItems,
-}) => {
-  // TODO: Implement onClick for each menu item
-  const menuItems: MenuProps['items'] = [
-    {
-      label: 'Copy to another Meal Plan',
-      icon: <HiOutlineDocumentDuplicate />,
-      key: '0',
-    },
-    {
-      label: 'Clear Foods',
-      icon: <HiOutlineArchiveBoxXMark />,
-      key: '1',
-      onClick: () => {
-        onClearMealItems();
-      },
-    },
-    {
-      type: 'divider',
-    },
-    {
-      label: 'Edit Meal Setting',
-      icon: <HiOutlineAdjustmentsVertical />,
-      key: '2',
-    },
-  ];
-
-  return (
-    <div className='flex items-center justify-between'>
-      <div>
-        <Typography className='text-[18px] font-bold capitalize'>
-          {mealType}
+}) => (
+  <div className='flex items-center justify-between'>
+    <div>
+      <Typography className='text-[18px] font-bold capitalize'>
+        {mealType}
+      </Typography>
+      {!mealItems.length ? (
+        <Typography className='text-[13px] text-gray-500'>
+          EMPTY MEAL
         </Typography>
-        {!mealItems.length ? (
-          <Typography className='text-[13px] text-gray-500'>
-            EMPTY MEAL
-          </Typography>
-        ) : (
-          <Popover
-            mouseEnterDelay={0.5}
-            className='cursor-help'
-            placement='left'
-            color='white'
-            styles={{
-              body: {
-                padding: 0,
-                borderRadius: '10px',
-                overflow: 'hidden',
-              },
-            }}
-            content={
-              <NutritionPopoverMeal
-                nutritionData={nutritionData}
-                mealType={mealType}
-              />
-            }
-          >
-            <Typography className='text-gray-500'>
-              {calories} Calories
-            </Typography>
-          </Popover>
-        )}
-      </div>
-      <PairButton isHovered={isHovered} menuItems={menuItems} />
+      ) : (
+        <Popover
+          className='cursor-help'
+          placement='left'
+          color='white'
+          styles={{
+            body: {
+              padding: 0,
+              borderRadius: '10px',
+              overflow: 'hidden',
+            },
+          }}
+          content={
+            <NutritionPopoverMeal
+              nutritionData={nutritionData}
+              mealType={mealType}
+            />
+          }
+        >
+          <Typography className='text-gray-500'>{calories} Calories</Typography>
+        </Popover>
+      )}
     </div>
-  );
-};
-
+    <div
+      className={cn(
+        'ml-auto flex items-center justify-center transition-all duration-200',
+        {
+          'opacity-0': !isHovered,
+        },
+      )}
+    >
+      <Button
+        // TODO: IMPLEMENT AUTO GENERATE MEAL PLAN
+        onClick={(e) => e.preventDefault()}
+        type='text'
+        shape='circle'
+        icon={<HiOutlineArrowPath className='text-xl' />}
+      />
+      <Button
+        onClick={() => {
+          onClearMealItems();
+        }}
+        type='text'
+        shape='circle'
+        icon={<HiOutlineArchiveBoxXMark className='text-xl' />}
+      />
+    </div>
+  </div>
+);
 export default MealBoxHeader;

@@ -31,17 +31,16 @@ const DetailedFood: React.FC<DetailedFoodProp> = ({ food, listIngredient }) => (
     >
       <div className='grid grid-cols-[2.3fr_3fr] gap-12'>
         <div>
-          {food?.imgUrls?.[0] ? (
-            <div className='aspect-[1.618] w-full overflow-hidden rounded-md'>
-              <img
-                src={food?.imgUrls[0]}
-                alt={food?.name}
-                className='h-full w-full object-cover'
-              />
-            </div>
-          ) : (
-            <p>No Image Available</p>
-          )}
+          <div className='aspect-[1.618] w-full overflow-hidden rounded-md'>
+            <img
+              src={
+                food?.imgUrls?.[0] ||
+                'https://cdn.vectorstock.com/i/500p/42/11/creative-concept-of-brain-food-symbolized-vector-53434211.jpg'
+              }
+              alt={food?.name}
+              className='h-full w-full object-cover'
+            />
+          </div>
           {food?.nutrition ? (
             <NutritionSummary nutrition={food?.nutrition} type='food' />
           ) : (
@@ -50,8 +49,8 @@ const DetailedFood: React.FC<DetailedFoodProp> = ({ food, listIngredient }) => (
         </div>
         <div className='col-span-1'>
           <TimeInfo
-            prepTime={food ? food.property.prepTime : 0}
-            cookTime={food ? food.property.cookTime : 0}
+            prepTime={food ? food.property?.prepTime : 0}
+            cookTime={food ? food.property?.cookTime : 0}
           />
           <ScaleRecipe units={food?.units || DEFAULT_UNIT} />
           {listIngredient ? (

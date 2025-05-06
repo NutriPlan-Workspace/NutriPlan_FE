@@ -1,6 +1,7 @@
 import type { NutritionFields } from '@/types/food';
 import { IngredientDisplay } from '@/types/ingredient';
 import type { MealPlanFood } from '@/types/mealPlan';
+import { NutritionGoal } from '@/types/user';
 
 import { roundNumber } from './roundNumber';
 
@@ -151,4 +152,46 @@ export const calculateTotalNutrition = (
   }
 
   return total;
+};
+
+export const getInvalidNutritionKeys = (
+  nutritionData?: NutritionFields,
+  targetNutrition?: NutritionGoal,
+): string[] => {
+  const invalidKeys: string[] = [];
+
+  if (!nutritionData || !targetNutrition) {
+    return invalidKeys;
+  }
+
+  const targetCalories = targetNutrition?.calories;
+  if (
+    Math.abs(nutritionData.calories - targetCalories) >
+    targetCalories * 0.05
+  ) {
+    invalidKeys.push('calories');
+  }
+
+  const macros: string[] = ['carbs', 'fats', 'proteins'];
+  const test: string[] = ['carb', 'fat', 'protein'];
+
+  for (const macro of macros) {
+    const targetKey = `${test[macros.indexOf(macro)]}Target`;
+    const actual = nutritionData[macro];
+    const targetRange = targetNutrition[targetKey];
+
+    if (
+      !targetRange ||
+      typeof targetRange.from !== 'number' ||
+      typeof targetRange.to !== 'number'
+    ) {
+      continue;
+    }
+
+    if (actual < targetRange.from || actual > targetRange.to) {
+      invalidKeys.push(macro);
+    }
+  }
+
+  return invalidKeys;
 };

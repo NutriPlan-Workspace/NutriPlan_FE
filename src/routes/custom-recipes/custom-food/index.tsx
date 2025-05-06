@@ -2,13 +2,14 @@ import React from 'react';
 import { createFileRoute, FileRoutesByPath } from '@tanstack/react-router';
 
 import { PATH } from '@/constants/path';
-import { PhysicalStats } from '@/organisms/PhysicalStats';
+import { FoodCustomContent } from '@/organisms/FoodCustomContent';
 import { handleUserRoute } from '@/utils/route';
 
-const PhysicalStatsPage: React.FC = () => <PhysicalStats />;
+const CustomFoodPage: React.FC = () => <FoodCustomContent />;
+
 export const Route = createFileRoute(
-  PATH.PHYSICAL_STATS as keyof FileRoutesByPath,
+  PATH.CREATE_CUSTOM_FOODS as keyof FileRoutesByPath,
 )({
-  component: PhysicalStatsPage,
+  component: CustomFoodPage,
   beforeLoad: handleUserRoute,
 });

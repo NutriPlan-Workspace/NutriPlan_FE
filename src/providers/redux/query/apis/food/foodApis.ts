@@ -3,6 +3,7 @@ import { baseApi } from '@/redux/query/apis/baseApi';
 import { FoodFormSchema } from '@/schemas/recipeSchema';
 import type { ApiResponse } from '@/types/apiResponse';
 import type { DetailedFoodResponse, Food, FoodCategory } from '@/types/food';
+import type { PostCustomFoodQueryArgs, PostFoodResponse } from '@/types/food';
 import type { FoodFilterQuery } from '@/types/foodFilterQuery';
 
 export const foodsApi = baseApi.injectEndpoints({
@@ -49,6 +50,35 @@ export const foodsApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    createCustomFood: builder.mutation<
+      PostFoodResponse,
+      PostCustomFoodQueryArgs
+    >({
+      query: (body) => ({
+        url: '/foods/',
+        method: 'POST',
+        body: body,
+      }),
+    }),
+    updateCustomFood: builder.mutation<
+      PostFoodResponse,
+      PostCustomFoodQueryArgs
+    >({
+      query: (body) => ({
+        url: `/foods/${body._id}`,
+        method: 'PUT',
+        body: body,
+      }),
+    }),
+    removeCustomFood: builder.mutation<
+      { success: boolean; message?: string },
+      string
+    >({
+      query: (foodId) => ({
+        url: `/foods/${foodId}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
@@ -59,4 +89,7 @@ export const {
   useSearchFoodQuery,
   useLazyGetFoodsQuery,
   useCreateCustomRecipeMutation,
+  useCreateCustomFoodMutation,
+  useUpdateCustomFoodMutation,
+  useRemoveCustomFoodMutation,
 } = foodsApi;

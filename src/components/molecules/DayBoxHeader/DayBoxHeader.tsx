@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import {
-  HiOutlineArchiveBoxXMark,
-  HiOutlineArrowLeftEndOnRectangle,
-  HiOutlineArrowRightStartOnRectangle,
-  HiOutlineDocument,
-  HiOutlineDocumentDuplicate,
-} from 'react-icons/hi2';
-import { MenuProps, Modal, Typography } from 'antd';
+import { HiOutlineArchiveBoxXMark } from 'react-icons/hi2';
+import { HiOutlineArrowPath } from 'react-icons/hi2';
+import { Modal, Typography } from 'antd';
+import { Button } from 'antd';
 
 import { DayBoxHeaderSkeleton } from '@/atoms/DayBoxHeaderSkeleton';
-import { PairButton } from '@/atoms/PairButton';
 import { cn } from '@/helpers/helpers';
 import { getDateOfMonth, getDayOfWeek } from '@/utils/dateUtils';
 
@@ -24,7 +19,6 @@ interface DayBoxHeaderProps {
 const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
   mealDate,
   isToday,
-  isHovered,
   isLoading,
   onClearMealDay,
 }) => {
@@ -34,39 +28,6 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
     setIsConfirmModalOpen(false);
   };
 
-  const menuItems: MenuProps['items'] = [
-    {
-      label: 'Insert Blank Day',
-      icon: <HiOutlineDocument />,
-      key: '0',
-    },
-    {
-      label: 'Clear Day',
-      icon: <HiOutlineArchiveBoxXMark />,
-      key: '1',
-      onClick: () => {
-        setIsConfirmModalOpen(true);
-      },
-    },
-    {
-      type: 'divider',
-    },
-    {
-      label: 'Copy to another Meal Plan',
-      icon: <HiOutlineDocumentDuplicate />,
-      key: '2',
-    },
-    {
-      label: 'Save Meal Plan',
-      icon: <HiOutlineArrowRightStartOnRectangle />,
-      key: '3',
-    },
-    {
-      label: 'Load Meal Plan',
-      icon: <HiOutlineArrowLeftEndOnRectangle />,
-      key: '4',
-    },
-  ];
   if (isLoading) return <DayBoxHeaderSkeleton />;
   return (
     <div className='mb-[10px] px-[15px]'>
@@ -84,11 +45,27 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
         >
           {getDateOfMonth(mealDate)}
         </Typography>
-        <PairButton
-          isHovered={isHovered}
-          menuItems={menuItems}
-          mealDate={mealDate}
-        />
+        <div
+          className={cn(
+            'flex items-center justify-center transition-all duration-200',
+          )}
+        >
+          <Button
+            // TODO: IMPLEMENT AUTO GENERATE MEAL PLAN
+            onClick={(e) => e.preventDefault()}
+            type='text'
+            shape='circle'
+            icon={<HiOutlineArrowPath className='text-xl' />}
+          />
+          <Button
+            onClick={() => {
+              setIsConfirmModalOpen(true);
+            }}
+            type='text'
+            shape='circle'
+            icon={<HiOutlineArchiveBoxXMark className='text-xl' />}
+          />
+        </div>
       </div>
 
       <Modal

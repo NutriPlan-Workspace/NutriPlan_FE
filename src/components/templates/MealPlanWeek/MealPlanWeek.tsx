@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { useDate } from '@/contexts/DateContext';
@@ -9,9 +9,12 @@ import { useMealTrackDragDrop } from '@/hooks/useMealTrackDragDrop';
 import { EmptyMealDay } from '@/molecules/EmptyMealDay';
 import MealPlanHeader from '@/molecules/MealPlanHeader/MealPlanHeader';
 import { MealBox } from '@/organisms/MealBox';
-import { useGetMealPlanDayRangeQuery } from '@/redux/query/apis/mealPlan/mealPlanApi';
-import { mealPlanSelector } from '@/redux/slices/mealPlan';
-import { getMealDate } from '@/utils/dateUtils';
+import {
+  useGetMealPlanDayRangeQuery,
+  useRemoveMealPlanMutation,
+} from '@/redux/query/apis/mealPlan/mealPlanApi';
+import { mealPlanSelector, setViewingMealPlans } from '@/redux/slices/mealPlan';
+import { getMealDate, isSameDay } from '@/utils/dateUtils';
 
 const MealPlanWeek: React.FC = () => {
   const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
@@ -21,15 +24,30 @@ const MealPlanWeek: React.FC = () => {
   const { handleCreateBlank } = useCreateBlankMealPlan();
   const { handleCopyPreviousDay } = useCopyPreviousMealPlan();
   useMealTrackDragDrop();
-
+  const [deleteMealPlan] = useRemoveMealPlanMutation();
   const { from, to } =
     rangeDate?.from && rangeDate?.to
       ? { from: getMealDate(rangeDate.from), to: getMealDate(rangeDate.to) }
       : {};
-
+  const dispatch = useDispatch();
   const { isFetching, refetch } = useGetMealPlanDayRangeQuery(
     from && to ? { from, to } : skipToken,
   );
+  const handleRemoveMealDay = async (mealDate: string) => {
+    const mealPlanToDelete = viewingMealPlans.find((mealPlan) =>
+      isSameDay(new Date(mealPlan.mealDate), new Date(mealDate)),
+    );
+    if (!mealPlanToDelete || !mealPlanToDelete.mealPlanDay?._id) {
+      return;
+    }
+    await deleteMealPlan(mealPlanToDelete.mealPlanDay._id);
+    const updatedPlans = viewingMealPlans.map((plan) =>
+      isSameDay(new Date(plan.mealDate), new Date(mealDate))
+        ? { ...plan, mealPlanDay: undefined }
+        : plan,
+    );
+    dispatch(setViewingMealPlans({ mealPlanWithDates: updatedPlans }));
+  };
 
   useEffect(() => {
     if (from && to) {
@@ -72,7 +90,13 @@ const MealPlanWeek: React.FC = () => {
           id={`meal-day-${mealDate}`}
           className='mx-[15px] mt-4 w-full border-b-3 border-b-black/10 pb-4'
         >
-          <MealPlanHeader mealDate={mealDate} />
+          <MealPlanHeader
+            mealDate={mealDate}
+            mealPlanDay={mealPlanDay}
+            onClearMealDay={() =>
+              handleRemoveMealDay(new Date(mealDate).toISOString().slice(0, 10))
+            }
+          />
 
           {mealPlanDay ? (
             <div className='flex flex-wrap gap-4'>

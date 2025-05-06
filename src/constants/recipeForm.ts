@@ -24,7 +24,7 @@ export type TimeField = {
 
 export const timeFields: TimeField[] = [
   { label: 'Prep time', unit: 'minutes', key: 'prepTime' },
-  { label: 'Cook time', unit: 'minutes', key: 'totalTime' },
+  { label: 'Cook time', unit: 'minutes', key: 'cookTime' },
 ];
 
 export const FOOD_TYPES = ['customFood', 'customRecipe', 'create'] as const;

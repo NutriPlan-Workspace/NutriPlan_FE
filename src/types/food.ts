@@ -179,3 +179,15 @@ export interface FoodCategory {
     total: number;
   };
 }
+
+export interface PostFoodResponse {
+  success: boolean;
+  data: Food;
+  message: string;
+  code: number;
+}
+
+export interface PostCustomFoodQueryArgs {
+  _id?: string;
+  customFood: Food;
+}
