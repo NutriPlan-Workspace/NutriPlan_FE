@@ -15,7 +15,6 @@
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@atlaskit/pragmatic-drag-and-drop": "^1.5.2",
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
-    "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^4.1.2",
     "@reduxjs/toolkit": "^2.5.1",
     "@tailwindcss/vite": "^4.0.9",
@@ -77,7 +76,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "vite": "^6.1.0",
-    "vite-plugin-svgr": "^4.3.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "lint-staged": {

@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Button className='h-[40px] w-[90%] cursor-pointer rounded-2xl border-none hover:bg-gray-300 hover:text-black'>
             <Link to={PATH.HOME}>
               <img
-                src='src/assets/noBgColor.png'
+                src='https://res.cloudinary.com/dtwrwvffl/image/upload/v1746503177/gordxatzr6puhs6upcfl.png'
                 alt='Logo'
                 className='w-28 object-cover'
               />

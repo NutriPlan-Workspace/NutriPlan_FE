@@ -59,7 +59,9 @@ const FoodCard: React.FC<FoodCardProps> = ({
               <img
                 src={
                   foodItem.imgUrls?.[0] ||
-                  'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png'
+                  (foodItem.isRecipe
+                    ? 'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/k52mpavgekiqflwmk9ex.avif'
+                    : 'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/whuexhkydv7ubiqh5rxe.jpg')
                 }
                 alt={foodItem.name}
                 key={foodItem.imgUrls?.[0]}
@@ -67,7 +69,7 @@ const FoodCard: React.FC<FoodCardProps> = ({
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src =
-                    'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png';
+                    'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/k52mpavgekiqflwmk9ex.avif';
                 }}
               />
             </div>

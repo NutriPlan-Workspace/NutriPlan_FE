@@ -52,7 +52,7 @@ const RecipeBasicInfoSection: React.FC<Props> = ({
         <img
           src={
             img ||
-            'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png'
+            'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/k52mpavgekiqflwmk9ex.avif'
           }
           alt='default'
           className='h-30 w-30'

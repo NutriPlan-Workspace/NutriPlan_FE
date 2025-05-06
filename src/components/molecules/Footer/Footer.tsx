@@ -17,7 +17,7 @@ const Footer: React.FC = () => (
             className='mx-auto text-start text-lg font-bold text-white'
           >
             <img
-              src='src/assets/noBgWhite.png'
+              src='https://res.cloudinary.com/dtwrwvffl/image/upload/v1746503177/tm52qbgqp7zljjgizukj.png'
               alt='Logo'
               className='w-36 object-cover'
             />

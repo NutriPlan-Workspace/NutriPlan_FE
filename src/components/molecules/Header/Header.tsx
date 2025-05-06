@@ -45,7 +45,7 @@ const Header: React.FC = () => {
       <div className='m-auto flex h-20 w-full items-center justify-between'>
         <Link to={PATH.HOME} className='text-lg font-bold text-gray-800'>
           <img
-            src='src/assets/noBgColor.png'
+            src='https://res.cloudinary.com/dtwrwvffl/image/upload/v1746503177/gordxatzr6puhs6upcfl.png'
             alt='Logo'
             className='w-36 object-cover'
           />

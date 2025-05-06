@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Col, Image, Row, Typography } from 'antd';
 
-import defaultImage from '@/assets/default_img.svg';
 import type { Collection } from '@/types/collection';
 
 const { Paragraph } = Typography;
@@ -32,8 +31,13 @@ const CollectionList: React.FC<CollectionListProps> = ({ collections }) => {
         >
           <div className='flex min-w-[160px] flex-col gap-2 p-2'>
             <Image
-              src={collection.img || defaultImage}
-              className='h-auto w-full min-w-[160px] rounded-md object-cover'
+              src={
+                collection.img ||
+                (collection.isFavorites
+                  ? 'https://img.freepik.com/free-photo/chicken-fajita-chicken-fillet-fried-with-bell-pepper-lavash-with-bread-slices-white-plate_114579-174.jpg?t=st=1746506112~exp=1746509712~hmac=8bddd99a63709df09e8e40e0d7855c1584bcc4c86310d2e1b79ec6e9ae1f4f82&w=740'
+                  : 'https://st.depositphotos.com/1809906/1375/v/950/depositphotos_13755635-stock-illustration-food-collection.jpg')
+              }
+              className='aspect-square min-w-[160px] rounded-md object-cover'
               preview={false}
             />
             <Paragraph className='m-0 min-w-[160px]'>

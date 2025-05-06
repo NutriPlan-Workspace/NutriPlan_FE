@@ -2,7 +2,6 @@ import React from 'react';
 import { IoMenu } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 
-import avatarDefault from '@/assets/avatarDefault.png';
 import { Button } from '@/atoms/Button';
 import { cn } from '@/helpers/helpers';
 import { userSelector } from '@/redux/slices/user';
@@ -42,7 +41,7 @@ const SidebarTop: React.FC<SidebarTopProps> = ({
             className='h-[40px] w-[40px] rounded-full border-none p-0 outline-none'
           >
             <img
-              src='https://avatar.iran.liara.run/public/boy?username=Ash'
+              src='https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510622/wlqbqzxb5uqvlm9zvugw.png'
               alt=''
               className='h-full w-full rounded-full'
             />

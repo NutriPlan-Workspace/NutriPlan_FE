@@ -94,7 +94,7 @@ const MealCard: React.FC<MealCardProps> = ({
           <Image
             src={
               food.imgUrls?.[0] ||
-              'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png'
+              'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/k52mpavgekiqflwmk9ex.avif'
             }
             className={cn(
               'h-[50px] w-[50px] max-w-[50px] rounded-[10px] border-2 border-transparent object-cover transition-all duration-200',

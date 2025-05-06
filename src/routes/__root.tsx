@@ -76,7 +76,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
             className='fixed inset-0 z-50 flex items-center justify-center bg-white'
           >
             <img
-              src='src/assets/noBgColor.png'
+              src='https://res.cloudinary.com/dtwrwvffl/image/upload/v1746503177/gordxatzr6puhs6upcfl.png'
               alt='Loading'
               className='w-100 animate-pulse object-cover'
             />
