@@ -32,5 +32,6 @@ export const baseApi = createApi({
 export const baseApiWithAuth = createApi({
   reducerPath: 'apiWithAuth',
   baseQuery: baseQueryWithAuth,
+  tagTypes: ['MealPlan'],
   endpoints: () => ({}),
 });

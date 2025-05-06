@@ -93,7 +93,7 @@ export const useMealTrack = (
       from: getMealDate(from),
       to: getMealDate(to),
     };
-  }, [selectedDate, currentSlide, sliderRef]);
+  }, [selectedDate]);
 
   const dayRangeArgs = from && to ? { from, to } : skipToken;
 

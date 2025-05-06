@@ -26,7 +26,7 @@ const NutritionRow: FC<NutritionRowProp> = ({ detailedNutrition, type }) => {
             {item.title === 'Carbs' && (
               <span className='h-3 w-3 rounded-full bg-yellow-500'></span>
             )}
-            {item.title === 'Fat' && (
+            {item.title === 'Fats' && (
               <span className='h-3 w-3 rounded-full bg-blue-500'></span>
             )}
             {item.title === 'Protein' && (

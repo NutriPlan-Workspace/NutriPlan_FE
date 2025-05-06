@@ -46,7 +46,7 @@ const FoodCustomEdit: React.FC = () => {
   const { data } = useGetFoodByIdQuery(id!);
   const [upload, setUpload] = useState(false);
   const [img, setImg] = useState<string>(
-    'https://www.eatthismuch.com/app/_app/immutable/assets/missing_thumbnail.BbdnfBW3.svg',
+    'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/whuexhkydv7ubiqh5rxe.jpg',
   );
   const [showOptional, setShowOptional] = useState(false);
 
@@ -73,7 +73,9 @@ const FoodCustomEdit: React.FC = () => {
     },
     resolver: zodResolver(foodSchema),
   });
-  const imgUrls: string[] = watch('imgUrls');
+  const imgUrls: string[] = watch('imgUrls').filter(
+    (url): url is string => url !== undefined,
+  );
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -121,8 +123,8 @@ const FoodCustomEdit: React.FC = () => {
   const handleRemove = async () => {
     try {
       await removeCustomFood(id).unwrap();
+      await refetch();
       router.history.back();
-      refetch();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       showToastError(ERROR_MESSAGES.IMAGE_UPLOAD_FAILED);
@@ -213,7 +215,7 @@ const FoodCustomEdit: React.FC = () => {
           <div className='flex'>
             <Paragraph>Image</Paragraph>
             <div className='ml-auto flex w-[200px] flex-col items-center gap-2'>
-              <Image width={120} src={imgUrls[0]} />
+              <Image width={120} src={imgUrls[0] || img} />
               <Button
                 className='flex items-center gap-2'
                 onClick={() => setUpload(!upload)}

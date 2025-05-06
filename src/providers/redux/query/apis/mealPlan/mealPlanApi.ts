@@ -102,6 +102,7 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
         method: 'PUT',
         body: mealPlan,
       }),
+      invalidatesTags: ['MealPlan'],
     }),
 
     createMealPlan: builder.mutation<
@@ -122,6 +123,7 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
         url: `/planner/${mealPlanId}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['MealPlan'],
     }),
     getGroceries: builder.query<
       GroceriesResponse,
@@ -131,6 +133,7 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
         const params = new URLSearchParams({ from, to }).toString();
         return `/planner/groceries?${params}`;
       },
+      providesTags: ['MealPlan'],
     }),
     autoGenerateMealPlan: builder.mutation<
       ApiResponse<MealPlanDay>,
@@ -162,6 +165,7 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
           dispatch(updateCacheMealPlanByDate({ mealPlanWithDate }));
         }
       },
+      invalidatesTags: ['MealPlan'],
     }),
   }),
 });

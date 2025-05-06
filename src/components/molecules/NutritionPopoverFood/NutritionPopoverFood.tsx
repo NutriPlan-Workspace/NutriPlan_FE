@@ -67,9 +67,18 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
         {nutritionFormat.map((item, index) => (
           <div key={index}>
             {index === 4 && <br key={-1} />}
-            <div className='mr-[20%] flex justify-between'>
-              <Typography className={item.color}>{item.label}: </Typography>
-              <Typography className={item.color}>
+            <div className='mr-[20%] flex items-center justify-between'>
+              {item.label === 'Carbs' && (
+                <span className='mr-2 h-3 w-3 rounded-full bg-yellow-500' />
+              )}
+              {item.label === 'Fats' && (
+                <span className='mr-2 h-3 w-3 rounded-full bg-blue-500' />
+              )}
+              {item.label === 'Proteins' && (
+                <span className='mr-2 h-3 w-3 rounded-full bg-purple-500' />
+              )}
+              <Typography className='mr-auto'>{item.label}:</Typography>
+              <Typography>
                 {roundNumber(
                   (food.nutrition?.[item.key as keyof NutritionFields] || 0) *
                     diffCalories,

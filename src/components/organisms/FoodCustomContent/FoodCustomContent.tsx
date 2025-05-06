@@ -43,7 +43,9 @@ const { Paragraph } = Typography;
 const FoodCustomContent: React.FC = () => {
   const currentCustomFood = useSelector(foodSelector).currentCustomFood;
   const [upload, setUpload] = useState(false);
-  const [img, setImg] = useState<string | undefined>(undefined);
+  const [img, setImg] = useState<string | undefined>(
+    'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/whuexhkydv7ubiqh5rxe.jpg',
+  );
 
   const [showOptional, setShowOptional] = useState(false);
 
