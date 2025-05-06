@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  GiFishCooked,
+  GiButter,
   GiForkKnifeSpoon,
-  GiGrain,
+  GiFruitBowl,
   GiLeafSwirl,
   GiMeat,
   GiOlive,
@@ -21,11 +21,11 @@ interface PrimaryDietCardProps {
 
 export const iconMap: Record<string, React.ReactNode> = {
   anything: <GiForkKnifeSpoon />,
-  keto: <GiMeat />,
+  keto: <GiButter />,
   mediterranean: <GiOlive />,
-  paleo: <GiGrain />,
+  paleo: <GiMeat />,
   vegan: <GiLeafSwirl />,
-  vegetarian: <GiFishCooked />,
+  vegetarian: <GiFruitBowl />,
 };
 
 export const PrimaryDietCard: React.FC<PrimaryDietCardProps> = ({

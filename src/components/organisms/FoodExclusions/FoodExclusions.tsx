@@ -108,14 +108,14 @@ const FoodExclusions: React.FC = () => {
       </div>
       <Divider />
 
-      <div className='my-6 flex max-w-[1000px] gap-10'>
-        <div className='max-w-[600px] flex-1'>
+      <div className='my-6 flex gap-10'>
+        <div className='w-[600px] flex-1'>
           <h2 className='text-[22px]'>Detail Category</h2>
           {CATEGORIES_BY_GROUP.map((category) => (
             <div key={category.group}>
               <h3 className='pt-6 pb-2 text-[18px]'>{category.group}</h3>
               <ul className='flex flex-wrap gap-2'>
-                {('mainItem' in category && category.mainItem
+                {('mainItem' in category && category.mainItem !== undefined
                   ? [category.mainItem, ...category.items]
                   : category.items
                 ).map((value) => {

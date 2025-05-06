@@ -43,12 +43,12 @@ export const PRIMARY_DIET = [
   {
     key: 'keto',
     label: 'Keto',
-    excludes: ['Legumes', 'Starchy', 'Vegetables', 'High-carb Grains'],
+    excludes: ['Grains', 'Legumes', 'Starchy Vegetables', 'High-Sugar Fruits'],
   },
   {
     key: 'mediterranean',
     label: 'Mediterranean',
-    excludes: ['Red Meat', 'Fruit juice', 'Starchy Vegetables'],
+    excludes: ['Red Meat', 'Fruit Juice', 'Starchy Vegetables'],
   },
   {
     key: 'paleo',
@@ -65,8 +65,8 @@ export const PRIMARY_DIET = [
       'Shellfish',
       'Dairy',
       'Eggs',
-      'Mayo',
       'Honey',
+      'Mayonnaise',
     ],
   },
   {
