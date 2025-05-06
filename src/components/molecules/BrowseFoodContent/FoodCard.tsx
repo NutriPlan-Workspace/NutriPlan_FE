@@ -17,7 +17,10 @@ interface FoodCardProps {
   showPopover?: boolean;
 }
 
-const FoodCard: React.FC<FoodCardProps> = ({ foodItem,   showPopover = true, }) => {
+const FoodCard: React.FC<FoodCardProps> = ({
+  foodItem,
+  showPopover = true,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const id = foodItem._id;
@@ -31,6 +34,7 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem,   showPopover = true, }) 
   return (
     <>
       <Popover
+        mouseEnterDelay={0.5}
         placement='left'
         color='white'
         styles={{
@@ -68,7 +72,7 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem,   showPopover = true, }) 
               <img
                 src={
                   foodItem.imgUrls?.[0] ||
-                  'https://cdn.vectorstock.com/i/500p/42/11/creative-concept-of-brain-food-symbolized-vector-53434211.jpg'
+                  'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png'
                 }
                 alt={foodItem.name}
                 key={foodItem.imgUrls?.[0]}
@@ -76,7 +80,7 @@ const FoodCard: React.FC<FoodCardProps> = ({ foodItem,   showPopover = true, }) 
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src =
-                    'https://cdn.vectorstock.com/i/500p/42/11/creative-concept-of-brain-food-symbolized-vector-53434211.jpg';
+                    'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png';
                 }}
               />
             </div>

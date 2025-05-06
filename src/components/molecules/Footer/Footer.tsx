@@ -16,11 +16,15 @@ const Footer: React.FC = () => (
             to={PATH.HOME}
             className='mx-auto text-start text-lg font-bold text-white'
           >
-            NutriXPlan
+            <img
+              src='src/assets/noBgWhite.png'
+              alt='Logo'
+              className='w-36 object-cover'
+            />
           </Link>
         </div>
 
-        <div className='flex w-full flex-1/2 justify-center gap-8'>
+        <div className='flex w-full flex-1/2 justify-around gap-8'>
           <FooterLinks />
         </div>
 

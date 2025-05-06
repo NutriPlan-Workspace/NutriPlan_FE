@@ -55,7 +55,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className='mb-4 flex flex-1 items-end justify-center'>
           {/* Logo in here */}
           <Button className='h-[40px] w-[90%] cursor-pointer rounded-2xl border-none hover:bg-gray-300 hover:text-black'>
-            <Link to={PATH.HOME}>Nutri Plan</Link>
+            <Link to={PATH.HOME}>
+              <img
+                src='src/assets/noBgColor.png'
+                alt='Logo'
+                className='w-28 object-cover'
+              />
+            </Link>
           </Button>
         </div>
       )}

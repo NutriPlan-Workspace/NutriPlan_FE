@@ -29,10 +29,9 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
     value,
     inputWidth,
     status,
-    isFocused,
     spanRef,
+    isFocused,
     setIsFocused,
-    setIsHovered,
     handleValueChange,
     handleOptionChange,
   } = useAmountSelector({ currentUnit, currentAmount, options });
@@ -40,11 +39,7 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
   return (
     <div className='align-center relative flex flex-col items-start justify-evenly'>
       {/* Real Input */}
-      <div
-        className='relative overflow-hidden'
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      <div className='relative overflow-hidden'>
         <div className='absolute bottom-[-5px] left-0 h-[5px] w-full'></div>
         <ConfigProvider
           theme={{
@@ -70,7 +65,7 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
               setIsFocused(false);
               onAmountChange(value, selectedOption.index, cardId);
             }}
-            controls={true}
+            controls={false}
             variant='filled'
             className='ease bg-white transition-all duration-100'
             style={{ width: inputWidth }}

@@ -70,6 +70,7 @@ const MealCard: React.FC<MealCardProps> = ({
         <DropIndicator edge='top' mealCardHeight={draggingCardHeight} />
       )}
       <Popover
+        mouseEnterDelay={0.5}
         placement='left'
         color='white'
         styles={{
@@ -91,7 +92,10 @@ const MealCard: React.FC<MealCardProps> = ({
           onMouseLeave={handleLeaveHover}
         >
           <Image
-            src={food.imgUrls?.[0] || ''}
+            src={
+              food.imgUrls?.[0] ||
+              'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png'
+            }
             className={cn(
               'h-[50px] w-[50px] max-w-[50px] rounded-[10px] border-2 border-transparent object-cover transition-all duration-200',
               { 'border-primary-400 border-2': isHovered },

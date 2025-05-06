@@ -44,7 +44,11 @@ const Header: React.FC = () => {
     <header className='flex w-full items-center justify-center border-b border-black/8 px-0 lg:px-4 xl:px-28'>
       <div className='m-auto flex h-20 w-full items-center justify-between'>
         <Link to={PATH.HOME} className='text-lg font-bold text-gray-800'>
-          Nutri X Plan
+          <img
+            src='src/assets/noBgColor.png'
+            alt='Logo'
+            className='w-36 object-cover'
+          />
         </Link>
 
         <NavigationHeader />

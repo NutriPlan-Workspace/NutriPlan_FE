@@ -37,7 +37,9 @@ const NutritionPopoverFood: React.FC<NutritionPopoverFoodProps> = ({
       <div
         className='h-[220px] w-full bg-cover bg-center'
         style={{
-          backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
+          backgroundImage: imageUrl
+            ? `url(${imageUrl})`
+            : 'url(https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png)',
         }}
       >
         <div className='flex h-full flex-col items-start justify-end bg-gradient-to-b from-transparent via-white/80 to-white p-3.5'>

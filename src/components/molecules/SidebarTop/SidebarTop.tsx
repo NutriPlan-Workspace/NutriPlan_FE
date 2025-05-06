@@ -29,9 +29,9 @@ const SidebarTop: React.FC<SidebarTopProps> = ({
       <div className='mb-4 flex h-[40px] items-center justify-between'>
         <Button
           onClick={onClickMenu}
-          className='border-primary hover:bg-primary-50 flex h-[40px] w-[40px] cursor-pointer items-center justify-center rounded-full border border-[1px] p-2'
+          className='border-secondary hover:bg-secondary-50 flex h-[40px] w-[40px] cursor-pointer items-center justify-center rounded-full border p-2'
         >
-          <IoMenu className='text-primary h-10 w-10' />
+          <IoMenu className='text-secondary h-10 w-10' />
         </Button>
       </div>
 
@@ -42,7 +42,7 @@ const SidebarTop: React.FC<SidebarTopProps> = ({
             className='h-[40px] w-[40px] rounded-full border-none p-0 outline-none'
           >
             <img
-              src={avatarDefault}
+              src='https://avatar.iran.liara.run/public/boy?username=Ash'
               alt=''
               className='h-full w-full rounded-full'
             />

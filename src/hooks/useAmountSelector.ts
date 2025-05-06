@@ -22,18 +22,14 @@ export const useAmountSelector = ({
   const [inputWidth, setInputWidth] = useState(105);
   const [status, setStatus] = useState<'' | 'error' | 'warning'>('');
   const [isFocused, setIsFocused] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const spanRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (spanRef.current) {
-      const newWidth =
-        spanRef.current.getBoundingClientRect().width +
-        55 +
-        (isHovered || isFocused ? 22 : 0);
+      const newWidth = spanRef.current.getBoundingClientRect().width + 55;
       setInputWidth(newWidth);
     }
-  }, [value, selectedOption, isHovered, isFocused]);
+  }, [value, selectedOption]);
 
   useEffect(() => {
     setStatus(value <= 0 ? 'warning' : '');
@@ -62,10 +58,9 @@ export const useAmountSelector = ({
     value,
     inputWidth,
     status,
-    isFocused,
     spanRef,
+    isFocused,
     setIsFocused,
-    setIsHovered,
     handleValueChange,
     handleOptionChange,
   };

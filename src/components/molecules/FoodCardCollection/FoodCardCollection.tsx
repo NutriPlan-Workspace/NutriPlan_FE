@@ -26,6 +26,7 @@ const FoodCardCollection: React.FC<FoodCardCollectionProps> = ({
 
   return (
     <Popover
+      mouseEnterDelay={0.5}
       placement='left'
       color='white'
       styles={{

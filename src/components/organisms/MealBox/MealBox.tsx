@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { motion } from 'motion/react';
 
 import { MealBoxHeader } from '@/molecules/MealBoxHeader';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';

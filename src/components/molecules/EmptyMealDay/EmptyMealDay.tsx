@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  HiOutlineClipboardCopy,
   HiOutlineDocumentAdd,
   HiOutlineDocumentDuplicate,
 } from 'react-icons/hi';
@@ -74,17 +73,21 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
   return (
     <div
       className={cn(
-        'w-full rounded-sm bg-white px-4 pt-[15px] pb-[60px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]',
+        'mt-1 w-full rounded-sm bg-white px-4 pt-[25px] pb-[30px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]',
         { 'pb-[20px]': isWeekly },
       )}
     >
-      <p className='mt-2 text-center'>
-        This meal plan will be automatically generated and emailed to you the
-        prior Friday
-      </p>
-      <p className='my-3 text-center font-bold'>- or -</p>
-      <p className='text-center'>Want to build it right now?</p>
-      <div className={cn('mt-8 flex justify-center', { 'mt-2': isWeekly })}>
+      {isWeekly ? (
+        <p className='text-center'>
+          This meal plan is empty. Want to build it right now?
+        </p>
+      ) : (
+        <>
+          <p className='text-center'>This meal plan is empty.</p>
+          <p className='text-center'>Want to build it right now?</p>
+        </>
+      )}
+      <div className={cn('mt-6 flex justify-center', { 'mt-2': isWeekly })}>
         <Button
           size='large'
           variant='solid'
@@ -96,27 +99,42 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
           Generate
         </Button>
       </div>
-      <p className='text-center text-sm'>
+      <p className='pt-2 text-center text-sm'>
         using
-        <Button variant='link' color='gold' className='pl-1'>
+        <span className='text-primary-400 pl-1'>
           {getDayOfWeek(new Date(mealDate))}&apos;s preferences
-        </Button>
+        </span>
       </p>
-      <div className='mt-4 grid grid-rows-1 justify-center gap-2'>
-        <Button
-          variant='filled'
-          color='gold'
-          icon={<HiOutlineDocumentDuplicate size={18} />}
-          className='border-borderGray mx-auto w-fit text-black'
-          onClick={() => handleAction(() => onCopyPreviousDay(mealDate))}
-        >
-          Copy the previous meal plan
-        </Button>
+      <p className={cn('my-5 text-center font-bold', { 'my-2': isWeekly })}>
+        - or -
+      </p>
+      {isWeekly ? (
+        <p className='text-center'>
+          You can create a new one or copy it from your most recently created
+          meal plan.
+        </p>
+      ) : (
+        <>
+          <p className='text-center'>You can create a new one</p>
+          <p className='text-center'>
+            or copy it from your most recently created meal plan.
+          </p>
+        </>
+      )}
+      <div
+        className={cn(
+          isWeekly
+            ? 'mt-4 flex justify-center gap-2'
+            : 'mt-4 grid grid-rows-1 justify-center gap-2',
+        )}
+      >
         <Button
           variant='filled'
           color='gold'
           icon={<HiOutlineDocumentAdd size={18} />}
-          className='border-borderGray mx-auto w-fit text-black'
+          className={cn('border-borderGray w-fit text-black', {
+            'mx-auto': !isWeekly,
+          })}
           onClick={() => handleAction(() => onCreateBlank(mealDate))}
         >
           New blank plan
@@ -124,10 +142,13 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
         <Button
           variant='filled'
           color='gold'
-          icon={<HiOutlineClipboardCopy size={18} />}
-          className='border-borderGray mx-auto w-fit text-black'
+          icon={<HiOutlineDocumentDuplicate size={18} />}
+          className={cn('border-borderGray w-fit text-black', {
+            'mx-auto': !isWeekly,
+          })}
+          onClick={() => handleAction(() => onCopyPreviousDay(mealDate))}
         >
-          Load a saved meal plan
+          Copy the latest meal plan
         </Button>
       </div>
     </div>

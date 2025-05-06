@@ -29,6 +29,7 @@ const FoodCardSideAdd: React.FC<FoodCardSideAddProps> = ({ food }) => {
   return (
     <div className={cn({ 'opacity-40': isDragging })}>
       <Popover
+        mouseEnterDelay={0.5}
         placement='left'
         color='white'
         styles={{
@@ -50,7 +51,10 @@ const FoodCardSideAdd: React.FC<FoodCardSideAddProps> = ({ food }) => {
           onMouseLeave={handleLeaveHover}
         >
           <Image
-            src={food.imgUrls?.[0] || ''}
+            src={
+              food.imgUrls?.[0] ||
+              'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png'
+            }
             className={cn(
               'h-[50px] w-[50px] max-w-[50px] rounded-[10px] object-cover transition-all duration-200',
               isHovered

@@ -26,7 +26,7 @@ const DateDisplay: React.FC<DateDisplayProps> = ({ isGroceries = false }) => {
         <p className='text-black'>Groceries for {dateText}</p>
       ) : (
         <>
-          <p className='text-primary'>Meal Planner</p>
+          <p className='text-secondary'>Meal Planner</p>
           <p className='text-black'>{dateText}</p>
         </>
       )}

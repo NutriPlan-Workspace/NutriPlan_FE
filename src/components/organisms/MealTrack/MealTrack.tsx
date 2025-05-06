@@ -57,7 +57,11 @@ const MealTrack: React.FC = () => {
 
   return (
     <div ref={parentRef}>
-      <Slider ref={sliderRef} {...settings}>
+      <Slider
+        ref={sliderRef}
+        {...settings}
+        className='min-h-[calc(100vh-120px)]'
+      >
         {viewingMealPlans.map(({ mealDate, mealPlanDay }, index) => (
           <DayBox
             key={mealDate}

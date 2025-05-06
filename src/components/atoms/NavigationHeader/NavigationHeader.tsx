@@ -5,16 +5,16 @@ import { PATH } from '@/constants/path';
 
 interface MenuItem {
   label: string;
-  path: string;
+  path?: string;
 }
 
 const menuItems: MenuItem[] = [
   { label: 'Browse Foods', path: PATH.BROWSE_FOODS },
-  { label: 'How it works', path: PATH.HOW_IT_WORKS },
-  { label: 'Why Nutriplan', path: PATH.WHY_NUTRIPLAN },
-  { label: 'Supported Diets', path: PATH.SUPPORTED_DIETS },
-  { label: 'For Professionals', path: PATH.FOR_PROFESSIONALS },
-  { label: 'About us', path: PATH.ABOUT_US },
+  { label: 'How it works' },
+  { label: 'Why Nutriplan' },
+  { label: 'Supported Diets' },
+  { label: 'For Professionals' },
+  { label: 'About us' },
 ];
 
 const Navigation: React.FC = () => (
@@ -23,11 +23,15 @@ const Navigation: React.FC = () => (
       {menuItems.map(({ label, path }, index) => (
         <li
           key={index}
-          className={`text-[14px] font-thin text-[#4d4d4f] hover:underline ${
-            path !== PATH.BROWSE_FOODS ? 'text-white' : ''
-          }`}
+          className='cursor-pointer text-[14px] font-thin text-[#4d4d4f]'
         >
-          <Link to={path}>{label}</Link>
+          {path ? (
+            <Link className='hover:underline' to={path}>
+              {label}
+            </Link>
+          ) : (
+            <span className='text-gray-300'>{label}</span>
+          )}
         </li>
       ))}
     </ul>

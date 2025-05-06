@@ -34,6 +34,7 @@ const Ingredient: React.FC<IngredientProps> = ({ ingredientList }) => {
             >
               <div className='flex h-[64px] w-[64px] items-center justify-center'>
                 <Popover
+                  mouseEnterDelay={0.5}
                   placement='right'
                   title={item.name}
                   content={
@@ -63,6 +64,7 @@ const Ingredient: React.FC<IngredientProps> = ({ ingredientList }) => {
               </div>
               <div className='flex min-w-70 flex-col'>
                 <Popover
+                  mouseEnterDelay={0.5}
                   placement='right'
                   title={item.name}
                   content={

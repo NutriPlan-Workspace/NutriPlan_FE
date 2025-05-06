@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { useRouterState } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -14,54 +14,91 @@ export const Route = createRootRoute({
   notFoundComponent: NotFoundPage,
 });
 
-const layoutVariants = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 },
-};
+function getLayoutKey(pathname: string): string {
+  if (pathname === PATH.LOGIN || pathname === PATH.REGISTER) {
+    return 'auth';
+  } else if (pathname === PATH.HOME || pathname === PATH.BROWSE_FOODS) {
+    return 'guest';
+  } else {
+    return 'logged-in';
+  }
+}
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
 
-  let layoutKey: string;
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentLayoutKey, setCurrentLayoutKey] = useState(() =>
+    getLayoutKey(pathname),
+  );
+
+  useEffect(() => {
+    const nextLayoutKey = getLayoutKey(pathname);
+    if (nextLayoutKey !== currentLayoutKey) {
+      setIsTransitioning(true);
+
+      const delayLayoutChange = setTimeout(() => {
+        setCurrentLayoutKey(nextLayoutKey);
+      }, 500);
+
+      const hideOverlay = setTimeout(() => {
+        setIsTransitioning(false);
+      }, 1000);
+
+      return () => {
+        clearTimeout(delayLayoutChange);
+        clearTimeout(hideOverlay);
+      };
+    }
+  }, [pathname]);
+
   let LayoutComponent: React.FC<{ children: React.ReactNode }>;
-  if (pathname === PATH.LOGIN || pathname === PATH.REGISTER) {
-    layoutKey = 'auth';
+  if (currentLayoutKey === 'auth') {
     LayoutComponent = LayoutAuth;
-  } else if (pathname === PATH.HOME || pathname === PATH.BROWSE_FOODS) {
-    layoutKey = 'guest';
+  } else if (currentLayoutKey === 'guest') {
     LayoutComponent = LayoutGuest;
   } else {
-    layoutKey = 'logged-in';
     LayoutComponent = LayoutLoggedIn;
   }
 
   return (
-    <AnimatePresence mode='wait'>
-      <motion.div
-        key={layoutKey}
-        initial='initial'
-        animate='animate'
-        exit='exit'
-        variants={layoutVariants}
-        transition={{ duration: 0.2 }}
-      >
-        <LayoutComponent>{children}</LayoutComponent>
-      </motion.div>
-    </AnimatePresence>
+    <div className='relative h-full w-full'>
+      <AnimatePresence>
+        {isTransitioning && (
+          <motion.div
+            key='overlay'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className='fixed inset-0 z-50 flex items-center justify-center bg-white'
+          >
+            <img
+              src='src/assets/noBgColor.png'
+              alt='Loading'
+              className='w-100 animate-pulse object-cover'
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <LayoutComponent key={currentLayoutKey}>
+        {!isTransitioning ? children : <div className='min-h-[100vh]'></div>}
+      </LayoutComponent>
+    </div>
   );
 }
 
 function TemplateComponent() {
   return (
-    <div className='w-[100vw]'>
+    <>
       <LayoutWrapper>
         <Outlet />
       </LayoutWrapper>
       <ModalFoodDetail />
-    </div>
+    </>
   );
 }
 

@@ -65,6 +65,7 @@ const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
           </Typography>
         ) : (
           <Popover
+            mouseEnterDelay={0.5}
             className='cursor-help'
             placement='left'
             color='white'

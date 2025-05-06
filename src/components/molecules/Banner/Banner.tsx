@@ -1,4 +1,7 @@
 import React from 'react';
+import { Link } from '@tanstack/react-router';
+
+import { PATH } from '@/constants/path';
 
 const Banner: React.FC = () => (
   <div className='flex w-full items-center justify-between gap-5 lg:px-4 xl:px-28'>
@@ -15,7 +18,12 @@ const Banner: React.FC = () => (
         budget, and schedule. Reach your diet and nutritional goals with our
         calorie calculator, weekly meal plans, grocery lists, and more.
       </p>
-      <p className='font-display mb-[12px] text-[14px] leading-[150%] font-bold text-[#199861] not-italic'></p>
+      <Link
+        to={PATH.MEAL_PLAN}
+        className='font-display mb-[12px] text-[14px] leading-[150%] font-bold text-[#199861] not-italic hover:cursor-pointer hover:underline'
+      >
+        Put your diet on NutriPlan now!
+      </Link>
     </div>
 
     <div className='flex w-1/2 justify-end'>

@@ -31,6 +31,7 @@ const GroceryCard: React.FC<MealCardProps> = ({ data }) => (
               </div>
               <div className='ml-4 flex flex-grow flex-col justify-center'>
                 <Popover
+                  mouseEnterDelay={0.5}
                   placement='right'
                   color='white'
                   styles={{
@@ -58,9 +59,6 @@ const GroceryCard: React.FC<MealCardProps> = ({ data }) => (
                   <Select
                     defaultValue={ingredient.unit?.description}
                     dropdownMatchSelectWidth={false}
-                    onChange={(value) => {
-                      console.log('Selected unit:', value);
-                    }}
                     className='w-32'
                   >
                     {ingredient.units?.map((unit) => (

@@ -32,6 +32,7 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
   const targetCalories = data?.data.calories;
   return (
     <Popover
+      mouseEnterDelay={0.5}
       open={isTotalCaloriesOpen}
       onOpenChange={setIsTotalCaloriesOpen}
       trigger='click'

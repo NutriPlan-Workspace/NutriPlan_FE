@@ -3,7 +3,6 @@ import { Control, FieldErrors } from 'react-hook-form';
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import { Button, Typography } from 'antd';
 
-import defaultImage from '@/assets/default_img.svg';
 import {
   ControlledInput,
   ControlledTextArea,
@@ -50,7 +49,14 @@ const RecipeBasicInfoSection: React.FC<Props> = ({
 
     <FormRow label='Image' isEnd={true}>
       <div className='flex flex-col items-center gap-4'>
-        <img src={img || defaultImage} alt='default' className='h-30 w-30' />
+        <img
+          src={
+            img ||
+            'https://madeinindiarestaurant.com/img/placeholders/comfort_food_placeholder.png'
+          }
+          alt='default'
+          className='h-30 w-30'
+        />
         <Button
           className='flex items-center gap-2'
           onClick={() => setUpload((prev) => !prev)}
