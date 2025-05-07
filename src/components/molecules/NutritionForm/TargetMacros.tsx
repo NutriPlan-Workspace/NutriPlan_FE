@@ -1,7 +1,6 @@
 import React from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { Typography } from 'antd';
-import { Tooltip } from 'antd';
 
 import { RangeSlider } from '@/atoms/RangeSlider';
 import type { NutritionFormSchema } from '@/schemas/nutritionTargetSchema';
@@ -29,68 +28,67 @@ const TargetMacros: React.FC<TargetMacrosProps> = ({ control, errors }) => (
         Calculate macros
       </Title>
     </div>
-    <div>
-      <Tooltip
-        title={
-          errors?.carbTarget?.from?.message || errors?.carbTarget?.to?.message
-        }
-        visible={!!errors?.carbTarget}
-      >
-        <Controller
-          name='carbTarget'
-          control={control}
-          render={({ field }) => (
-            <RangeSlider
-              color='lightcoral'
-              title='Carbs'
-              {...field}
-              maxValue={619}
-            />
+    <Controller
+      name='carbTarget'
+      control={control}
+      render={({ field }) => (
+        <div className='mb-4'>
+          <RangeSlider
+            color='lightcoral'
+            title='Carbs'
+            {...field}
+            maxValue={619}
+          />
+          {(errors?.carbTarget?.from || errors?.carbTarget?.to) && (
+            <p className='mt-1 text-xs text-red-500'>
+              {errors.carbTarget?.from?.message ||
+                errors.carbTarget?.to?.message}
+            </p>
           )}
-        />
-      </Tooltip>
+        </div>
+      )}
+    />
 
-      <Tooltip
-        title={
-          errors?.fatTarget?.from?.message || errors?.fatTarget?.to?.message
-        }
-        visible={!!errors?.fatTarget}
-      >
-        <Controller
-          name='fatTarget'
-          control={control}
-          render={({ field }) => (
-            <RangeSlider
-              color='lightblue'
-              title='Fats'
-              {...field}
-              maxValue={275}
-            />
+    <Controller
+      name='fatTarget'
+      control={control}
+      render={({ field }) => (
+        <div className='mb-4'>
+          <RangeSlider
+            color='lightblue'
+            title='Fats'
+            {...field}
+            maxValue={275}
+          />
+          {(errors?.fatTarget?.from || errors?.fatTarget?.to) && (
+            <p className='mt-1 text-xs text-red-500'>
+              {errors.fatTarget?.from?.message || errors.fatTarget?.to?.message}
+            </p>
           )}
-        />
-      </Tooltip>
+        </div>
+      )}
+    />
 
-      <Tooltip
-        title={
-          errors?.proteinTarget?.from?.message ||
-          errors?.proteinTarget?.to?.message
-        }
-        visible={!!errors?.proteinTarget}
-      >
-        <Controller
-          name='proteinTarget'
-          control={control}
-          render={({ field }) => (
-            <RangeSlider
-              color='lightgreen'
-              title='Proteins'
-              {...field}
-              maxValue={619}
-            />
+    <Controller
+      name='proteinTarget'
+      control={control}
+      render={({ field }) => (
+        <div className='mb-4'>
+          <RangeSlider
+            color='lightgreen'
+            title='Proteins'
+            {...field}
+            maxValue={619}
+          />
+          {(errors?.proteinTarget?.from || errors?.proteinTarget?.to) && (
+            <p className='mt-1 text-xs text-red-500'>
+              {errors.proteinTarget?.from?.message ||
+                errors.proteinTarget?.to?.message}
+            </p>
           )}
-        />
-      </Tooltip>
-    </div>
+        </div>
+      )}
+    />
   </div>
 );
 

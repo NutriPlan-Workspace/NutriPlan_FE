@@ -44,7 +44,7 @@ const DetailedFood: React.FC<DetailedFoodProp> = ({ food, listIngredient }) => (
             />
           </div>
 
-          <FoodActionButtons food={food} />
+          <FoodActionButtons food={food} listIngredient={listIngredient} />
 
           {food?.nutrition ? (
             <NutritionSummary nutrition={food?.nutrition} type='food' />
@@ -54,8 +54,10 @@ const DetailedFood: React.FC<DetailedFoodProp> = ({ food, listIngredient }) => (
         </div>
         <div className='col-span-1'>
           <TimeInfo
-            prepTime={food ? food.property?.prepTime || 0 : 0}
-            cookTime={food ? food.property?.cookTime || 0 : 0}
+            prepTime={food ? food.property?.prepTime : 0}
+            cookTime={
+              food ? food.property?.totalTime || food.property?.cookTime : 0
+            }
           />
           <ScaleRecipe units={food?.units || DEFAULT_UNIT} />
           {listIngredient ? (

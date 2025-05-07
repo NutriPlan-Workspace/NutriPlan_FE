@@ -8,6 +8,7 @@ interface FoodState {
   viewingDetailFood: Food | MealPlanFood | null;
   previousViewingDetailFood: Food | MealPlanFood | null;
   currentCustomFood: Food | null;
+  currentCustomIngredients: Food[];
 }
 
 const initialState: FoodState = {
@@ -15,6 +16,7 @@ const initialState: FoodState = {
   viewingDetailFood: null,
   previousViewingDetailFood: null,
   currentCustomFood: null,
+  currentCustomIngredients: [],
 };
 
 const foodSlice = createSlice({
@@ -48,6 +50,12 @@ const foodSlice = createSlice({
     removeCurrentCustomFood: (state) => {
       state.currentCustomFood = null;
     },
+    setCurrentCustomIngredients: (state, action: PayloadAction<Food[]>) => {
+      state.currentCustomIngredients = action.payload;
+    },
+    removeCurrentCustomIngredients: (state) => {
+      state.currentCustomIngredients = [];
+    },
   },
 });
 
@@ -59,5 +67,7 @@ export const {
   removePreviousViewingDetailFood,
   setCurrentCustomFood,
   removeCurrentCustomFood,
+  setCurrentCustomIngredients,
+  removeCurrentCustomIngredients,
 } = foodSlice.actions;
 export default foodSlice.reducer;

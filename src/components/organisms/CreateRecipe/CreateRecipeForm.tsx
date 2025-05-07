@@ -65,6 +65,8 @@ const CreateRecipeForm: React.FC = () => {
   });
   const dispatch = useDispatch();
   const currentCustomFood = useSelector(foodSelector).currentCustomFood;
+  const currentCustomIngredients =
+    useSelector(foodSelector).currentCustomIngredients;
   const { showToastError, showToastSuccess } = useToast();
   const [createCustomRecipe, { isLoading }] = useCreateCustomRecipeMutation();
   const [upload, setUpload] = useState(false);
@@ -100,6 +102,10 @@ const CreateRecipeForm: React.FC = () => {
 
       reset({
         ...currentCustomFood,
+        videoUrl: undefined,
+        description: isNaN(Number(currentCustomFood.description))
+          ? ''
+          : currentCustomFood.description,
         directions: transformedDirections,
         ingredients: transformedIngredients,
         property: {
@@ -111,21 +117,32 @@ const CreateRecipeForm: React.FC = () => {
           isSnack: currentCustomFood.property?.isSnack ?? true,
           isDessert: currentCustomFood.property?.isDessert ?? true,
         },
+        type: FOOD_TYPE_MAP.customRecipe,
       });
 
       setImg(currentCustomFood.imgUrls?.[0]);
-      setIngredient(currentCustomFood.ingredientList ?? []);
 
-      setIngredientDisplay(
-        transformedIngredients.map((ingredient) => ({
-          ...ingredient,
-          food: currentCustomFood.ingredientList?.find(
-            (f) => f._id === ingredient.ingredientFoodId,
-          ),
-        })),
-      );
+      if (currentCustomFood && currentCustomIngredients) {
+        const transformedIngredients: IngredientDisplay[] =
+          currentCustomFood.ingredients.map((ingredient) => {
+            const food = currentCustomIngredients.find(
+              (foodItem) => foodItem._id === ingredient.ingredientFoodId._id,
+            );
+
+            return {
+              ingredientFoodId: ingredient.ingredientFoodId._id,
+              amount: ingredient.amount,
+              unit: ingredient.unit,
+              food: food ?? ({} as Food),
+            };
+          });
+
+        setIngredientDisplay(transformedIngredients);
+      }
+
+      setIngredient(currentCustomIngredients ?? []);
     }
-  }, [currentCustomFood, reset]);
+  }, [currentCustomFood, currentCustomIngredients, reset]);
 
   const onSubmit = async (data: FoodFormSchema) => {
     try {

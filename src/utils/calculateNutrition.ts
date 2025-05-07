@@ -147,7 +147,7 @@ export const calculateTotalNutrition = (
     for (const key in total) {
       const k = key as keyof NutritionFields;
       const value = food.nutrition[k] || 0;
-      total[k] += value * multiply * 100;
+      total[k] += value * multiply;
     }
   }
 

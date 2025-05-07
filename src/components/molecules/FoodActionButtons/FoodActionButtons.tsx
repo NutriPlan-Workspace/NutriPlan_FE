@@ -15,6 +15,7 @@ import {
 import {
   removePreviousViewingDetailFood,
   setCurrentCustomFood,
+  setCurrentCustomIngredients,
   setIsModalDetailOpen,
 } from '@/redux/slices/food';
 import type { Food } from '@/types/food';
@@ -22,9 +23,13 @@ import { showToastError } from '@/utils/toastUtils';
 
 interface FoodActionButtonsProps {
   food: Food;
+  listIngredient?: Food[];
 }
 
-const FoodActionButtons: React.FC<FoodActionButtonsProps> = ({ food }) => {
+const FoodActionButtons: React.FC<FoodActionButtonsProps> = ({
+  food,
+  listIngredient,
+}) => {
   const dispatch = useDispatch();
   const [loadingFavorite, setLoadingFavorite] = useState(false);
   const navigate = useNavigate();
@@ -81,6 +86,7 @@ const FoodActionButtons: React.FC<FoodActionButtonsProps> = ({ food }) => {
     if (food.isRecipe) {
       navigate({ to: `/custom-recipes/create-recipe/` });
       dispatch(setCurrentCustomFood(food));
+      dispatch(setCurrentCustomIngredients(listIngredient!));
       dispatch(removePreviousViewingDetailFood());
       dispatch(setIsModalDetailOpen(false));
     } else {

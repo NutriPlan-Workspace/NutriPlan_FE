@@ -186,7 +186,7 @@ const EditRecipeForm: React.FC<EditRecipeFormProps> = ({ data }) => {
 
   const handleRemove = async () => {
     try {
-      await removeCustomFood(id).unwrap();
+      await removeCustomFood(id!).unwrap();
       await refetch();
       handleCancelClick();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
