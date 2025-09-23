@@ -18,8 +18,11 @@ jobs:
         with:
           node-version: '22' # hoặc version React bạn dùng
 
-      - name: Clean install deps
+      - name: Install dependencies
         run: npm ci
+
+      - name: Rebuild Tailwind Oxide for Linux
+        run: npm rebuild @tailwindcss/oxide
 
       - name: Build React app
         run: npm run build
