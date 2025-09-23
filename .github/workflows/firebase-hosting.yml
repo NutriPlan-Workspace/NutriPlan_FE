@@ -9,6 +9,12 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
+    env:
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_URL }}
+      VITE_CLOUDINARY_CLOUD_NAME: ${{ secrets.VITE_CLOUDINARY_CLOUD_NAME }}
+      VITE_CLOUDINARY_UPLOAD_PRESET: ${{ secrets.VITE_CLOUDINARY_UPLOAD_PRESET }}
+      VITE_CLOUDINARY_UPLOAD_FOLDER: ${{ secrets.VITE_CLOUDINARY_UPLOAD_FOLDER }}
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
@@ -21,11 +27,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Rebuild Tailwind Oxide for Linux
+      - name: Rebuild Tailwind Oxide
         run: npm rebuild @tailwindcss/oxide
 
       - name: Build React app
         run: npm run build
 
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
       - name: Deploy to Firebase
-        run: npx firebase deploy --token "$FIREBASE_TOKEN"
+        run: firebase deploy --token "$FIREBASE_TOKEN"
