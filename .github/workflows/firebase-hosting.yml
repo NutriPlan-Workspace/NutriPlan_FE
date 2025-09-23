@@ -18,8 +18,8 @@ jobs:
         with:
           node-version: '22' # hoặc version React bạn dùng
 
-      - name: Install dependencies
-        run: npm install
+      - name: Clean install deps
+        run: npm ci
 
       - name: Build React app
         run: npm run build
