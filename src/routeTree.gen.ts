@@ -8,343 +8,149 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as WeightGoalIndexRouteImport } from './routes/weight-goal/index'
+import { Route as UnauthorizedIndexRouteImport } from './routes/unauthorized/index'
+import { Route as RegisterIndexRouteImport } from './routes/register/index'
+import { Route as PrimaryDietIndexRouteImport } from './routes/primary-diet/index'
+import { Route as PhysicalStatsIndexRouteImport } from './routes/physical-stats/index'
+import { Route as NutritionTargetsIndexRouteImport } from './routes/nutrition-targets/index'
+import { Route as MealPlanIndexRouteImport } from './routes/meal-plan/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as GroceriesIndexRouteImport } from './routes/groceries/index'
+import { Route as FoodExclusionsIndexRouteImport } from './routes/food-exclusions/index'
+import { Route as DiscoverIndexRouteImport } from './routes/discover/index'
+import { Route as CustomRecipesIndexRouteImport } from './routes/custom-recipes/index'
+import { Route as CollectionsIndexRouteImport } from './routes/collections/index'
+import { Route as BrowseFoodsIndexRouteImport } from './routes/browse-foods/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AccountIndexRouteImport } from './routes/account/index'
+import { Route as CustomRecipesCreateRecipeRouteImport } from './routes/custom-recipes/create-recipe'
+import { Route as CustomRecipesIdRouteImport } from './routes/custom-recipes/$id'
+import { Route as CollectionsCreateRouteImport } from './routes/collections/create'
+import { Route as CollectionsIdRouteImport } from './routes/collections/$id'
+import { Route as CustomRecipesCustomFoodIndexRouteImport } from './routes/custom-recipes/custom-food/index'
+import { Route as CustomRecipesCustomFoodIdRouteImport } from './routes/custom-recipes/custom-food/$id'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as WeightGoalIndexImport } from './routes/weight-goal/index'
-import { Route as UnauthorizedIndexImport } from './routes/unauthorized/index'
-import { Route as RegisterIndexImport } from './routes/register/index'
-import { Route as PrimaryDietIndexImport } from './routes/primary-diet/index'
-import { Route as PhysicalStatsIndexImport } from './routes/physical-stats/index'
-import { Route as NutritionTargetsIndexImport } from './routes/nutrition-targets/index'
-import { Route as MealPlanIndexImport } from './routes/meal-plan/index'
-import { Route as LoginIndexImport } from './routes/login/index'
-import { Route as GroceriesIndexImport } from './routes/groceries/index'
-import { Route as FoodExclusionsIndexImport } from './routes/food-exclusions/index'
-import { Route as DiscoverIndexImport } from './routes/discover/index'
-import { Route as CustomRecipesIndexImport } from './routes/custom-recipes/index'
-import { Route as CollectionsIndexImport } from './routes/collections/index'
-import { Route as BrowseFoodsIndexImport } from './routes/browse-foods/index'
-import { Route as AdminIndexImport } from './routes/admin/index'
-import { Route as AccountIndexImport } from './routes/account/index'
-import { Route as CustomRecipesCreateRecipeImport } from './routes/custom-recipes/create-recipe'
-import { Route as CustomRecipesIdImport } from './routes/custom-recipes/$id'
-import { Route as CollectionsCreateImport } from './routes/collections/create'
-import { Route as CollectionsIdImport } from './routes/collections/$id'
-import { Route as CustomRecipesCustomFoodIndexImport } from './routes/custom-recipes/custom-food/index'
-import { Route as CustomRecipesCustomFoodIdImport } from './routes/custom-recipes/custom-food/$id'
-
-// Create/Update Routes
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const WeightGoalIndexRoute = WeightGoalIndexImport.update({
+const WeightGoalIndexRoute = WeightGoalIndexRouteImport.update({
   id: '/weight-goal/',
   path: '/weight-goal/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const UnauthorizedIndexRoute = UnauthorizedIndexImport.update({
+const UnauthorizedIndexRoute = UnauthorizedIndexRouteImport.update({
   id: '/unauthorized/',
   path: '/unauthorized/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const RegisterIndexRoute = RegisterIndexImport.update({
+const RegisterIndexRoute = RegisterIndexRouteImport.update({
   id: '/register/',
   path: '/register/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PrimaryDietIndexRoute = PrimaryDietIndexImport.update({
+const PrimaryDietIndexRoute = PrimaryDietIndexRouteImport.update({
   id: '/primary-diet/',
   path: '/primary-diet/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PhysicalStatsIndexRoute = PhysicalStatsIndexImport.update({
+const PhysicalStatsIndexRoute = PhysicalStatsIndexRouteImport.update({
   id: '/physical-stats/',
   path: '/physical-stats/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const NutritionTargetsIndexRoute = NutritionTargetsIndexImport.update({
+const NutritionTargetsIndexRoute = NutritionTargetsIndexRouteImport.update({
   id: '/nutrition-targets/',
   path: '/nutrition-targets/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const MealPlanIndexRoute = MealPlanIndexImport.update({
+const MealPlanIndexRoute = MealPlanIndexRouteImport.update({
   id: '/meal-plan/',
   path: '/meal-plan/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LoginIndexRoute = LoginIndexImport.update({
+const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/login/',
   path: '/login/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const GroceriesIndexRoute = GroceriesIndexImport.update({
+const GroceriesIndexRoute = GroceriesIndexRouteImport.update({
   id: '/groceries/',
   path: '/groceries/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const FoodExclusionsIndexRoute = FoodExclusionsIndexImport.update({
+const FoodExclusionsIndexRoute = FoodExclusionsIndexRouteImport.update({
   id: '/food-exclusions/',
   path: '/food-exclusions/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DiscoverIndexRoute = DiscoverIndexImport.update({
+const DiscoverIndexRoute = DiscoverIndexRouteImport.update({
   id: '/discover/',
   path: '/discover/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CustomRecipesIndexRoute = CustomRecipesIndexImport.update({
+const CustomRecipesIndexRoute = CustomRecipesIndexRouteImport.update({
   id: '/custom-recipes/',
   path: '/custom-recipes/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CollectionsIndexRoute = CollectionsIndexImport.update({
+const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
   id: '/collections/',
   path: '/collections/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const BrowseFoodsIndexRoute = BrowseFoodsIndexImport.update({
+const BrowseFoodsIndexRoute = BrowseFoodsIndexRouteImport.update({
   id: '/browse-foods/',
   path: '/browse-foods/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AdminIndexRoute = AdminIndexImport.update({
+const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountIndexRoute = AccountIndexImport.update({
+const AccountIndexRoute = AccountIndexRouteImport.update({
   id: '/account/',
   path: '/account/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CustomRecipesCreateRecipeRoute = CustomRecipesCreateRecipeImport.update({
-  id: '/custom-recipes/create-recipe',
-  path: '/custom-recipes/create-recipe',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const CustomRecipesIdRoute = CustomRecipesIdImport.update({
+const CustomRecipesCreateRecipeRoute =
+  CustomRecipesCreateRecipeRouteImport.update({
+    id: '/custom-recipes/create-recipe',
+    path: '/custom-recipes/create-recipe',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CustomRecipesIdRoute = CustomRecipesIdRouteImport.update({
   id: '/custom-recipes/$id',
   path: '/custom-recipes/$id',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CollectionsCreateRoute = CollectionsCreateImport.update({
+const CollectionsCreateRoute = CollectionsCreateRouteImport.update({
   id: '/collections/create',
   path: '/collections/create',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CollectionsIdRoute = CollectionsIdImport.update({
+const CollectionsIdRoute = CollectionsIdRouteImport.update({
   id: '/collections/$id',
   path: '/collections/$id',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
 const CustomRecipesCustomFoodIndexRoute =
-  CustomRecipesCustomFoodIndexImport.update({
+  CustomRecipesCustomFoodIndexRouteImport.update({
     id: '/custom-recipes/custom-food/',
     path: '/custom-recipes/custom-food/',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any)
-
-const CustomRecipesCustomFoodIdRoute = CustomRecipesCustomFoodIdImport.update({
-  id: '/custom-recipes/custom-food/$id',
-  path: '/custom-recipes/custom-food/$id',
-  getParentRoute: () => rootRoute,
-} as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/collections/$id': {
-      id: '/collections/$id'
-      path: '/collections/$id'
-      fullPath: '/collections/$id'
-      preLoaderRoute: typeof CollectionsIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/collections/create': {
-      id: '/collections/create'
-      path: '/collections/create'
-      fullPath: '/collections/create'
-      preLoaderRoute: typeof CollectionsCreateImport
-      parentRoute: typeof rootRoute
-    }
-    '/custom-recipes/$id': {
-      id: '/custom-recipes/$id'
-      path: '/custom-recipes/$id'
-      fullPath: '/custom-recipes/$id'
-      preLoaderRoute: typeof CustomRecipesIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/custom-recipes/create-recipe': {
-      id: '/custom-recipes/create-recipe'
-      path: '/custom-recipes/create-recipe'
-      fullPath: '/custom-recipes/create-recipe'
-      preLoaderRoute: typeof CustomRecipesCreateRecipeImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/': {
-      id: '/account/'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/browse-foods/': {
-      id: '/browse-foods/'
-      path: '/browse-foods'
-      fullPath: '/browse-foods'
-      preLoaderRoute: typeof BrowseFoodsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/collections/': {
-      id: '/collections/'
-      path: '/collections'
-      fullPath: '/collections'
-      preLoaderRoute: typeof CollectionsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/custom-recipes/': {
-      id: '/custom-recipes/'
-      path: '/custom-recipes'
-      fullPath: '/custom-recipes'
-      preLoaderRoute: typeof CustomRecipesIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/discover/': {
-      id: '/discover/'
-      path: '/discover'
-      fullPath: '/discover'
-      preLoaderRoute: typeof DiscoverIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/food-exclusions/': {
-      id: '/food-exclusions/'
-      path: '/food-exclusions'
-      fullPath: '/food-exclusions'
-      preLoaderRoute: typeof FoodExclusionsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/groceries/': {
-      id: '/groceries/'
-      path: '/groceries'
-      fullPath: '/groceries'
-      preLoaderRoute: typeof GroceriesIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/meal-plan/': {
-      id: '/meal-plan/'
-      path: '/meal-plan'
-      fullPath: '/meal-plan'
-      preLoaderRoute: typeof MealPlanIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/nutrition-targets/': {
-      id: '/nutrition-targets/'
-      path: '/nutrition-targets'
-      fullPath: '/nutrition-targets'
-      preLoaderRoute: typeof NutritionTargetsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/physical-stats/': {
-      id: '/physical-stats/'
-      path: '/physical-stats'
-      fullPath: '/physical-stats'
-      preLoaderRoute: typeof PhysicalStatsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/primary-diet/': {
-      id: '/primary-diet/'
-      path: '/primary-diet'
-      fullPath: '/primary-diet'
-      preLoaderRoute: typeof PrimaryDietIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/register/': {
-      id: '/register/'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/unauthorized/': {
-      id: '/unauthorized/'
-      path: '/unauthorized'
-      fullPath: '/unauthorized'
-      preLoaderRoute: typeof UnauthorizedIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/weight-goal/': {
-      id: '/weight-goal/'
-      path: '/weight-goal'
-      fullPath: '/weight-goal'
-      preLoaderRoute: typeof WeightGoalIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/custom-recipes/custom-food/$id': {
-      id: '/custom-recipes/custom-food/$id'
-      path: '/custom-recipes/custom-food/$id'
-      fullPath: '/custom-recipes/custom-food/$id'
-      preLoaderRoute: typeof CustomRecipesCustomFoodIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/custom-recipes/custom-food/': {
-      id: '/custom-recipes/custom-food/'
-      path: '/custom-recipes/custom-food'
-      fullPath: '/custom-recipes/custom-food'
-      preLoaderRoute: typeof CustomRecipesCustomFoodIndexImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
+const CustomRecipesCustomFoodIdRoute =
+  CustomRecipesCustomFoodIdRouteImport.update({
+    id: '/custom-recipes/custom-food/$id',
+    path: '/custom-recipes/custom-food/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -371,7 +177,6 @@ export interface FileRoutesByFullPath {
   '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
   '/custom-recipes/custom-food': typeof CustomRecipesCustomFoodIndexRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
@@ -397,9 +202,8 @@ export interface FileRoutesByTo {
   '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
   '/custom-recipes/custom-food': typeof CustomRecipesCustomFoodIndexRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
@@ -424,7 +228,6 @@ export interface FileRoutesById {
   '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
   '/custom-recipes/custom-food/': typeof CustomRecipesCustomFoodIndexRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -503,7 +306,6 @@ export interface FileRouteTypes {
     | '/custom-recipes/custom-food/'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CollectionsIdRoute: typeof CollectionsIdRoute
@@ -528,6 +330,172 @@ export interface RootRouteChildren {
   WeightGoalIndexRoute: typeof WeightGoalIndexRoute
   CustomRecipesCustomFoodIdRoute: typeof CustomRecipesCustomFoodIdRoute
   CustomRecipesCustomFoodIndexRoute: typeof CustomRecipesCustomFoodIndexRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/weight-goal/': {
+      id: '/weight-goal/'
+      path: '/weight-goal'
+      fullPath: '/weight-goal'
+      preLoaderRoute: typeof WeightGoalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unauthorized/': {
+      id: '/unauthorized/'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof UnauthorizedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register/': {
+      id: '/register/'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/primary-diet/': {
+      id: '/primary-diet/'
+      path: '/primary-diet'
+      fullPath: '/primary-diet'
+      preLoaderRoute: typeof PrimaryDietIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/physical-stats/': {
+      id: '/physical-stats/'
+      path: '/physical-stats'
+      fullPath: '/physical-stats'
+      preLoaderRoute: typeof PhysicalStatsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nutrition-targets/': {
+      id: '/nutrition-targets/'
+      path: '/nutrition-targets'
+      fullPath: '/nutrition-targets'
+      preLoaderRoute: typeof NutritionTargetsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meal-plan/': {
+      id: '/meal-plan/'
+      path: '/meal-plan'
+      fullPath: '/meal-plan'
+      preLoaderRoute: typeof MealPlanIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groceries/': {
+      id: '/groceries/'
+      path: '/groceries'
+      fullPath: '/groceries'
+      preLoaderRoute: typeof GroceriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/food-exclusions/': {
+      id: '/food-exclusions/'
+      path: '/food-exclusions'
+      fullPath: '/food-exclusions'
+      preLoaderRoute: typeof FoodExclusionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover/': {
+      id: '/discover/'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/custom-recipes/': {
+      id: '/custom-recipes/'
+      path: '/custom-recipes'
+      fullPath: '/custom-recipes'
+      preLoaderRoute: typeof CustomRecipesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/': {
+      id: '/collections/'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof CollectionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/browse-foods/': {
+      id: '/browse-foods/'
+      path: '/browse-foods'
+      fullPath: '/browse-foods'
+      preLoaderRoute: typeof BrowseFoodsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/custom-recipes/create-recipe': {
+      id: '/custom-recipes/create-recipe'
+      path: '/custom-recipes/create-recipe'
+      fullPath: '/custom-recipes/create-recipe'
+      preLoaderRoute: typeof CustomRecipesCreateRecipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/custom-recipes/$id': {
+      id: '/custom-recipes/$id'
+      path: '/custom-recipes/$id'
+      fullPath: '/custom-recipes/$id'
+      preLoaderRoute: typeof CustomRecipesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/create': {
+      id: '/collections/create'
+      path: '/collections/create'
+      fullPath: '/collections/create'
+      preLoaderRoute: typeof CollectionsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/$id': {
+      id: '/collections/$id'
+      path: '/collections/$id'
+      fullPath: '/collections/$id'
+      preLoaderRoute: typeof CollectionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/custom-recipes/custom-food/': {
+      id: '/custom-recipes/custom-food/'
+      path: '/custom-recipes/custom-food'
+      fullPath: '/custom-recipes/custom-food'
+      preLoaderRoute: typeof CustomRecipesCustomFoodIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/custom-recipes/custom-food/$id': {
+      id: '/custom-recipes/custom-food/$id'
+      path: '/custom-recipes/custom-food/$id'
+      fullPath: '/custom-recipes/custom-food/$id'
+      preLoaderRoute: typeof CustomRecipesCustomFoodIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -555,111 +523,6 @@ const rootRouteChildren: RootRouteChildren = {
   CustomRecipesCustomFoodIdRoute: CustomRecipesCustomFoodIdRoute,
   CustomRecipesCustomFoodIndexRoute: CustomRecipesCustomFoodIndexRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/collections/$id",
-        "/collections/create",
-        "/custom-recipes/$id",
-        "/custom-recipes/create-recipe",
-        "/account/",
-        "/admin/",
-        "/browse-foods/",
-        "/collections/",
-        "/custom-recipes/",
-        "/discover/",
-        "/food-exclusions/",
-        "/groceries/",
-        "/login/",
-        "/meal-plan/",
-        "/nutrition-targets/",
-        "/physical-stats/",
-        "/primary-diet/",
-        "/register/",
-        "/unauthorized/",
-        "/weight-goal/",
-        "/custom-recipes/custom-food/$id",
-        "/custom-recipes/custom-food/"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/collections/$id": {
-      "filePath": "collections/$id.tsx"
-    },
-    "/collections/create": {
-      "filePath": "collections/create.tsx"
-    },
-    "/custom-recipes/$id": {
-      "filePath": "custom-recipes/$id.tsx"
-    },
-    "/custom-recipes/create-recipe": {
-      "filePath": "custom-recipes/create-recipe.tsx"
-    },
-    "/account/": {
-      "filePath": "account/index.tsx"
-    },
-    "/admin/": {
-      "filePath": "admin/index.tsx"
-    },
-    "/browse-foods/": {
-      "filePath": "browse-foods/index.tsx"
-    },
-    "/collections/": {
-      "filePath": "collections/index.tsx"
-    },
-    "/custom-recipes/": {
-      "filePath": "custom-recipes/index.tsx"
-    },
-    "/discover/": {
-      "filePath": "discover/index.tsx"
-    },
-    "/food-exclusions/": {
-      "filePath": "food-exclusions/index.tsx"
-    },
-    "/groceries/": {
-      "filePath": "groceries/index.tsx"
-    },
-    "/login/": {
-      "filePath": "login/index.tsx"
-    },
-    "/meal-plan/": {
-      "filePath": "meal-plan/index.tsx"
-    },
-    "/nutrition-targets/": {
-      "filePath": "nutrition-targets/index.tsx"
-    },
-    "/physical-stats/": {
-      "filePath": "physical-stats/index.tsx"
-    },
-    "/primary-diet/": {
-      "filePath": "primary-diet/index.tsx"
-    },
-    "/register/": {
-      "filePath": "register/index.tsx"
-    },
-    "/unauthorized/": {
-      "filePath": "unauthorized/index.tsx"
-    },
-    "/weight-goal/": {
-      "filePath": "weight-goal/index.tsx"
-    },
-    "/custom-recipes/custom-food/$id": {
-      "filePath": "custom-recipes/custom-food/$id.tsx"
-    },
-    "/custom-recipes/custom-food/": {
-      "filePath": "custom-recipes/custom-food/index.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */
