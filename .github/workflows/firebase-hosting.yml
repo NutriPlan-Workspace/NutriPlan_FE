@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      VITE_API_BASE_URL: ${{ secrets.VITE_API_URL }}
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
       VITE_CLOUDINARY_CLOUD_NAME: ${{ secrets.VITE_CLOUDINARY_CLOUD_NAME }}
       VITE_CLOUDINARY_UPLOAD_PRESET: ${{ secrets.VITE_CLOUDINARY_UPLOAD_PRESET }}
       VITE_CLOUDINARY_UPLOAD_FOLDER: ${{ secrets.VITE_CLOUDINARY_UPLOAD_FOLDER }}
