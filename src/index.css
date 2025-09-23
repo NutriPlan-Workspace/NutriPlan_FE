@@ -1,8 +1,4 @@
 @layer theme, base, antd, components, utilities;
-@import url('https://fonts.cdnfonts.com/css/tt-norms');
-@import url('https://fonts.cdnfonts.com/css/Poppins');
-@import url('https://fonts.cdnfonts.com/css/roboto');
-@import url('https://fonts.cdnfonts.com/css/rossanova-personal-use');
 @import 'tailwindcss';
 @import 'react-day-picker/dist/style.css';
 
