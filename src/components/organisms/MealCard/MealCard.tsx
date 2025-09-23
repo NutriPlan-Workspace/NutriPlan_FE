@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { EyeOutlined } from '@ant-design/icons';
 import { Image, Popover, Typography } from 'antd';
@@ -39,7 +39,7 @@ interface MealCardProps {
 const isMealPlanFood = (item: MealPlanFood | Food): item is MealPlanFood =>
   (item as MealPlanFood).foodId !== undefined;
 
-const MealCard: React.FC<MealCardProps> = ({
+const MealCardComponent: React.FC<MealCardProps> = ({
   index,
   mealDate,
   mealType,
@@ -89,14 +89,25 @@ const MealCard: React.FC<MealCardProps> = ({
     dispatch(removeFromFavoriteList(food._id));
   }, [dispatch, favoriteList, food._id, updateFavoriteFoods]);
 
-  const menuItems = getMenuItems({
-    isFavorite,
-    onAddToFavorite: onAddToFavorite,
-    onRemoveFromFavorite: onRemoveFromFavorite,
-    onRemoveFood,
-    onDuplicateFood,
-    index,
-  });
+  const menuItems = useMemo(
+    () =>
+      getMenuItems({
+        isFavorite,
+        onAddToFavorite: onAddToFavorite,
+        onRemoveFromFavorite: onRemoveFromFavorite,
+        onRemoveFood,
+        onDuplicateFood,
+        index,
+      }),
+    [
+      index,
+      isFavorite,
+      onAddToFavorite,
+      onDuplicateFood,
+      onRemoveFood,
+      onRemoveFromFavorite,
+    ],
+  );
 
   return (
     <div className='relative'>
@@ -134,6 +145,7 @@ const MealCard: React.FC<MealCardProps> = ({
               'h-[50px] w-[50px] max-w-[50px] rounded-[10px] border-2 border-transparent object-cover transition-all duration-200',
               { 'border-primary-400 border-2': isHovered },
             )}
+            loading='lazy'
             preview={{
               mask: <EyeOutlined style={{ fontSize: 20, color: 'white' }} />,
             }}
@@ -176,5 +188,32 @@ const MealCard: React.FC<MealCardProps> = ({
     </div>
   );
 };
+
+type ShallowMealItem = {
+  _id?: string;
+  amount?: number;
+  unit?: number;
+};
+
+const areEqual = (prev: MealCardProps, next: MealCardProps) => {
+  if (
+    prev.index !== next.index ||
+    prev.mealDate !== next.mealDate ||
+    prev.mealType !== next.mealType
+  )
+    return false;
+
+  // Compare critical fields of mealItem only
+  const prevItem = prev.mealItem as ShallowMealItem;
+  const nextItem = next.mealItem as ShallowMealItem;
+  if (prevItem?._id !== nextItem?._id) return false;
+  if (prevItem?.amount !== nextItem?.amount) return false;
+  if (prevItem?.unit !== nextItem?.unit) return false;
+
+  // Assume handlers are stable via useCallback upstream.
+  return true;
+};
+
+const MealCard = memo(MealCardComponent, areEqual);
 
 export default MealCard;

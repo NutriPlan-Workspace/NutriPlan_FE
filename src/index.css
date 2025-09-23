@@ -206,3 +206,27 @@
 .ant-skeleton {
   font-size: 0;
 }
+
+/* Pragmatic DnD meal card hover/edge animation */
+[data-meal-card='true'] {
+  position: relative;
+  transition:
+    transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 120ms ease;
+}
+
+/* subtle bounce when another card is hovering on top/bottom edge */
+[data-meal-card='true'][data-dragging-over='true'][data-closest-edge='top'] {
+  transform: translateY(-6px);
+}
+
+[data-meal-card='true'][data-dragging-over='true'][data-closest-edge='bottom'] {
+  transform: translateY(6px);
+}
+
+/* reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  [data-meal-card='true'] {
+    transition: none;
+  }
+}

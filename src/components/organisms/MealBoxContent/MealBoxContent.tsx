@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { HiOutlineArrowPath } from 'react-icons/hi2';
 import { useDispatch, useSelector } from 'react-redux';
 import { Typography } from 'antd';
@@ -12,8 +12,9 @@ import {
   mealPlanSelector,
   updateViewingMealPlanByDate,
 } from '@/redux/slices/mealPlan';
+import { makeSelectMealPlanByDate } from '@/redux/slices/mealPlan/selectors';
 import { MealItems, MealPlanFood } from '@/types/mealPlan';
-import { isSameDay } from '@/utils/dateUtils';
+// import { isSameDay } from '@/utils/dateUtils';
 import {
   getMealPlanDayAfterAddNewMealItem,
   getMealPlanDayAfterChangeAmount,
@@ -35,7 +36,11 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
   const dispatch = useDispatch();
   const { draggingCardHeight } = useSelector(mealPlanSelector);
   const [updateMealPlan] = useUpdateMealPlanMutation();
-  const viewingMealPlan = useSelector(mealPlanSelector).viewingMealPlans;
+  const selectMealPlanByDate = useMemo(makeSelectMealPlanByDate, []);
+  const currentMealPlan = useSelector(
+    (state: import('@/redux/store').RootState) =>
+      selectMealPlanByDate(state, mealDate),
+  );
   const { mealBoxRef, isDragEnter, isOnlyItemDraggingOver } = useMealBoxDrop({
     mealDate,
     mealType,
@@ -46,9 +51,7 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
     unit: number,
     cardId: string,
   ) => {
-    const currentMealPlanDay = viewingMealPlan.find((viewingMealPlanDay) =>
-      isSameDay(new Date(viewingMealPlanDay.mealDate), new Date(mealDate)),
-    );
+    const currentMealPlanDay = currentMealPlan;
 
     if (!currentMealPlanDay || !currentMealPlanDay.mealPlanDay) {
       return;
@@ -80,9 +83,7 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
   };
 
   const handleRemoveFood = async (index: number) => {
-    const currentMealPlanDay = viewingMealPlan.find((viewingMealPlanDay) =>
-      isSameDay(new Date(viewingMealPlanDay.mealDate), new Date(mealDate)),
-    );
+    const currentMealPlanDay = currentMealPlan;
 
     if (!currentMealPlanDay) {
       return;
@@ -112,9 +113,7 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
   };
 
   const handleDuplicateFood = async (index: number) => {
-    const currentMealPlanDay = viewingMealPlan.find((viewingMealPlanDay) =>
-      isSameDay(new Date(viewingMealPlanDay.mealDate), new Date(mealDate)),
-    );
+    const currentMealPlanDay = currentMealPlan;
 
     if (!currentMealPlanDay?.mealPlanDay?.mealItems?.[mealType]) {
       return;
