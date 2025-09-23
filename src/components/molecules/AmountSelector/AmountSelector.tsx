@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ConfigProvider, InputNumber, Select } from 'antd';
 
+import { roundWithThreshold } from '@/constants/threshold';
 import { useAmountSelector } from '@/hooks/useAmountSelector';
 
 const { Option } = Select;
@@ -36,6 +37,18 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
     handleOptionChange,
   } = useAmountSelector({ currentUnit, currentAmount, options });
 
+  const lastCommittedRef = useRef({
+    amount: roundWithThreshold(currentAmount),
+    unit: currentUnit,
+  });
+
+  useEffect(() => {
+    lastCommittedRef.current = {
+      amount: roundWithThreshold(currentAmount),
+      unit: currentUnit,
+    };
+  }, [currentAmount, currentUnit]);
+
   return (
     <div className='align-center relative flex flex-col items-start justify-evenly'>
       {/* Real Input */}
@@ -63,7 +76,11 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
             }}
             onBlur={() => {
               setIsFocused(false);
-              onAmountChange(value, selectedOption.index, cardId);
+              onAmountChange(
+                roundWithThreshold(value),
+                selectedOption.index,
+                cardId,
+              );
             }}
             controls={false}
             variant='filled'
@@ -73,7 +90,30 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
             addonAfter={
               <Select
                 value={selectedOption.description}
-                onChange={handleOptionChange}
+                onChange={(newDescription) => {
+                  const newOption = options.find(
+                    (o) => o.description === newDescription,
+                  );
+                  if (!newOption) return;
+                  // Calculate converted value before updating local state
+                  const newValueCalculated =
+                    (value / selectedOption.amount) * newOption.amount;
+                  // apply threshold rounding
+                  const rounded = roundWithThreshold(newValueCalculated);
+                  // Update local state
+                  handleOptionChange(newDescription);
+                  // Commit to parent so unit & amount persist and DB updates
+                  if (
+                    lastCommittedRef.current.amount !== rounded ||
+                    lastCommittedRef.current.unit !== newOption.index
+                  ) {
+                    onAmountChange(rounded, newOption.index, cardId);
+                    lastCommittedRef.current = {
+                      amount: rounded,
+                      unit: newOption.index,
+                    };
+                  }
+                }}
                 defaultValue={'0'}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}

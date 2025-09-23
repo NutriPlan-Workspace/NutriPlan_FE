@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { roundWithThreshold } from '@/constants/threshold';
+
 interface UseAmountSelectorProps {
   currentUnit: number;
   currentAmount: number;
@@ -24,6 +26,15 @@ export const useAmountSelector = ({
   const [isFocused, setIsFocused] = useState(false);
   const spanRef = useRef<HTMLSpanElement>(null);
 
+  // Keep internal state in sync if props change (e.g., when list reorders)
+  useEffect(() => {
+    setSelectedOption(options[currentUnit] || options[0]);
+  }, [currentUnit, options]);
+
+  useEffect(() => {
+    setValue(currentAmount);
+  }, [currentAmount]);
+
   useEffect(() => {
     if (spanRef.current) {
       const newWidth = spanRef.current.getBoundingClientRect().width + 55;
@@ -46,10 +57,9 @@ export const useAmountSelector = ({
       ({ description }) => description === newDescription,
     );
     if (!newOption || !selectedOption) return;
-
     const newValueCalculated =
       (value / selectedOption.amount) * newOption.amount;
-    setValue(newValueCalculated);
+    setValue(roundWithThreshold(newValueCalculated));
     setSelectedOption(newOption);
   };
 

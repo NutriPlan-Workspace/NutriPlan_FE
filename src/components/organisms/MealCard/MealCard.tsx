@@ -163,7 +163,11 @@ const MealCard: React.FC<MealCardProps> = ({
               />
             )}
           </div>
-          <PairButton isHovered={isHovered} menuItems={menuItems} />
+          <PairButton
+            isHovered={isHovered}
+            menuItems={menuItems}
+            mealDate={new Date(mealDate)}
+          />
         </div>
       </Popover>
       {dragState && closestEdge === 'bottom' && (
