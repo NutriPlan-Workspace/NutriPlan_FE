@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { batch, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import {
   draggable,
@@ -34,6 +34,7 @@ export const useMealCardDrag = ({
   const draggingCardHeight = useSelector(mealPlanSelector).draggingCardHeight;
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const mealCardRef = useRef<HTMLDivElement | null>(null);
+
   // refs to avoid unnecessary re-renders during drag
   const prevEdgeRef = useRef<Edge | null>(null);
   const prevDragStateRef = useRef<boolean>(false);
@@ -44,10 +45,10 @@ export const useMealCardDrag = ({
     const mealCardElement = mealCardRef.current;
     invariant(mealCardElement, 'mealCardElement is not defined');
 
-    // mark element for CSS targeting and ensure relative positioning for indicators
+    // mark element for CSS targeting
     mealCardElement.dataset.mealCard = 'true';
 
-    const setAttrsWithRaf = (attrs: Record<string, string | null>) => {
+    const setAttrsWithRef = (attrs: Record<string, string | null>) => {
       // merge pending attrs
       pendingAttrsRef.current = {
         ...(pendingAttrsRef.current ?? {}),
@@ -67,6 +68,18 @@ export const useMealCardDrag = ({
           }
         });
       }
+    };
+
+    // Clear data attributes from all meal-card elements to avoid leaving
+    // residual [data-dragging-over] / [data-closest-edge] selectors active
+    const clearAllMealCardAttrs = () => {
+      document.querySelectorAll("[data-meal-card='true']").forEach((el) => {
+        // remove the data attributes used for CSS animations
+        delete (el as HTMLElement).dataset.draggingOver;
+        delete (el as HTMLElement).dataset.closestEdge;
+        // also clear any inline transform left behind
+        (el as HTMLElement).style.transform = '';
+      });
     };
 
     return combine(
@@ -114,23 +127,23 @@ export const useMealCardDrag = ({
         },
         onDragStart: () => {
           const height = mealCardElement.clientHeight;
-          batch(() => {
-            dispatch(setDraggingCardHeight({ draggingCardHeight: height }));
-            dispatch(setIsDragging({ isDragging: true }));
-          });
+          dispatch(setDraggingCardHeight({ draggingCardHeight: height }));
+          dispatch(setIsDragging({ isDragging: true }));
           // fade while still in original area
           mealCardElement.style.opacity = '0.4';
           mealCardElement.style.willChange = 'transform, opacity';
         },
         onDrop: () => {
-          batch(() => {
-            dispatch(setIsDragging({ isDragging: false }));
-          });
+          dispatch(setIsDragging({ isDragging: false }));
           // cleanup inline styles & data attributes
           mealCardElement.style.display = 'flex';
           mealCardElement.style.opacity = '1';
           mealCardElement.style.willChange = '';
-          setAttrsWithRaf({ draggingOver: null, closestEdge: null });
+          // remove attributes on this element via the batching helper
+          setAttrsWithRef({ draggingOver: null, closestEdge: null });
+          // also clear attributes from any other meal cards that might still
+          // have them (ensures no CSS selector keeps applying after drop)
+          clearAllMealCardAttrs();
           prevEdgeRef.current = null;
           prevDragStateRef.current = false;
         },
@@ -161,7 +174,7 @@ export const useMealCardDrag = ({
           ) {
             const edge = extractClosestEdge(args.self.data);
             // update element data attributes for CSS-driven animation
-            setAttrsWithRaf({ draggingOver: 'true', closestEdge: edge ?? '' });
+            setAttrsWithRef({ draggingOver: 'true', closestEdge: edge ?? '' });
             mealCardElement.style.willChange = 'transform';
 
             // minimize React re-renders by only updating when changed
@@ -185,13 +198,13 @@ export const useMealCardDrag = ({
             if (prevEdgeRef.current !== edge) {
               prevEdgeRef.current = edge;
               // update data attribute for smoother animation without re-render
-              setAttrsWithRaf({ closestEdge: edge ?? '' });
+              setAttrsWithRef({ closestEdge: edge ?? '' });
               setClosestEdge(edge);
             }
           }
         },
         onDragLeave: ({ source }) => {
-          setAttrsWithRaf({ draggingOver: null, closestEdge: null });
+          setAttrsWithRef({ draggingOver: null, closestEdge: null });
           prevEdgeRef.current = null;
           if (prevDragStateRef.current) {
             prevDragStateRef.current = false;
@@ -204,9 +217,11 @@ export const useMealCardDrag = ({
             mealCardElement.style.opacity = '1';
           }
           mealCardElement.style.willChange = '';
+          // ensure other meal cards are not left with hover attributes
+          clearAllMealCardAttrs();
         },
         onDrop: ({ source }) => {
-          setAttrsWithRaf({ draggingOver: null, closestEdge: null });
+          setAttrsWithRef({ draggingOver: null, closestEdge: null });
           prevEdgeRef.current = null;
           if (prevDragStateRef.current) {
             prevDragStateRef.current = false;
@@ -217,6 +232,8 @@ export const useMealCardDrag = ({
             mealCardElement.style.opacity = '1';
           }
           mealCardElement.style.willChange = '';
+          // clear any stray attrs left on other meal cards
+          clearAllMealCardAttrs();
         },
       }),
       () => {
