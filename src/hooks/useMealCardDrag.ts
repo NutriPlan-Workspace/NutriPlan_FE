@@ -93,38 +93,6 @@ export const useMealCardDrag = ({
           index,
           height: mealCardElement.clientHeight,
         }),
-        onGenerateDragPreview: ({ nativeSetDragImage }) => {
-          // Lightweight custom preview to reduce layout cost
-          const width = mealCardElement.clientWidth;
-          const height = mealCardElement.clientHeight;
-          const preview = document.createElement('div');
-          preview.style.width = `${width}px`;
-          preview.style.height = `${height}px`;
-          preview.style.position = 'fixed';
-          preview.style.top = '-10000px';
-          preview.style.left = '-10000px';
-          preview.style.pointerEvents = 'none';
-          preview.style.opacity = '0.9';
-          preview.style.background = '#ffffff';
-          preview.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
-          preview.style.border = '2px solid rgba(0,0,0,0.06)';
-          preview.style.borderRadius =
-            getComputedStyle(mealCardElement).borderRadius;
-          preview.style.willChange = 'transform, opacity';
-          document.body.appendChild(preview);
-
-          nativeSetDragImage?.(
-            preview,
-            Math.min(24, width / 2),
-            Math.min(24, height / 2),
-          );
-
-          return () => {
-            if (preview && preview.parentElement) {
-              preview.parentElement.removeChild(preview);
-            }
-          };
-        },
         onDragStart: () => {
           const height = mealCardElement.clientHeight;
           dispatch(setDraggingCardHeight({ draggingCardHeight: height }));
