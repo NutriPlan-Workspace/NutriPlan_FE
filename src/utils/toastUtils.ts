@@ -12,7 +12,7 @@ const toastStyles: Record<ToastType, string> = {
   success: 'text-green-600 border-[#97f8ae]',
   error: 'text-red-500 border-[#f6a3ab]',
   info: 'text-blue-500 border-[#87e3f1]',
-  warning: 'text-yellow-500 border-[#ffe28c]',
+  warning: 'text-green-700 border-[#b8f3c8]',
 };
 
 const showToast = (content: string, type: ToastType): void => {

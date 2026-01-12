@@ -92,7 +92,7 @@ const NutritionSummary: FC<NutritionSummaryProp> = ({
         {!isDetailCollection && (
           <>
             <Button
-              className='mt-2 border-gray-400 text-gray-600 hover:border-gray-400 hover:bg-gray-200 hover:text-black'
+              className='mt-3 w-full rounded-2xl border border-black/10 bg-white/60 px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-white'
               onClick={showModal}
             >
               Detailed Nutrition Information

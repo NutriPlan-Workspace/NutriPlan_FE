@@ -11,6 +11,7 @@ export interface User {
   fullName: string;
   email: string;
   role: Role;
+  avatarUrl?: string;
   physicalStat: {
     gender: Gender;
     heightRecords: { date: Date; height: number }[];
@@ -54,6 +55,7 @@ export interface UserAuth {
   fullName: string;
   email: string;
   role: Role;
+  avatarUrl?: string;
 }
 
 export interface PhysicalStatsValues {
@@ -167,6 +169,6 @@ export interface UserResponse {
   success: boolean;
   message: string;
   code: number;
-  data: User;
+  data: UserAuth;
   error?: string;
 }

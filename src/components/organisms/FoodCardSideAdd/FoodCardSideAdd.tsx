@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Image, Popover, Typography } from 'antd';
 
+import { NUTRITION_POPOVER_BODY_STYLE } from '@/constants/popoverStyles';
 import { cn } from '@/helpers/helpers';
 import { useFoodCardSideAddDrag } from '@/hooks/useFoodCardSideAddDrag';
 import { NutritionPopoverFood } from '@/molecules/NutritionPopoverFood';
@@ -33,11 +34,7 @@ const FoodCardSideAdd: React.FC<FoodCardSideAddProps> = ({ food }) => {
         placement='left'
         color='white'
         styles={{
-          body: {
-            padding: 0,
-            borderRadius: '10px',
-            overflow: 'hidden',
-          },
+          body: NUTRITION_POPOVER_BODY_STYLE,
         }}
         content={<NutritionPopoverFood mealItem={food} />}
       >

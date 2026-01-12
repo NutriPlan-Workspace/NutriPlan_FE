@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 
+import { cn } from '@/helpers/helpers';
 import type { MenuItemDropdown } from '@/types/menuItem';
 
 interface MenuOptionProps {
@@ -32,11 +33,16 @@ const MenuOption: React.FC<MenuOptionProps> = ({
   };
 
   return (
-    <div className={`border-none bg-white shadow-md ${className}`}>
+    <div
+      className={cn(
+        'overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-[0_12px_28px_-24px_rgba(16,24,40,0.3)]',
+        className,
+      )}
+    >
       <Menu
         selectedKeys={[selectedItem]}
         onClick={handleMenuClick}
-        className='w-full'
+        className='w-full border-0'
         items={items}
       />
     </div>

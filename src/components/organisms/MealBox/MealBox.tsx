@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { MealBoxHeader } from '@/molecules/MealBoxHeader';
@@ -6,16 +6,23 @@ import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
 import { MealBoxContent } from '@/organisms/MealBoxContent';
 import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import {
+  closeSwapModal,
   mealPlanSelector,
+  openSwapModal,
+  setSwapModalData,
+  setSwapModalLoading,
   updateViewingMealPlanByDate,
 } from '@/redux/slices/mealPlan';
 import type { MealItems, MealPlanDay, MealPlanFood } from '@/types/mealPlan';
+import type { MealType, SwapOptionsResponse } from '@/types/mealSwap';
 import {
   getTotalCalories,
   getTotalNutrition,
 } from '@/utils/calculateNutrition';
 import { isSameDay } from '@/utils/dateUtils';
 import { getMealPlanDayDatabaseDTOByMealPlanDay } from '@/utils/mealPlan';
+import { fetchSwapOptions } from '@/utils/mealSwapApi';
+import { showToastError } from '@/utils/toastUtils';
 
 interface MealBoxProps {
   mealItems: MealPlanFood[];
@@ -34,6 +41,13 @@ const MealBox: React.FC<MealBoxProps> = ({
   const dispatch = useDispatch();
   const [updateMealPlan] = useUpdateMealPlanMutation();
   const viewingMealPlan = useSelector(mealPlanSelector).viewingMealPlans;
+  const swapModal = useSelector(mealPlanSelector).swapModal;
+
+  const totalCalories = useMemo(() => getTotalCalories(mealItems), [mealItems]);
+  const totalNutrition = useMemo(
+    () => getTotalNutrition(mealItems),
+    [mealItems],
+  );
 
   const handleRemoveAllFoodInMealType = async (
     mealDate: string,
@@ -63,9 +77,53 @@ const MealBox: React.FC<MealBoxProps> = ({
     await updateMealPlan({ mealPlan: updatedMealPlanDatabaseDTO });
   };
 
+  const handleOpenSwapOptions = useCallback(async () => {
+    const currentMealPlanDay = viewingMealPlan.find((plan) =>
+      isSameDay(new Date(plan.mealDate), new Date(mealDate)),
+    )?.mealPlanDay;
+
+    if (!currentMealPlanDay?._id) {
+      showToastError('Meal plan not found for this day.');
+      return;
+    }
+
+    dispatch(
+      openSwapModal({
+        swapType: 'meal',
+        mealPlanId: currentMealPlanDay._id,
+        mealDate,
+        mealType: mealType as MealType,
+        filters: {},
+      }),
+    );
+    dispatch(setSwapModalLoading({ loading: true }));
+    try {
+      const data = await fetchSwapOptions(currentMealPlanDay._id, {
+        swapType: 'meal',
+        mealType: mealType as MealType,
+        limit: 5,
+      });
+      dispatch(setSwapModalData({ data: data as SwapOptionsResponse }));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Swap options failed';
+      showToastError(message);
+      dispatch(closeSwapModal());
+    } finally {
+      dispatch(setSwapModalLoading({ loading: false }));
+    }
+  }, [dispatch, mealDate, mealType, viewingMealPlan]);
+
+  const isGeneratingThisMeal =
+    swapModal.open &&
+    swapModal.loading &&
+    swapModal.swapType === 'meal' &&
+    swapModal.mealDate === mealDate &&
+    swapModal.mealType === (mealType as MealType);
+
   return (
     <div
-      className='mt-1 w-full rounded-sm bg-white p-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_12px_12px_rgba(0,0,0,0.05),_0px_0px_12px_rgba(35,31,32,0.1)]'
+      className='mt-2 w-full rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35),_0_2px_4px_rgba(15,23,42,0.06)] backdrop-blur-sm transition-all duration-200 hover:shadow-[0_16px_28px_-18px_rgba(15,23,42,0.35),_0_6px_12px_rgba(15,23,42,0.08)]'
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -78,12 +136,14 @@ const MealBox: React.FC<MealBoxProps> = ({
               handleRemoveAllFoodInMealType(mealDate, mealType)
             }
             mealType={mealType}
-            calories={getTotalCalories(mealItems)}
-            nutritionData={getTotalNutrition(mealItems)}
+            calories={totalCalories}
+            nutritionData={totalNutrition}
             mealItems={mealItems}
             isHovered={isHovered}
+            onGenerateOptions={handleOpenSwapOptions}
+            isGenerating={isGeneratingThisMeal}
           />
-          <div className='rounded-lg bg-white'>
+          <div className='rounded-xl bg-white/70'>
             <MealBoxContent
               mealDate={mealDate}
               mealType={mealType as keyof MealItems}

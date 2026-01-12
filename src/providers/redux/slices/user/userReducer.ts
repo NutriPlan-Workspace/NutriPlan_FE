@@ -13,6 +13,7 @@ export const userInitialState: UserState = {
     fullName: '',
     email: '',
     role: Role.GUEST,
+    avatarUrl: '',
   },
 };
 

@@ -3,6 +3,7 @@ import { Button, Image, InputNumber, Select, Typography } from 'antd';
 
 import { Food } from '@/types/food';
 import { IngredientInput } from '@/types/ingredient';
+import { getUnitAmountFromUnits } from '@/utils/foodUnits';
 
 import { NutritionSummary } from '../NutritionSummary';
 
@@ -20,7 +21,9 @@ const SelectedIngredientDetail: React.FC<SelectedIngredientDetailProps> = ({
   onBack,
 }) => {
   const [unitIndex, setUnitIndex] = useState(0);
-  const [amount, setAmount] = useState<number>(selectedFood.units[0].amount);
+  const [amount, setAmount] = useState<number>(
+    getUnitAmountFromUnits(selectedFood.units, 0, 1),
+  );
 
   const handleAdd = () => {
     onAddFood({
@@ -32,7 +35,7 @@ const SelectedIngredientDetail: React.FC<SelectedIngredientDetailProps> = ({
 
   const handleUnitChange = (index: number) => {
     setUnitIndex(index);
-    setAmount(selectedFood.units[index].amount);
+    setAmount(getUnitAmountFromUnits(selectedFood.units, index, 1));
   };
 
   return (

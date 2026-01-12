@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaRegPlusSquare, FaSearch } from 'react-icons/fa';
 import { useNavigate } from '@tanstack/react-router';
-import { Input, Typography } from 'antd';
+import { Input } from 'antd';
 
 import { Button } from '@/atoms/Button';
 import { CollectionPageSkeleton } from '@/atoms/CollectionPageSkeleton';
@@ -9,11 +9,10 @@ import { DropdownMenuWrapper } from '@/atoms/DropdownMenu';
 import { PATH } from '@/constants/path';
 import { CollectionList } from '@/molecules/CollectionList';
 import { useGetListCollectionQuery } from '@/redux/query/apis/collection/collectionApi';
+import HubPageShell from '@/templates/HubPageShell';
 import type { Collection as CollectionType } from '@/types/collection';
 import type { MenuItemDropdown } from '@/types/menuItem';
 import { debounceValue } from '@/utils/debounce';
-
-const { Title, Paragraph } = Typography;
 
 const dropdownItems: MenuItemDropdown[] = [
   { key: '1', label: 'Date Added' },
@@ -34,7 +33,7 @@ const Collection: React.FC = () => {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   useEffect(() => {
     if (!data?.data) return;
@@ -64,46 +63,51 @@ const Collection: React.FC = () => {
   };
 
   return (
-    <div className='flex flex-col gap-4 p-5'>
-      <Title level={3} className='font-thin'>
-        Collections
-      </Title>
-      <Button
-        className='hover:border-primary flex max-w-[200px] items-center justify-center gap-4 py-4 hover:text-black'
-        onClick={() => navigate({ to: PATH.CREATE_COLLECTION })}
-      >
-        <FaRegPlusSquare />
-        <Paragraph className='m-0'>Create collection</Paragraph>
-      </Button>
-      <div className='flex max-w-[800px] items-center justify-between'>
-        <Input
-          size='large'
-          placeholder='Search...'
-          prefix={<FaSearch />}
-          className='max-w-[250px]'
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-        <div className='flex items-center gap-2'>
-          <label>Sort By: </label>
-          <DropdownMenuWrapper
-            items={dropdownItems}
-            defaultSelectedKey={selectedKey}
-            onSelect={handleSelect}
+    <HubPageShell
+      title='Collections'
+      description='Organize foods and recipes into reusable collections.'
+      maxWidthClassName='max-w-7xl'
+      actions={
+        <Button
+          onClick={() => navigate({ to: PATH.CREATE_COLLECTION })}
+          className='bg-secondary-100 text-secondary-800 hover:!bg-secondary-200 h-11 rounded-2xl border-none px-4 font-semibold'
+        >
+          <span className='flex items-center gap-2'>
+            <FaRegPlusSquare />
+            Create collection
+          </span>
+        </Button>
+      }
+    >
+      <div className='flex flex-col gap-5'>
+        <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+          <Input
+            size='large'
+            placeholder='Search collections...'
+            prefix={<FaSearch />}
+            className='w-full max-w-[420px] rounded-2xl'
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
+          <div className='flex items-center gap-2 text-sm text-gray-700'>
+            <span className='font-medium'>Sort</span>
+            <DropdownMenuWrapper
+              items={dropdownItems}
+              defaultSelectedKey={selectedKey}
+              onSelect={handleSelect}
+            />
+          </div>
         </div>
-      </div>
-      <Title level={3} className='mt-4 mb-0 font-thin'>
-        My Collections
-      </Title>
-      {isLoading ? (
-        <CollectionPageSkeleton />
-      ) : (
-        <div className='flex w-full items-center gap-4'>
+
+        <div className='h-px bg-black/5' />
+
+        {isLoading ? (
+          <CollectionPageSkeleton />
+        ) : (
           <CollectionList collections={sortedCollections} />
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </HubPageShell>
   );
 };
 export default Collection;

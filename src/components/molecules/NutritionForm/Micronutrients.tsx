@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { InputField } from '@/atoms/Input';
 import type { NutritionFormSchema } from '@/schemas/nutritionTargetSchema';
 
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 interface MicronutrientsProps {
   control: Control<NutritionFormSchema>;
@@ -27,13 +27,14 @@ const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
   };
 
   return (
-    <div className='mr-2 flex flex-col gap-2'>
-      <Title level={3} className='font-thin'>
-        Micronutrients
-      </Title>
-
-      <div className='flex items-center justify-between'>
-        <Paragraph>Minimum Fiber</Paragraph>
+    <div className='flex flex-col gap-4'>
+      <div className='flex items-center justify-between gap-4'>
+        <div className='flex flex-col'>
+          <Paragraph className='m-0 text-sm font-medium text-gray-700'>
+            Minimum fiber
+          </Paragraph>
+          <span className='text-xs text-gray-500'>grams per day</span>
+        </div>
         <Controller
           name='minimumFiber'
           control={control}
@@ -41,11 +42,13 @@ const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
             <Tooltip
               title={errors.minimumFiber?.message}
               open={!!errors.minimumFiber}
+              overlayClassName='np-tooltip'
             >
               <InputField
                 {...field}
                 type='number'
-                className='hover:border-primary-200 focus:border-primary-200 mb-2 w-[100px] rounded-md'
+                inputMode='numeric'
+                className='hover:border-primary-200 focus:border-primary-200 h-10 w-[140px] rounded-xl text-right'
                 onChange={(e) => field.onChange(Number(e.target.value))}
               />
             </Tooltip>
@@ -53,8 +56,17 @@ const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
         />
       </div>
 
-      <div className='flex items-center justify-between'>
-        <Paragraph>Limit Daily Sodium</Paragraph>
+      <div className='h-px bg-gray-200/70' />
+
+      <div className='flex items-center justify-between gap-4'>
+        <div className='flex flex-col'>
+          <Paragraph className='m-0 text-sm font-medium text-gray-700'>
+            Limit daily sodium
+          </Paragraph>
+          <span className='text-xs text-gray-500'>
+            enable a maximum sodium target
+          </span>
+        </div>
         <Switch
           checked={limitSodium}
           onChange={() => handleSwitchChange(setLimitSodium)}
@@ -63,13 +75,18 @@ const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
 
       {limitSodium && (
         <motion.div
-          className='flex items-center justify-between'
+          className='flex items-center justify-between gap-4'
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
         >
-          <Paragraph>Maximum Sodium</Paragraph>
+          <div className='flex flex-col'>
+            <Paragraph className='m-0 text-sm font-medium text-gray-700'>
+              Maximum sodium
+            </Paragraph>
+            <span className='text-xs text-gray-500'>mg per day</span>
+          </div>
           <Controller
             name='maxiumSodium'
             control={control}
@@ -77,11 +94,13 @@ const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
               <Tooltip
                 title={errors.maxiumSodium?.message}
                 open={!!errors.maxiumSodium}
+                overlayClassName='np-tooltip'
               >
                 <InputField
                   {...field}
                   type='number'
-                  className='hover:border-primary-200 focus:border-primary-200 mb-2 w-[100px] rounded-md'
+                  inputMode='numeric'
+                  className='hover:border-primary-200 focus:border-primary-200 h-10 w-[140px] rounded-xl text-right'
                   onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </Tooltip>
@@ -90,8 +109,17 @@ const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
         </motion.div>
       )}
 
-      <div className='flex items-center justify-between'>
-        <Paragraph>Limit Daily Cholesterol</Paragraph>
+      <div className='h-px bg-gray-200/70' />
+
+      <div className='flex items-center justify-between gap-4'>
+        <div className='flex flex-col'>
+          <Paragraph className='m-0 text-sm font-medium text-gray-700'>
+            Limit daily cholesterol
+          </Paragraph>
+          <span className='text-xs text-gray-500'>
+            enable a maximum cholesterol target
+          </span>
+        </div>
         <Switch
           checked={limitCholesterol}
           onChange={() => handleSwitchChange(setLimitCholesterol)}
@@ -100,13 +128,18 @@ const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
 
       {limitCholesterol && (
         <motion.div
-          className='flex items-center justify-between'
+          className='flex items-center justify-between gap-4'
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
         >
-          <Paragraph>Maximum Cholesterol</Paragraph>
+          <div className='flex flex-col'>
+            <Paragraph className='m-0 text-sm font-medium text-gray-700'>
+              Maximum cholesterol
+            </Paragraph>
+            <span className='text-xs text-gray-500'>mg per day</span>
+          </div>
           <Controller
             name='maxiumCholesterol'
             control={control}
@@ -114,11 +147,13 @@ const Micronutrients: React.FC<MicronutrientsProps> = ({ control, errors }) => {
               <Tooltip
                 title={errors.maxiumCholesterol?.message}
                 open={!!errors.maxiumCholesterol}
+                overlayClassName='np-tooltip'
               >
                 <InputField
                   {...field}
                   type='number'
-                  className='hover:border-primary-200 focus:border-primary-200 mb-2 w-[100px] rounded-md'
+                  inputMode='numeric'
+                  className='hover:border-primary-200 focus:border-primary-200 h-10 w-[140px] rounded-xl text-right'
                   onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </Tooltip>

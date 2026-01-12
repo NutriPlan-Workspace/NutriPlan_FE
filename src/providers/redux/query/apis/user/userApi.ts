@@ -17,6 +17,7 @@ export const userApi = baseApi.injectEndpoints({
         url: '/user/stats',
         method: 'GET',
       }),
+      providesTags: ['PhysicalStats'],
     }),
     getNutritionTarget: builder.query<
       NutritionGoalResponse,
@@ -26,6 +27,7 @@ export const userApi = baseApi.injectEndpoints({
         url: '/user/nutrition-target',
         method: 'GET',
       }),
+      providesTags: ['NutritionTarget'],
     }),
     getNewNutritionTarget: builder.query<
       NutritionGoalResponse,
@@ -45,6 +47,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: nutritionGoal,
       }),
+      invalidatesTags: ['NutritionTarget'],
     }),
     updatePhysicalStats: builder.mutation<PhysicalStatResponse, PhysicalStat>({
       query: (physicalStat) => ({
@@ -52,12 +55,14 @@ export const userApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: physicalStat,
       }),
+      invalidatesTags: ['PhysicalStats'],
     }),
     getPrimaryDiet: builder.query<PrimaryDietResponse, void>({
       query: () => ({
         url: '/user/primary-diet',
         method: 'GET',
       }),
+      providesTags: ['PrimaryDiet'],
     }),
     updatePrimaryDiet: builder.mutation<PrimaryDietResponse, PrimaryDietArgs>({
       query: (primaryDiet) => ({
@@ -65,12 +70,36 @@ export const userApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: primaryDiet,
       }),
+      invalidatesTags: ['PrimaryDiet', 'FoodExclusions'],
+      async onQueryStarted(arg, api) {
+        const patch = api.dispatch(
+          userApi.util.updateQueryData('getPrimaryDiet', undefined, (draft) => {
+            draft.data = arg.primaryDiet;
+          }),
+        );
+
+        try {
+          const { data } = await api.queryFulfilled;
+          api.dispatch(
+            userApi.util.updateQueryData(
+              'getPrimaryDiet',
+              undefined,
+              (draft) => {
+                draft.data = data.data;
+              },
+            ),
+          );
+        } catch {
+          patch.undo();
+        }
+      },
     }),
     getFoodExclusions: builder.query<FoodExclusionsResponse, void>({
       query: () => ({
         url: '/user/food-exclusions',
         method: 'GET',
       }),
+      providesTags: ['FoodExclusions'],
     }),
     updateFoodExclusions: builder.mutation<
       FoodExclusionsResponse,
@@ -81,6 +110,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: excluded,
       }),
+      invalidatesTags: ['FoodExclusions'],
     }),
   }),
 });

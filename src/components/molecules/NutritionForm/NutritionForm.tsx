@@ -22,7 +22,10 @@ interface NutritionFormProps {
   loading: boolean;
 }
 
-const NutritionForm: React.FC<NutritionFormProps> = ({ nutritionData }) => {
+const NutritionForm: React.FC<NutritionFormProps> = ({
+  nutritionData,
+  loading,
+}) => {
   const {
     control,
     handleSubmit,
@@ -51,6 +54,8 @@ const NutritionForm: React.FC<NutritionFormProps> = ({ nutritionData }) => {
 
   const [updateNutrition, { isLoading }] = useUpdateNutritionRequestMutation();
 
+  const isBusy = loading || isLoading;
+
   const onSubmit = async (data: NutritionFormSchema) => {
     try {
       const response = await updateNutrition(data).unwrap();
@@ -67,20 +72,66 @@ const NutritionForm: React.FC<NutritionFormProps> = ({ nutritionData }) => {
 
   return (
     <form
-      className='flex max-w-[720px] flex-col gap-4'
+      className='flex w-full flex-col gap-6'
       onSubmit={handleSubmit(onSubmit)}
     >
-      <NutritionTitle control={control} errors={errors} />
-      <TargetMacros control={control} errors={errors} />
-      <Micronutrients control={control} errors={errors} />
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-12'>
+        <div className='flex flex-col gap-6 lg:col-span-7'>
+          <section className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-30px_rgba(16,24,40,0.28)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/85 sm:p-6'>
+            <div className='flex flex-col gap-1'>
+              <div className='text-sm font-semibold text-gray-900'>
+                Calories
+              </div>
+              <div className='text-xs text-gray-500'>
+                Your daily energy target (kcal).
+              </div>
+            </div>
+            <div className='mt-4'>
+              <NutritionTitle control={control} errors={errors} />
+            </div>
+          </section>
 
-      <div className='flex items-center justify-center'>
+          <section className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-30px_rgba(16,24,40,0.28)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/85 sm:p-6'>
+            <div className='flex flex-col gap-1'>
+              <div className='text-sm font-semibold text-gray-900'>
+                Macro ranges
+              </div>
+              <div className='text-xs text-gray-500'>
+                Pick a flexible range for carbs, fats, and protein.
+              </div>
+            </div>
+            <div className='mt-5'>
+              <TargetMacros control={control} errors={errors} />
+            </div>
+          </section>
+        </div>
+
+        <div className='lg:col-span-5'>
+          <section className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-30px_rgba(16,24,40,0.28)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/85 sm:p-6'>
+            <div className='flex flex-col gap-1'>
+              <div className='text-sm font-semibold text-gray-900'>
+                Micronutrients
+              </div>
+              <div className='text-xs text-gray-500'>
+                Optional limits for fiber, sodium, and cholesterol.
+              </div>
+            </div>
+            <div className='mt-4'>
+              <Micronutrients control={control} errors={errors} />
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div className='flex items-center justify-end'>
         <Button
           htmlType='submit'
-          className='bg-primary hover:bg-primary-400 h-[42px] w-[100px] border-none px-[24px] py-[9px] text-[16px] font-bold text-black disabled:bg-gray-500 disabled:text-white disabled:opacity-50'
-          disabled={isLoading}
+          type='primary'
+          loading={isBusy}
+          disabled={isBusy}
+          className='!bg-primary hover:!bg-primary-400 h-11 rounded-2xl !border-none px-6 !text-black shadow-[0_14px_34px_-26px_rgba(16,24,40,0.45)] disabled:!bg-gray-300 disabled:!text-gray-600'
         >
-          {isLoading ? 'Updating...' : 'Update'}
+          Update targets
         </Button>
       </div>
     </form>

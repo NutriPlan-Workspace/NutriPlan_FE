@@ -18,6 +18,7 @@ export interface MealPlanFoodDetail {
   _id: string;
   name: string;
   imgUrls: string[];
+  categories?: number[];
   property: PropertySummaryFields;
   nutrition: NutritionFields;
   units: {
@@ -148,6 +149,7 @@ export interface GroceriesResponse {
 export interface IngreResponse {
   _id: string;
   name: string;
+  categories?: number[];
   totalAmount: number;
   unit: {
     _id: string;
@@ -165,6 +167,9 @@ export interface IngreResponse {
     carbs: number;
     fats: number;
     proteins: number;
+    fiber?: number;
+    sodium?: number;
+    cholesterol?: number;
   };
   foodDetails: {
     name: string;

@@ -18,6 +18,9 @@ const SidebarTop: React.FC<SidebarTopProps> = ({
   isCollapsed,
 }) => {
   const user = useSelector(userSelector).user;
+  const avatarSrc =
+    user?.avatarUrl ||
+    'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510622/wlqbqzxb5uqvlm9zvugw.png';
 
   return (
     <div
@@ -41,7 +44,7 @@ const SidebarTop: React.FC<SidebarTopProps> = ({
             className='h-[40px] w-[40px] rounded-full border-none p-0 outline-none'
           >
             <img
-              src='https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510622/wlqbqzxb5uqvlm9zvugw.png'
+              src={avatarSrc}
               alt=''
               className='h-full w-full rounded-full'
             />

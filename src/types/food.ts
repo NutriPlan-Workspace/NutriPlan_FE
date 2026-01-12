@@ -6,6 +6,7 @@ export interface Food {
   defaultUnit: number;
   categoryId: string;
   secondaryCategoryId: string;
+  categories?: number[];
   imgUrls: string[];
   nutrition: NutritionFields;
   property: PropertyFields;

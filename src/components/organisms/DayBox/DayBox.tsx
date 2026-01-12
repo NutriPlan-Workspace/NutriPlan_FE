@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'motion/react';
 
@@ -7,12 +7,16 @@ import { DayBoxHeader } from '@/molecules/DayBoxHeader';
 import { DayBoxSummary } from '@/molecules/DayBoxSummary';
 import { NutritionPopoverDay } from '@/molecules/NutritionPopoverDay';
 import { DayBoxContent } from '@/organisms/DayBoxContent';
-import { useRemoveMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
+import {
+  useAutoGenerateMealPlanMutation,
+  useRemoveMealPlanMutation,
+} from '@/redux/query/apis/mealPlan/mealPlanApi';
 import { useGetNutritionTargetQuery } from '@/redux/query/apis/user/userApis';
 import { mealPlanSelector, setViewingMealPlans } from '@/redux/slices/mealPlan';
 import type { MealPlanDay } from '@/types/mealPlan';
 import { getTotalNutrition } from '@/utils/calculateNutrition';
 import { isSameDay, isSameDayAsToday } from '@/utils/dateUtils';
+import { showToastError } from '@/utils/toastUtils';
 
 interface DayBoxProps {
   mealPlanDay: MealPlanDay | undefined;
@@ -32,19 +36,26 @@ const DayBox: React.FC<DayBoxProps> = ({
   onCopyPreviousDay,
 }) => {
   const mealItems = mealPlanDay?.mealItems || undefined;
-  const allDayMealItems = mealItems
-    ? [...mealItems.breakfast, ...mealItems.lunch, ...mealItems.dinner]
-    : undefined;
+  const allDayMealItems = useMemo(
+    () =>
+      mealItems
+        ? [...mealItems.breakfast, ...mealItems.lunch, ...mealItems.dinner]
+        : undefined,
+    [mealItems],
+  );
   const isToday = isSameDayAsToday(mealDate);
   const [isHovered, setIsHovered] = useState(false);
 
-  const totalNutrition = allDayMealItems
-    ? getTotalNutrition(allDayMealItems)
-    : undefined;
+  const totalNutrition = useMemo(
+    () => (allDayMealItems ? getTotalNutrition(allDayMealItems) : undefined),
+    [allDayMealItems],
+  );
   const { data } = useGetNutritionTargetQuery();
   const dispatch = useDispatch();
   const viewingMealPlans = useSelector(mealPlanSelector).viewingMealPlans;
   const [deleteMealPlan] = useRemoveMealPlanMutation();
+  const [autoGenerateMealPlan, { isLoading: isGenerating }] =
+    useAutoGenerateMealPlanMutation();
   const date = new Date(mealDate);
   const formattedDate = date.toISOString().slice(0, 10);
 
@@ -62,6 +73,16 @@ const DayBox: React.FC<DayBoxProps> = ({
         : plan,
     );
     dispatch(setViewingMealPlans({ mealPlanWithDates: updatedPlans }));
+  };
+
+  const handleGenerateMealDay = async () => {
+    try {
+      await autoGenerateMealPlan({ date: date.toISOString() }).unwrap();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Auto generate failed';
+      showToastError(message);
+    }
   };
 
   return (
@@ -84,6 +105,8 @@ const DayBox: React.FC<DayBoxProps> = ({
           <div className='max-w-[450px] flex-1 px-4'>
             <DayBoxHeader
               onClearMealDay={() => handleRemoveMealDay(formattedDate)}
+              onGenerateMealDay={handleGenerateMealDay}
+              isGenerating={isGenerating}
               mealDate={mealDate}
               isToday={isToday}
               isHovered={isHovered}
@@ -112,6 +135,8 @@ const DayBox: React.FC<DayBoxProps> = ({
         <>
           <DayBoxHeader
             onClearMealDay={() => handleRemoveMealDay(formattedDate)}
+            onGenerateMealDay={handleGenerateMealDay}
+            isGenerating={isGenerating}
             mealDate={mealDate}
             isToday={isToday}
             isHovered={isHovered}

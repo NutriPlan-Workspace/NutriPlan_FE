@@ -5,6 +5,7 @@ import { PATH } from '@/constants/path';
 import { DiscoverHeader } from '@/molecules/DiscoverHeader';
 import { DiscoverContent } from '@/organisms/DiscoverContent';
 import { useLazyGetFoodsQuery } from '@/redux/query/apis/food/foodApis';
+import HubPageShell from '@/templates/HubPageShell';
 import type { Food } from '@/types/food';
 import type { FoodFilterQuery } from '@/types/foodFilterQuery';
 import { handleUserRoute } from '@/utils/route';
@@ -55,8 +56,12 @@ const DiscoverPageContent: React.FC = () => {
   }, [page, filters, trigger]);
 
   return (
-    <div className='flex h-screen flex-col'>
-      <div className='flex-shrink-0'>
+    <HubPageShell
+      title='Discover'
+      description='Browse foods and save them into your collections.'
+      maxWidthClassName='max-w-7xl'
+    >
+      <div className='flex flex-col gap-5'>
         <DiscoverHeader
           openModal={openModal}
           setOpenModal={setOpenModal}
@@ -64,9 +69,7 @@ const DiscoverPageContent: React.FC = () => {
             handleFilterChange(newFilters, keysToRemove);
           }}
         />
-      </div>
 
-      <div className='flex-1 overflow-y-auto'>
         <DiscoverContent
           foods={foods}
           isFetching={isFetching}
@@ -74,7 +77,7 @@ const DiscoverPageContent: React.FC = () => {
           hasMore={hasMore}
         />
       </div>
-    </div>
+    </HubPageShell>
   );
 };
 

@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { Select } from 'antd';
 
 import { ACTIVITY_LEVEL } from '@/constants/user';
+import { cn } from '@/helpers/helpers';
 
 interface ActivityLevelSelectProps {
   defaultSelectedKey?: string;
   onChange?: (value: string) => void;
+  className?: string;
 }
 
 const ActivityLevelSelect: React.FC<ActivityLevelSelectProps> = ({
   defaultSelectedKey,
   onChange,
+  className,
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<string>(
     ACTIVITY_LEVEL[0]?.key || '',
@@ -34,7 +37,10 @@ const ActivityLevelSelect: React.FC<ActivityLevelSelectProps> = ({
 
   return (
     <Select
-      className='h-[40px] w-[340px] rounded-lg border border-gray-300 transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+      className={cn(
+        'h-[40px] w-[340px] rounded-lg border border-gray-300 transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500',
+        className,
+      )}
       value={selectedLevel}
       onChange={handleChange}
       placeholder='Select activity level'

@@ -1,5 +1,8 @@
-import React from 'react';
-import { Col, InputNumber, Row, Slider } from 'antd';
+import React, { useRef, useState } from 'react';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { InputNumber, Popover, Slider } from 'antd';
+
+import { NUTRITION_TARGET_MIN_GAP_COOLDOWN_MS } from '@/constants/nutritionTargets';
 
 interface RangeSliderProps {
   color: string;
@@ -8,6 +11,8 @@ interface RangeSliderProps {
   maxValue: number;
   onChange: (value: { from: number; to: number }) => void;
   isFilterCollection?: boolean;
+  minGap?: number;
+  minGapMessage?: string;
 }
 
 const RangeSlider: React.FC<RangeSliderProps> = ({
@@ -17,80 +22,183 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   maxValue,
   onChange,
   isFilterCollection = false,
+  minGap = 0,
+  minGapMessage,
 }) => {
+  const lastWarnedAtRef = useRef<number>(0);
+  const hideTimerRef = useRef<number | null>(null);
+  const [minGapPopoverOpen, setMinGapPopoverOpen] = useState(false);
+
+  const clamp = (num: number, min: number, max: number) =>
+    Math.min(max, Math.max(min, num));
+
+  const gapMessage = minGapMessage ?? `Range must be at least ${minGap}`;
+
+  const warnIfNeeded = () => {
+    const now = Date.now();
+    if (now - lastWarnedAtRef.current < NUTRITION_TARGET_MIN_GAP_COOLDOWN_MS) {
+      return;
+    }
+    lastWarnedAtRef.current = now;
+
+    setMinGapPopoverOpen(true);
+    if (hideTimerRef.current) {
+      window.clearTimeout(hideTimerRef.current);
+    }
+    hideTimerRef.current = window.setTimeout(() => {
+      setMinGapPopoverOpen(false);
+      hideTimerRef.current = null;
+    }, 1200);
+  };
+
+  const normalizeRange = (nextFrom: number, nextTo: number) => {
+    const prevFrom = value?.from ?? 0;
+    const prevTo = value?.to ?? 0;
+
+    let from = clamp(nextFrom, 0, maxValue);
+    let to = clamp(nextTo, 0, maxValue);
+
+    if (to < from) {
+      const tmp = from;
+      from = to;
+      to = tmp;
+    }
+
+    if (minGap > 0 && to - from < minGap) {
+      const fromDelta = Math.abs(from - prevFrom);
+      const toDelta = Math.abs(to - prevTo);
+
+      if (fromDelta > toDelta) {
+        from = clamp(to - minGap, 0, maxValue);
+      } else {
+        to = clamp(from + minGap, 0, maxValue);
+      }
+
+      warnIfNeeded();
+    }
+
+    return { from, to };
+  };
+
   const handleSliderChange = (newValue: number[]) => {
-    onChange({ from: newValue[0], to: newValue[1] });
+    const next = normalizeRange(newValue[0], newValue[1]);
+    onChange(next);
+  };
+
+  const handleFromChange = (val: number | null) => {
+    const nextFrom = val ?? 0;
+    const next = normalizeRange(nextFrom, value?.to ?? 0);
+    onChange(next);
+  };
+
+  const handleToChange = (val: number | null) => {
+    const nextTo = val ?? maxValue;
+    const next = normalizeRange(value?.from ?? 0, nextTo);
+    onChange(next);
   };
 
   return isFilterCollection ? (
     <div className='flex w-full flex-col'>
-      <div className='flex items-center justify-between pr-3'>
-        <label className='font-medium'>{title}</label>
-        <div className='flex gap-1'>
+      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+        <label className='text-sm font-semibold text-gray-900'>{title}</label>
+        <div className='flex items-center gap-2'>
           <InputNumber
             min={0}
             max={maxValue}
             value={value?.from}
-            onChange={(val) => onChange({ from: val ?? 0, to: value?.to })}
+            onChange={handleFromChange}
+            controls={false}
+            className='w-24'
           />
+          <span className='text-xs font-semibold text-gray-400'>–</span>
           <InputNumber
             min={0}
             max={maxValue}
             value={value?.to}
-            onChange={(val) =>
-              onChange({ from: value?.from, to: val ?? maxValue })
-            }
+            onChange={handleToChange}
+            controls={false}
+            className='w-24'
           />
         </div>
       </div>
-      <Row className='rounded-md'>
-        <Col span={24}>
-          <Slider
-            range={{ draggableTrack: true }}
-            min={0}
-            max={maxValue}
-            value={[value?.from, value?.to]}
-            onChange={handleSliderChange}
-            trackStyle={[{ backgroundColor: color }]}
-            handleStyle={[{ borderColor: color }, { borderColor: color }]}
-          />
-        </Col>
-      </Row>
+
+      <div className='mt-2'>
+        <Popover
+          open={minGapPopoverOpen}
+          content={
+            <div className='flex items-center gap-2'>
+              <ExclamationCircleOutlined />
+              <span>{gapMessage}</span>
+            </div>
+          }
+          placement='bottom'
+        >
+          <div>
+            <Slider
+              range={{ draggableTrack: true }}
+              min={0}
+              max={maxValue}
+              value={[value?.from, value?.to]}
+              onChange={handleSliderChange}
+              trackStyle={[{ backgroundColor: color }]}
+              handleStyle={[{ borderColor: color }, { borderColor: color }]}
+            />
+          </div>
+        </Popover>
+      </div>
     </div>
   ) : (
-    <div className='flex w-full items-center justify-between'>
-      <label className='w-[80px] font-medium'>{title}</label>
-      <Row className='flex-1 rounded-md p-2'>
-        <Col span={16} className='pr-4'>
-          <Slider
-            range={{ draggableTrack: true }}
-            min={0}
-            max={maxValue}
-            value={[value?.from, value?.to]}
-            onChange={handleSliderChange}
-            trackStyle={[{ backgroundColor: color }]}
-            handleStyle={[{ borderColor: color }, { borderColor: color }]}
-          />
-        </Col>
-        <Col span={4} className='pl-2'>
+    <div className='flex w-full flex-col gap-3 rounded-2xl border border-gray-100 bg-white/60 p-3 sm:flex-row sm:items-center sm:gap-4'>
+      <label className='w-[92px] shrink-0 text-sm font-semibold text-gray-900'>
+        {title}
+      </label>
+
+      <div className='flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4'>
+        <div className='min-w-0 flex-1'>
+          <Popover
+            open={minGapPopoverOpen}
+            content={
+              <div className='flex items-center gap-2'>
+                <ExclamationCircleOutlined />
+                <span>{gapMessage}</span>
+              </div>
+            }
+            placement='bottom'
+          >
+            <div>
+              <Slider
+                range={{ draggableTrack: true }}
+                min={0}
+                max={maxValue}
+                value={[value?.from, value?.to]}
+                onChange={handleSliderChange}
+                trackStyle={[{ backgroundColor: color }]}
+                handleStyle={[{ borderColor: color }, { borderColor: color }]}
+              />
+            </div>
+          </Popover>
+        </div>
+
+        <div className='flex items-center gap-2'>
           <InputNumber
             min={0}
             max={maxValue}
             value={value?.from}
-            onChange={(val) => onChange({ from: val ?? 0, to: value?.to })}
+            onChange={handleFromChange}
+            controls={false}
+            className='w-24'
           />
-        </Col>
-        <Col span={4}>
+          <span className='text-xs font-semibold text-gray-400'>–</span>
           <InputNumber
             min={0}
             max={maxValue}
             value={value?.to}
-            onChange={(val) =>
-              onChange({ from: value?.from, to: val ?? maxValue })
-            }
+            onChange={handleToChange}
+            controls={false}
+            className='w-24'
           />
-        </Col>
-      </Row>
+        </div>
+      </div>
     </div>
   );
 };

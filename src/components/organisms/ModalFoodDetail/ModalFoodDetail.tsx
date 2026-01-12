@@ -3,6 +3,7 @@ import { IoMdArrowRoundBack } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 import { Modal } from 'antd';
 
+import { FOOD_CATEGORIES } from '@/constants/foodCategories';
 import { useScale } from '@/contexts/ScaleContext';
 import { useLazyGetFoodByIdQuery } from '@/redux/query/apis/food/foodApis';
 import {
@@ -34,6 +35,12 @@ const ModalFoodDetail: React.FC = () => {
 
   const [triggerGetFoodById, { data: detailedFood, isFetching }] =
     useLazyGetFoodByIdQuery();
+
+  const categoryLabelByValue = new Map(
+    FOOD_CATEGORIES.map(
+      (category) => [category.value, category.label] as const,
+    ),
+  );
 
   useEffect(() => {
     if (!viewingFoodData) return;
@@ -96,6 +103,31 @@ const ModalFoodDetail: React.FC = () => {
         }}
       >
         <div className='scrollbar-thin h-[75vh] w-full overflow-y-auto px-8 pb-8'>
+          {detailedFood?.data?.mainFood?.categories?.length ? (
+            <div className='sticky top-0 z-10 -mx-8 mb-4 border-b border-gray-200/70 bg-white/70 px-8 py-4 backdrop-blur'>
+              <div className='flex items-center justify-between gap-4'>
+                <div>
+                  <div className='text-xs font-semibold tracking-widest text-gray-500'>
+                    CATEGORIES
+                  </div>
+                  <div className='mt-2 flex flex-wrap gap-2'>
+                    {detailedFood.data.mainFood.categories
+                      .map((id) => categoryLabelByValue.get(id))
+                      .filter((label): label is string => Boolean(label))
+                      .map((label, idx) => (
+                        <span
+                          key={`${label}-${idx}`}
+                          className='rounded-full border border-white/60 bg-white/90 px-3 py-1 text-[12px] font-semibold text-gray-800 shadow-[0_12px_30px_-26px_rgba(16,24,40,0.45)]'
+                        >
+                          {label}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           {!isFetching &&
             (detailedFood !== undefined &&
             detailedFood.data.mainFood.isRecipe ? (

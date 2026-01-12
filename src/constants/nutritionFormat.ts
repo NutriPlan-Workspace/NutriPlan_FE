@@ -8,7 +8,7 @@ export enum NUTRITION_TEXT_COLOR {
 }
 
 export enum NUTRITION_HEX_COLOR {
-  CARBS = '#fcb524',
+  CARBS = '#6ac85a',
   FATS = '#52c0bc',
   PROTEINS = '#976fe8',
 }
@@ -88,7 +88,7 @@ export const nutritionFieldGroup = [
     field: [
       { key: 'calories', title: 'Calories', unit: '' },
       { key: 'carbs', title: 'Carbs', unit: 'g' },
-      { key: 'fat', title: 'Fats', unit: 'g' },
+      { key: 'fats', title: 'Fats', unit: 'g' },
       { key: 'proteins', title: 'Protein', unit: 'g' },
       { key: 'netCarbs', title: 'Net Carbs', unit: 'g' },
       { key: 'fiber', title: 'Fiber', unit: 'g' },
@@ -232,7 +232,7 @@ export const nutritionalValue = [
   },
   {
     label: 'Fats',
-    key: 'fat',
+    key: 'fats',
     unit: `g`,
     color: NUTRITION_HEX_COLOR.FATS,
   },

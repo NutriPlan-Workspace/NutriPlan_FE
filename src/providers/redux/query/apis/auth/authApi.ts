@@ -4,10 +4,12 @@ import {
   LOGIN_ENDPOINT,
   LOGOUT_ENDPOINT,
   REGISTER_ENDPOINT,
+  UPDATE_AVATAR_ENDPOINT,
 } from '@/constants/endpoints';
 import { HTTP_STATUS } from '@/constants/httpStatus';
 import { baseApi } from '@/redux/query/apis/baseApi';
 import { setUser } from '@/redux/slices/user';
+import type { RootState } from '@/redux/store/store';
 import type { ChangePasswordSchemaType } from '@/schemas/passwordSchema';
 import type { ApiResponse } from '@/types/apiResponse';
 import type { LoginData, LogoutResponse, RegisterData } from '@/types/auth';
@@ -64,6 +66,34 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+
+    updateAvatarRequest: builder.mutation<
+      ApiResponse<{ avatarUrl: string }>,
+      { avatarUrl: string }
+    >({
+      query: (body) => ({
+        url: UPDATE_AVATAR_ENDPOINT,
+        method: 'PUT',
+        body,
+      }),
+      async onQueryStarted(arg, { dispatch, getState, queryFulfilled }) {
+        const state = getState() as RootState;
+        const previousUser = state.user.user;
+
+        dispatch(setUser({ ...previousUser, avatarUrl: arg.avatarUrl }));
+
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.data?.avatarUrl) {
+            dispatch(
+              setUser({ ...previousUser, avatarUrl: data.data.avatarUrl }),
+            );
+          }
+        } catch {
+          dispatch(setUser(previousUser));
+        }
+      },
+    }),
   }),
 });
 
@@ -73,4 +103,5 @@ export const {
   useLogoutRequestMutation,
   useRegisterRequestMutation,
   useChangePasswordRequestMutation,
+  useUpdateAvatarRequestMutation,
 } = authApi;

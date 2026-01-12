@@ -1,3 +1,7 @@
+import React from 'react';
+import { FaRegCalendarAlt, FaRegClone } from 'react-icons/fa';
+import { PiCalendarDots } from 'react-icons/pi';
+
 import type { MenuItemDropdown } from '@/types/menuItem';
 import { getDisplayWeek } from '@/utils/dateUtils';
 
@@ -8,9 +12,21 @@ export const PLAN_TYPES = {
 } as const;
 
 export const PLAN_MENU_ITEMS: MenuItemDropdown[] = [
-  { key: PLAN_TYPES.SINGLE_DAY, label: 'Single Day' },
-  { key: PLAN_TYPES.MULTI_DAY, label: 'Multi Day' },
-  { key: PLAN_TYPES.WEEKLY_VIEW, label: 'Weekly View' },
+  {
+    key: PLAN_TYPES.SINGLE_DAY,
+    label: 'Single Day',
+    icon: React.createElement(FaRegCalendarAlt, { className: 'h-4 w-4' }),
+  },
+  {
+    key: PLAN_TYPES.MULTI_DAY,
+    label: 'Multi Day',
+    icon: React.createElement(FaRegClone, { className: 'h-4 w-4' }),
+  },
+  {
+    key: PLAN_TYPES.WEEKLY_VIEW,
+    label: 'Weekly View',
+    icon: React.createElement(PiCalendarDots, { className: 'h-4 w-4' }),
+  },
 ];
 
 export const WEEK_TYPES = {

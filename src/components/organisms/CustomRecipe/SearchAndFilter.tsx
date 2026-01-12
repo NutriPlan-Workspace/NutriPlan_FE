@@ -29,42 +29,54 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
   handleInputChange,
   handleSortChange,
 }) => (
-  <div className='flex items-center justify-between'>
-    <div className='flex items-center'>
-      <Button
-        className={cn(
-          'rounded-r-none border-r border-gray-300 bg-white p-5 text-gray-500',
-          activeTab === 'foods' && 'bg-primary border-transparent text-white',
-        )}
-        onClick={() => setActiveTab(activeTab === 'foods' ? null : 'foods')}
-      >
-        Foods
-      </Button>
+  <div className='flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between'>
+    <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+      <div className='inline-flex overflow-hidden rounded-2xl border border-gray-200 bg-white/70 shadow-[0_10px_26px_-22px_rgba(16,24,40,0.25)]'>
+        <Button
+          className={cn(
+            'h-11 rounded-none border-0 px-4 text-sm font-semibold',
+            activeTab === 'foods'
+              ? '!bg-primary !text-white'
+              : '!bg-transparent !text-gray-700 hover:!bg-white',
+          )}
+          onClick={() => setActiveTab(activeTab === 'foods' ? null : 'foods')}
+        >
+          Foods
+        </Button>
 
-      <Button
-        className={cn(
-          'rounded-l-none border-gray-300 bg-white p-5 text-gray-500',
-          activeTab === 'recipes' && 'bg-primary border-transparent text-white',
-        )}
-        onClick={() => setActiveTab(activeTab === 'recipes' ? null : 'recipes')}
-      >
-        Recipes
-      </Button>
+        <div className='w-px bg-gray-200' />
+
+        <Button
+          className={cn(
+            'h-11 rounded-none border-0 px-4 text-sm font-semibold',
+            activeTab === 'recipes'
+              ? '!bg-primary !text-white'
+              : '!bg-transparent !text-gray-700 hover:!bg-white',
+          )}
+          onClick={() =>
+            setActiveTab(activeTab === 'recipes' ? null : 'recipes')
+          }
+        >
+          Recipes
+        </Button>
+      </div>
 
       <AntdInput
-        placeholder='Search Foods...'
+        placeholder='Search your custom items...'
         suffix={<IoSearch className='h-5 w-5 text-gray-500' />}
-        className='ml-4 h-[42px] w-[350px] rounded-full border border-gray-300 px-4 py-1'
+        className='h-11 w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-1 sm:w-[420px]'
         value={searchValue}
         onChange={handleInputChange}
       />
     </div>
-    <div className='mr-20'>
+
+    <div className='flex items-center gap-2 text-sm text-gray-700'>
+      <span className='font-medium'>Sort</span>
       <DropdownMenuWrapper
         items={item}
         defaultSelectedKey={sortOption}
         onSelect={handleSortChange}
-        className='min-w-[80px]'
+        className='min-w-[90px]'
       />
     </div>
   </div>

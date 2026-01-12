@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 import { GrDocumentUpdate } from 'react-icons/gr';
 import { useSelector } from 'react-redux';
@@ -6,51 +6,62 @@ import { InputNumber } from 'antd';
 import { Tooltip } from 'antd';
 
 import Button from '@/atoms/Button/Button';
-import PopupButton from '@/atoms/Button/PopupButton';
 import { GoalChart } from '@/atoms/GoalChart';
 import { RadioInput } from '@/atoms/Input';
-import { NutritionTargetModal } from '@/atoms/NutritionTargetModal';
 import { GOAL_TYPES } from '@/constants/user';
+import { cn } from '@/helpers/helpers';
 import {
-  useGetNewNutritionTargetQuery,
-  useGetNutritionTargetQuery,
   useGetPhysicalStatsQuery,
-  useUpdateNutritionTargetMutation,
   useUpdatePhysicalStatsMutation,
 } from '@/redux/query/apis/user/userApi';
 import { userSelector } from '@/redux/slices/user';
 import { physicalStatsSchema } from '@/schemas/physicalStatsSchema';
-import type { NutritionGoal } from '@/types/user';
 import { formatDate } from '@/utils/dateUtils';
 
-const WeightAndGoal: React.FC = () => {
+export interface WeightAndGoalProps {
+  embedded?: boolean;
+  className?: string;
+  showTitle?: boolean;
+  goalType?: string;
+  onGoalTypeChange?: (value: string) => void | Promise<void>;
+  onTargetsChanged?: () => void;
+}
+
+const WeightAndGoal: React.FC<WeightAndGoalProps> = ({
+  embedded = false,
+  className,
+  showTitle = true,
+  goalType: goalTypeProp,
+  onGoalTypeChange,
+  onTargetsChanged,
+}) => {
   const userId = useSelector(userSelector).user.id;
-  const [isOpen, setIsOpen] = useState(false);
   const [weight, setWeight] = useState<number | null>(null);
-  const [goalType, setGoalType] = useState('');
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const {
     data: physicalStats,
     isLoading: isStatsLoading,
     refetch: refetchPhysicalStats,
   } = useGetPhysicalStatsQuery();
   const [updateWeight, { isLoading }] = useUpdatePhysicalStatsMutation();
-  const [updateNutritionTarget] = useUpdateNutritionTargetMutation();
-  const { data: newTarget, refetch: refetchNewTarget } =
-    useGetNewNutritionTargetQuery({ userId });
-  const { data: oldTarget, refetch: refetchOldTarget } =
-    useGetNutritionTargetQuery({ userId });
   const weightRecords = physicalStats?.data?.weightRecords ?? [];
   const [error, setError] = useState<string | null>(null);
+  const autoSaveTimerRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (oldTarget?.data?.goalType && goalType === '') {
-      setGoalType(oldTarget.data.goalType);
-    }
-  }, [oldTarget, goalType]);
+  const goalType = goalTypeProp ?? '';
 
-  const handleUpdate = async () => {
+  const handleUpdate = async ({ isAutoSave = false } = {}) => {
     if (!physicalStats) return;
+    if (weight === null || weight === undefined) return;
+    if (isLoading) return;
+
+    const latestSavedWeight = weightRecords[weightRecords.length - 1]?.weight;
+    if (
+      typeof latestSavedWeight === 'number' &&
+      Number.isFinite(latestSavedWeight) &&
+      latestSavedWeight === weight
+    ) {
+      return;
+    }
 
     const latestHeight =
       physicalStats.data.heightRecords?.[
@@ -74,144 +85,182 @@ const WeightAndGoal: React.FC = () => {
       weightRecords: [{ weight: validation.data.weight }],
     });
     await refetchPhysicalStats();
-    refetchNewTarget();
-    setIsOpen(true);
+    onTargetsChanged?.();
+    if (isAutoSave) return;
   };
 
-  const handleSave = async () => {
-    if (!newTarget || !newTarget.data) {
-      return;
+  const scheduleAutoSave = (nextWeight: number | null) => {
+    if (!embedded) return;
+    if (autoSaveTimerRef.current) {
+      window.clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
     }
 
-    const payload: NutritionGoal = {
-      userId: userId,
-      goalType: goalType || oldTarget?.data?.goalType,
-      calories: newTarget.data.calories,
-      proteinTarget: newTarget.data.proteinTarget,
-      carbTarget: newTarget.data.carbTarget,
-      fatTarget: newTarget.data.fatTarget,
-    };
+    if (nextWeight === null || nextWeight === undefined) return;
 
-    await updateNutritionTarget(payload).unwrap();
-    await refetchOldTarget();
-    setIsModalVisible(false);
+    autoSaveTimerRef.current = window.setTimeout(() => {
+      handleUpdate({ isAutoSave: true });
+    }, 700);
   };
 
-  const handleGoalTypeChange = async (value: string) => {
-    setGoalType(value);
+  useEffect(
+    () => () => {
+      if (autoSaveTimerRef.current) {
+        window.clearTimeout(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = null;
+      }
+    },
+    [],
+  );
 
-    if (value !== oldTarget?.data?.goalType) {
-      setIsOpen(true);
-      await updateNutritionTarget({
-        userId: userId,
-        ...oldTarget?.data,
-        goalType: value,
-      });
-      await refetchOldTarget();
-      await refetchNewTarget();
-    }
+  const handleGoalTypeChangeInternal = async (value: string) => {
+    await onGoalTypeChange?.(value);
   };
   if (isStatsLoading) return <div></div>;
 
   return (
-    <div>
-      <div className='flex w-[800px] flex-wrap gap-4 space-y-5 pl-[50px]'>
-        <h1 className='mt-4 text-[28px]'>Weight And Goal</h1>
-        {weightRecords.length > 1 && (
-          <GoalChart
-            data={weightRecords.map((record) => ({
-              ...record,
-              date: new Date(record.date).toISOString(),
-            }))}
-          />
+    <div className={cn('w-full', className)}>
+      <div
+        className={cn(
+          'flex w-full flex-col gap-5',
+          embedded ? 'px-0' : 'pl-[50px]',
+          embedded ? 'max-w-none' : 'max-w-[800px]',
+        )}
+      >
+        {showTitle && (
+          <h1
+            className={cn(
+              embedded
+                ? 'mt-0 text-lg font-semibold text-gray-900'
+                : 'mt-4 text-[28px] font-semibold',
+            )}
+          >
+            Weight &amp; Goal
+          </h1>
         )}
 
-        <div className='flex w-[800px] items-center justify-center'>
-          <div>
-            <p>Today&apos;s Weight</p>
+        {weightRecords.length > 1 && (
+          <div className='rounded-2xl border border-black/5 bg-white/60 p-4'>
+            <GoalChart
+              data={weightRecords.map((record) => ({
+                ...record,
+                date: new Date(record.date).toISOString(),
+              }))}
+            />
           </div>
-          <div className='ml-auto flex items-start gap-4'>
-            <div className='flex flex-col'>
-              <div className='flex w-[300px] items-center'>
-                <div className='ml-auto'>
-                  <Tooltip
-                    title={error}
-                    color='orange'
-                    open={!!error}
-                    placement='bottom'
-                  >
-                    <InputNumber
-                      type='number'
-                      value={weight}
-                      onChange={(val) => {
-                        setWeight(val);
-                        setError(null);
-                      }}
-                      controls={false}
-                      className={`h-10 w-24 rounded-xl border px-4 py-1 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-                        error ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                    />
-                  </Tooltip>
-                  <span className='ml-2 text-sm text-gray-500'>kg</span>
-                  <Button
-                    onClick={handleUpdate}
-                    disabled={isLoading}
-                    className={`ml-2 border-none px-4 py-5 text-[16px] font-bold text-white ${
-                      isLoading
-                        ? 'cursor-not-allowed bg-gray-400'
-                        : 'bg-[#ff774e] hover:bg-[#ff5722]'
-                    }`}
-                  >
+        )}
+
+        <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+            <div>
+              <div className='text-sm font-semibold text-gray-900'>
+                Today’s weight
+              </div>
+              <div className='mt-1 text-sm text-gray-500'>
+                Update to refresh your targets.
+              </div>
+            </div>
+
+            <div className='flex flex-wrap items-center gap-2'>
+              <div className='inline-flex items-center gap-2 whitespace-nowrap'>
+                <Tooltip
+                  title={error}
+                  color='orange'
+                  open={!!error}
+                  placement='bottom'
+                >
+                  <InputNumber
+                    type='number'
+                    value={weight}
+                    onChange={(val) => {
+                      setWeight(val);
+                      setError(null);
+
+                      scheduleAutoSave(val);
+                    }}
+                    onBlur={() => {
+                      if (!embedded) return;
+                      handleUpdate({ isAutoSave: true });
+                    }}
+                    controls={false}
+                    className={cn(
+                      'h-11 w-28 rounded-2xl border px-4 py-1 text-gray-800 shadow-sm',
+                      embedded
+                        ? 'focus:border-rose-200 focus:ring-1 focus:ring-rose-200'
+                        : 'focus:border-blue-500 focus:ring-1 focus:ring-blue-500',
+                      error ? 'border-red-500' : 'border-black/10',
+                    )}
+                  />
+                </Tooltip>
+                <span className='text-sm text-gray-500'>kg</span>
+              </div>
+              {!embedded && (
+                <Button
+                  onClick={() => handleUpdate({ isAutoSave: false })}
+                  disabled={isLoading}
+                  className={cn(
+                    'h-11 rounded-2xl border-none px-4 font-semibold text-white',
+                    isLoading
+                      ? 'cursor-not-allowed bg-gray-400'
+                      : 'bg-[#2F80ED] hover:bg-[#1c6bd4]',
+                  )}
+                >
+                  <span className='flex items-center gap-2'>
                     {isLoading ? (
                       <FaSpinner className='animate-spin' />
                     ) : (
                       <GrDocumentUpdate />
                     )}
                     Update
-                  </Button>
-                </div>
-              </div>
+                  </span>
+                </Button>
+              )}
+
+              {embedded && isLoading && (
+                <span className='ml-2 inline-flex items-center gap-2 text-xs font-semibold text-gray-500'>
+                  <FaSpinner className='animate-spin' /> Saving…
+                </span>
+              )}
             </div>
           </div>
+
+          {weightRecords.length > 0 && (
+            <div className='text-sm text-gray-600'>
+              Last updated:{' '}
+              <span className='font-medium'>
+                {weightRecords[weightRecords.length - 1]?.weight} kg
+              </span>{' '}
+              on{' '}
+              <span className='font-medium'>
+                {formatDate(weightRecords[weightRecords.length - 1]?.date)}
+              </span>
+            </div>
+          )}
         </div>
 
-        {weightRecords.length > 0 && (
-          <p className='text-gray-500'>
-            Last updated: {weightRecords[weightRecords.length - 1]?.weight} kg
-            on {formatDate(weightRecords[weightRecords.length - 1]?.date)}
-          </p>
-        )}
+        <div className='h-px bg-black/5' />
 
-        <div className='flex w-[800px] items-center justify-center'>
+        <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
           <div>
-            <p>Set General Goal</p>
+            <div className='text-sm font-semibold text-gray-900'>
+              General goal
+            </div>
+            <div className='mt-1 text-sm text-gray-500'>
+              Choose a direction; we’ll adjust targets accordingly.
+            </div>
           </div>
-          <div className='ml-auto'>
+
+          <div className='w-full sm:w-auto sm:max-w-full'>
             <RadioInput
               options={[...GOAL_TYPES]}
-              defaultActiveKey={goalType || oldTarget?.data?.goalType}
-              onChange={handleGoalTypeChange}
+              defaultActiveKey={goalType}
+              onChange={handleGoalTypeChangeInternal}
+              variant={embedded ? 'userHub' : 'default'}
+              className='w-full max-w-full justify-start sm:justify-end'
             />
           </div>
         </div>
       </div>
-
-      {isOpen && (
-        <PopupButton
-          onClick={() => {
-            setIsOpen(false);
-            setIsModalVisible(true);
-          }}
-        />
-      )}
-      <NutritionTargetModal
-        isModalVisible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        oldTarget={oldTarget}
-        newTarget={newTarget}
-        handleSave={handleSave}
-      />
     </div>
   );
 };

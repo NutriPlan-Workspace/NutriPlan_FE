@@ -25,7 +25,13 @@ const baseQueryWithAuth = async (args: any, api: any, extraOptions: any) => {
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQuery,
-  tagTypes: ['Favorites'],
+  tagTypes: [
+    'Favorites',
+    'NutritionTarget',
+    'PrimaryDiet',
+    'FoodExclusions',
+    'PhysicalStats',
+  ],
   endpoints: () => ({}),
 });
 

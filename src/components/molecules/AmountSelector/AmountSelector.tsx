@@ -61,10 +61,11 @@ const AmountSelector: React.FC<AmountSelectorProps> = ({
             },
             components: {
               InputNumber: {
-                activeBorderColor: '#ffc84e',
+                activeBorderColor: 'var(--color-primary-400)',
               },
               Select: {
-                optionSelectedBg: '#ffc84e3f',
+                optionSelectedBg:
+                  'color-mix(in srgb, var(--color-primary-200) 60%, white)',
               },
             },
           }}

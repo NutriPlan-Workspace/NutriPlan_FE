@@ -55,7 +55,7 @@ const FoodGrid: React.FC<FoodGridProps> = ({
             </p>
           ) : !isLastPage ? (
             <Button
-              className='border-none bg-[#ffc84e] px-7 py-6 text-[16px] font-bold text-black hover:bg-[#ffb81c] hover:underline'
+              className='bg-primary hover:bg-primary-400 border-none px-7 py-6 text-[16px] font-bold text-black hover:underline'
               onClick={onLoadMore}
               disabled={isFetching}
             >

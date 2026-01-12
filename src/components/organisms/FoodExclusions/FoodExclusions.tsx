@@ -7,6 +7,7 @@ import {
   EXCLUDED_BY_DIET,
   FOOD_CATEGORIES,
 } from '@/constants/foodCategories';
+import { cn } from '@/helpers/helpers';
 import {
   useGetFoodExclusionsQuery,
   useGetPrimaryDietQuery,
@@ -20,7 +21,17 @@ import {
 
 import ExclusionButton from './ExclusionButton';
 
-const FoodExclusions: React.FC = () => {
+export interface FoodExclusionsProps {
+  embedded?: boolean;
+  className?: string;
+  showTitle?: boolean;
+}
+
+const FoodExclusions: React.FC<FoodExclusionsProps> = ({
+  embedded = false,
+  className,
+  showTitle = true,
+}) => {
   const { data: primaryDietData } = useGetPrimaryDietQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -92,111 +103,146 @@ const FoodExclusions: React.FC = () => {
   );
 
   return (
-    <div className='h-[100vh] w-full overflow-y-scroll px-[50px]'>
-      <div className='max-w-[700px]'>
-        <h1 className='py-4 text-[28px]'>Food Exclusions</h1>
-        <p className='pb-4 text-gray-600'>
-          Add &quot;exclusions&quot; to filter out recipes from the generator
-          suggestions. Any recipes that match their title or ingredients will
-          not be included in your plans.
-        </p>
-        <p className='text-gray-600'>
-          Custom Exclusions can be used to completely customize your experience.
-          For example, add &quot;Bell Peppers&quot; if you are allergic or
-          &quot;Smoothie&quot; if you dislike making them.
-        </p>
-      </div>
-      <Divider />
-
-      <div className='my-6 flex gap-10'>
-        <div className='w-[600px] flex-1'>
-          <h2 className='text-[22px]'>Detail Category</h2>
-          {CATEGORIES_BY_GROUP.map((category) => (
-            <div key={category.group}>
-              <h3 className='pt-6 pb-2 text-[18px]'>{category.group}</h3>
-              <ul className='flex flex-wrap gap-2'>
-                {('mainItem' in category && category.mainItem !== undefined
-                  ? [category.mainItem, ...category.items]
-                  : category.items
-                ).map((value) => {
-                  const item = FOOD_CATEGORIES.find((c) => c.value === value);
-                  if (!item) return null;
-                  return (
-                    <li key={item.value}>
-                      <ExclusionButton
-                        item={item}
-                        disabled={excludedByDietFull.has(item.value)}
-                        isActive={exclusions.has(item.value)}
-                        onToggle={toggleExclusion}
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
+    <div
+      className={cn(
+        'w-full',
+        embedded ? 'overflow-visible px-0' : 'overflow-y-auto px-[50px]',
+        className,
+      )}
+    >
+      {showTitle && (
+        <div className={cn(embedded ? 'max-w-none' : 'max-w-[700px]')}>
+          <h1 className='py-4 text-[28px]'>Food Exclusions</h1>
+          <p className='pb-4 text-gray-600'>
+            Add &quot;exclusions&quot; to filter out recipes from generator
+            suggestions. Any recipes that match their title or ingredients will
+            not be included in your plans.
+          </p>
+          <p className='text-gray-600'>
+            Custom exclusions can be used to completely customize your
+            experience.
+          </p>
+          <Divider />
         </div>
+      )}
 
-        <div className='sticky top-10 h-fit w-[400px]'>
-          <h2 className='pb-2 text-[22px]'>
-            Excluded by Diet (
-            <span className='capitalize'>
-              {primaryDietData && primaryDietData.data}
-            </span>
-            )
-          </h2>
-          {renderToggleItems(excludedByDiet)}
-
-          <AnimatePresence>
-            {exclusions.size > 0 && (
-              <motion.div
-                key='your-exclusions'
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className='overflow-hidden'
-              >
-                <h2 className='pt-6 pb-2 text-[22px]'>Your Exclusions</h2>
-                {renderToggleItems(
-                  getYourExclusions(exclusions, excludedByDietFull),
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className='min-h-[150px]'>
-            <h2 className='pt-6 pb-2 text-[22px]'>Recipes Variety</h2>
-            <p className='text-sm text-gray-600'>
-              You have excluded {excludedPercent}% of the available categories.
-            </p>
-            <div className='mt-2 mb-3 h-4 w-[300px] overflow-hidden rounded-full border border-gray-200 bg-white'>
-              <motion.div
-                className='bg-primary h-full rounded-full'
-                initial={{ width: 0 }}
-                animate={{ width: `${excludedPercent}%` }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
-              />
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-12'>
+        <div className='lg:col-span-8'>
+          <div className='mb-4 flex items-end justify-between gap-3'>
+            <div>
+              <h2 className='text-lg font-semibold text-gray-900'>
+                Categories
+              </h2>
+              <p className='mt-1 text-sm text-gray-600'>
+                Toggle categories to filter recipes and suggestions.
+              </p>
             </div>
+          </div>
 
-            <AnimatePresence>
-              {excludedPercent >= 60 && (
-                <motion.div
-                  className='bg-primary-100 px-3 py-1'
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <p className='text-sm text-gray-600'>
-                    Numerous food exclusions may limit the variety of recipes
-                    available.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <div className='space-y-6'>
+            {CATEGORIES_BY_GROUP.map((category) => (
+              <section
+                key={category.group}
+                className='rounded-3xl border border-black/5 bg-white/60 p-5 shadow-[0_18px_48px_-36px_rgba(16,24,40,0.22)] backdrop-blur-2xl'
+              >
+                <h3 className='text-base font-semibold text-gray-900'>
+                  {category.group}
+                </h3>
+                <ul className='mt-3 flex flex-wrap gap-2'>
+                  {('mainItem' in category && category.mainItem !== undefined
+                    ? [category.mainItem, ...category.items]
+                    : category.items
+                  ).map((value) => {
+                    const item = FOOD_CATEGORIES.find((c) => c.value === value);
+                    if (!item) return null;
+                    return (
+                      <li key={item.value}>
+                        <ExclusionButton
+                          item={item}
+                          disabled={excludedByDietFull.has(item.value)}
+                          isActive={exclusions.has(item.value)}
+                          onToggle={toggleExclusion}
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            ))}
           </div>
         </div>
+
+        <aside className='lg:col-span-4'>
+          <div className='sticky top-10 space-y-6'>
+            <section className='rounded-3xl border border-rose-100/70 bg-white/70 p-5 shadow-[0_18px_48px_-36px_rgba(16,24,40,0.22)] backdrop-blur-2xl'>
+              <h2 className='text-base font-semibold text-gray-900'>
+                Excluded by diet
+                <span className='ml-2 text-sm font-medium text-gray-600'>
+                  ({primaryDietData?.data ? String(primaryDietData.data) : '—'})
+                </span>
+              </h2>
+              <div className='mt-3'>{renderToggleItems(excludedByDiet)}</div>
+            </section>
+
+            <AnimatePresence>
+              {exclusions.size > 0 && (
+                <motion.section
+                  key='your-exclusions'
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className='overflow-hidden rounded-3xl border border-black/5 bg-white/60 p-5 shadow-[0_18px_48px_-36px_rgba(16,24,40,0.22)] backdrop-blur-2xl'
+                >
+                  <h2 className='text-base font-semibold text-gray-900'>
+                    Your exclusions
+                  </h2>
+                  <div className='mt-3'>
+                    {renderToggleItems(
+                      getYourExclusions(exclusions, excludedByDietFull),
+                    )}
+                  </div>
+                </motion.section>
+              )}
+            </AnimatePresence>
+
+            <section className='rounded-3xl border border-black/5 bg-white/60 p-5 shadow-[0_18px_48px_-36px_rgba(16,24,40,0.22)] backdrop-blur-2xl'>
+              <h2 className='text-base font-semibold text-gray-900'>
+                Recipe variety
+              </h2>
+              <p className='mt-1 text-sm text-gray-600'>
+                You have excluded{' '}
+                <span className='font-semibold text-gray-900'>
+                  {excludedPercent}%
+                </span>{' '}
+                of categories.
+              </p>
+
+              <div className='mt-3 h-3 w-full overflow-hidden rounded-full border border-black/5 bg-white'>
+                <motion.div
+                  className='h-full rounded-full bg-[#ef7a66]'
+                  initial={{ width: 0 }}
+                  animate={{ width: `${excludedPercent}%` }}
+                  transition={{ duration: 0.45, ease: 'easeInOut' }}
+                />
+              </div>
+
+              <AnimatePresence>
+                {excludedPercent >= 60 && (
+                  <motion.div
+                    className='mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-sm text-gray-600 ring-1 ring-rose-100'
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Numerous exclusions may limit recipe variety.
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </section>
+          </div>
+        </aside>
       </div>
     </div>
   );

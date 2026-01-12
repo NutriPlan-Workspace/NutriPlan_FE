@@ -11,28 +11,29 @@
   --font-secondary: 'Poppins', sans-serif;
   --font-third: 'Roboto', sans-serif;
   --font-rossanova: 'Rossanova Personal Use', serif;
-  --color-primary: #ffc84e;
-  --color-primary-50: #fff9eb;
-  --color-primary-100: #fff0c6;
-  --color-primary-200: #ffde88;
-  --color-primary-300: #ffc84e;
-  --color-primary-400: #ffb020;
-  --color-primary-500: #f98c07;
-  --color-primary-600: #dd6602;
-  --color-primary-700: #b74506;
-  --color-primary-800: #94350c;
-  --color-primary-900: #7a2d0d;
-  --color-primary-950: #461502;
+  /* softened primary (was too saturated) */
+  --color-primary: #6fb478;
+  --color-primary-50: #f4faf4;
+  --color-primary-100: #e3f4e4;
+  --color-primary-200: #c9e9cb;
+  --color-primary-300: #a6d9aa;
+  --color-primary-400: #83c08a;
+  --color-primary-500: #6fb478;
+  --color-primary-600: #539a60;
+  --color-primary-700: #417d4d;
+  --color-primary-800: #35643f;
+  --color-primary-900: #2b5234;
+  --color-primary-950: #18301f;
   --color-error: #ef4444;
   --color-gray-9: #1c1c1c;
   --color-borderGray: #d9d9d9;
   --color-textGray: #999;
-  --color-carbsYellow: #fcb524;
+  --color-carbsYellow: #a3e635;
   --color-fatsBlue: #52c0bc;
   --color-proteinsPurple: #976fe8;
   --color-shortTime: #d8efd3;
-  --color-mediumTime: #ffecc8;
-  --color-longTime: #ffc7c7;
+  --color-mediumTime: #e8f7dc;
+  --color-longTime: #c7f0c7;
   --color-secondary: #649dad;
   --color-secondary-50: #f2f8f9;
   --color-secondary-100: #deedef;
@@ -53,20 +54,20 @@
   /* Override css variable React-Toastify : [https://fkhadra.github.io/react-toastify/how-to-style/#override-css-variables] */
   --toastify-color-progress-success: linear-gradient(
     to right,
-    #97f8ae,
-    #3ebc5b
+    #dff4e0,
+    var(--color-primary)
   );
   --toastify-color-progress-error: linear-gradient(to right, #f6a3ab, #da3243);
   --toastify-color-progress-warning: linear-gradient(
     to right,
-    #ffe28c,
-    #d4ad38
+    #e9f4e7,
+    var(--color-primary-400)
   );
   --toastify-color-progress-info: linear-gradient(to right, #87e3f1, #3fa6b6);
-  --toastify-spinner-color: #33d638;
-  --toastify-icon-color-success: #5ddd7b;
+  --toastify-spinner-color: var(--color-primary);
+  --toastify-icon-color-success: var(--color-primary);
   --toastify-icon-color-error: #f16f7c;
-  --toastify-icon-color-warning: #e7c971;
+  --toastify-icon-color-warning: #8fbf7a;
   --toastify-icon-color-info: #3fa6b6;
 }
 
@@ -156,7 +157,7 @@
   left: -2.5em;
   top: 0.4em;
   margin-top: -0.25em;
-  background: #f9dd94;
+  background: var(--color-primary-200);
   height: 2em;
   width: 2em;
   line-height: 2em;
@@ -177,7 +178,7 @@
 
 .direction-list ul.ant-list-items li:hover:after {
   left: -0.5em;
-  border-left-color: #f9dd94;
+  border-left-color: var(--color-primary-200);
 }
 
 .direction-list ul.ant-list-items li.completed {
@@ -199,6 +200,140 @@
   margin-left: 2px;
 }
 
+.side-add-scroll {
+  scrollbar-gutter: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(111, 180, 120, 0.45) transparent;
+}
+
+.side-add-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.side-add-scroll::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.side-add-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(111, 180, 120, 0.4);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.side-add-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Modern tooltip theme (Ant Design) */
+.np-tooltip .ant-tooltip-inner {
+  border-radius: 12px;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.92);
+  color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 18px 44px -28px rgba(16, 24, 40, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.np-tooltip .ant-tooltip-arrow::before {
+  background: rgba(15, 23, 42, 0.92);
+}
+/* Make Tailwind scrollbar utilities slimmer where used */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.side-add-tabs .ant-tabs-nav {
+  margin: 0 0 10px 0;
+  background: transparent;
+}
+
+/* Fade the tabs as they approach the 3-dots menu on the right */
+.side-add-tabs .ant-tabs-nav-wrap {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 calc(100% - 52px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 calc(100% - 52px),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.side-add-tabs .ant-tabs-extra-content {
+  display: flex;
+  align-items: center;
+}
+
+.side-add-tabs .ant-tabs-nav::before {
+  border-bottom: 0;
+}
+
+.side-add-tabs .ant-tabs-nav-list {
+  gap: 6px;
+}
+
+.side-add-tabs .ant-tabs-tab {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  color: #64748b;
+  font-weight: 600;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.side-add-tabs .ant-tabs-tab:hover {
+  color: #334155;
+  border-color: rgba(148, 163, 184, 0.7);
+  transform: translateY(-1px);
+}
+
+.side-add-tabs .ant-tabs-tab.ant-tabs-tab-active {
+  background: linear-gradient(135deg, #ecf8ee, #dff1e2);
+  border-color: rgba(111, 180, 120, 0.35);
+  color: #2f6a38;
+  box-shadow: 0 8px 18px -14px rgba(47, 106, 56, 0.5);
+}
+
+.side-add-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: inherit;
+}
+
+.side-add-tabs .ant-tabs-ink-bar {
+  background: transparent;
+}
+
 .ant-skeleton {
   font-size: 0;
 }
@@ -209,6 +344,40 @@
   transition:
     transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1),
     opacity 120ms ease;
+}
+
+@keyframes mealFlash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(50, 213, 131, 0.6);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(50, 213, 131, 0.35);
+    transform: translateY(-2px);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(50, 213, 131, 0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes dockSheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-140%) skewX(-12deg);
+  }
+  15% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(140%) skewX(-12deg);
+  }
+}
+
+.meal-card-flash {
+  border-color: var(--color-primary-400);
+  animation: mealFlash 700ms ease-out;
 }
 
 /* subtle bounce when another card is hovering on top/bottom edge */
@@ -224,5 +393,8 @@
 @media (prefers-reduced-motion: reduce) {
   [data-meal-card='true'] {
     transition: none;
+  }
+  .meal-card-flash {
+    animation: none;
   }
 }

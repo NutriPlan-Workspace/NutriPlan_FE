@@ -26,7 +26,7 @@ const NutritionTargetModal: React.FC<NutritionTargetModalProps> = ({
       <div key='save-footer' className='flex w-full justify-center'>
         <Button
           key='save'
-          className='border-none bg-[#ffc84e] px-6 py-5 text-[16px] font-bold text-black hover:bg-[#ffb81c]'
+          className='bg-primary hover:bg-primary-400 border-none px-6 py-5 text-[16px] font-bold text-black'
           onClick={() => {
             handleSave();
             onCancel();

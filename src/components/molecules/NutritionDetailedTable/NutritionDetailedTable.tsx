@@ -14,51 +14,34 @@ const NutritionDetailedTable: FC<NutritionDetailedTableProps> = ({
   nutrition,
   type,
 }) => (
-  <table className='w-full border-none'>
-    {nutritionFieldGroup.map((item) => {
-      const nutritionItem = item.field.map(({ key, title, unit }) => ({
+  <div className='space-y-10'>
+    {nutritionFieldGroup.map((group) => {
+      const nutritionItem = group.field.map(({ key, title, unit }) => ({
+        key,
         title,
         amount: nutrition[key as keyof NutritionFields],
         unit,
       }));
+
       return (
-        <>
-          <thead>
-            <tr>
-              <th
-                className={
-                  item.nutriName === 'general'
-                    ? 'pb-3 text-left text-lg'
-                    : 'pt-10 pb-3 text-left text-lg'
-                }
-              >
-                {item.label1}
-              </th>
-              <th
-                className={
-                  item.nutriName === 'general'
-                    ? 'pb-3 text-right text-lg'
-                    : 'pt-10 pb-3 text-right text-lg'
-                }
-              >
-                {item.label2}
-              </th>
-              <th
-                className={
-                  item.nutriName === 'general'
-                    ? 'pb-3 text-right text-lg'
-                    : 'pt-10 pb-3 text-right text-lg'
-                }
-              >
-                {item.label3}
-              </th>
-            </tr>
-          </thead>
-          <NutritionRow detailedNutrition={nutritionItem} type={type} />
-        </>
+        <section key={group.nutriName}>
+          <div className='mb-3 flex items-end justify-between gap-3'>
+            <div className='text-lg font-semibold text-gray-900'>
+              {group.label1}
+            </div>
+            <div className='grid grid-cols-2 gap-6 text-right text-xs font-semibold tracking-widest text-gray-500 uppercase'>
+              <span>{group.label2 || 'Amount'}</span>
+              <span>{group.label3 || 'Target'}</span>
+            </div>
+          </div>
+
+          <div className='overflow-hidden rounded-2xl border border-black/5 bg-white/60'>
+            <NutritionRow detailedNutrition={nutritionItem} type={type} />
+          </div>
+        </section>
       );
     })}
-  </table>
+  </div>
 );
 
 export default NutritionDetailedTable;

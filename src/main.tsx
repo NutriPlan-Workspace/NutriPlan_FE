@@ -39,6 +39,10 @@ ReactDOM.createRoot(rootElement).render(
                   theme={{
                     token: {
                       fontFamily: '"TT Norms", sans-serif',
+                      // align Ant Design's default (blue) primary with NutriPlan theme
+                      colorPrimary: '#6fb478',
+                      colorInfo: '#6fb478',
+                      colorLink: '#417d4d',
                     },
                   }}
                 >

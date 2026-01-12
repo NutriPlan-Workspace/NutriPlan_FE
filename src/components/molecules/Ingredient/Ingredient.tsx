@@ -10,6 +10,7 @@ import {
   setViewingDetailFood,
 } from '@/redux/slices/food';
 import type { Food } from '@/types/food';
+import { getUnitAmountFromUnits } from '@/utils/foodUnits';
 
 import { PopoverIngreContent } from '../PopoverIngreContent';
 
@@ -100,20 +101,54 @@ const Ingredient: React.FC<IngredientProps> = ({ ingredientList }) => {
                   {item.description === 'NaN' ? '' : item.description}
                 </p>
                 <div className='flex gap-x-6 text-gray-500'>
-                  <span>
-                    {(
-                      ((item.units[2].amount || 1) * amount) /
-                      conversionFactor
-                    ).toFixed(1)}{' '}
-                    {item.units[2].description}
-                  </span>
-                  <span>
-                    {(
-                      ((item.units[0].amount || 1) * amount) /
-                      conversionFactor
-                    ).toFixed(1)}{' '}
-                    {item.units[0].description}
-                  </span>
+                  {(() => {
+                    const primaryUnitIndex = item.units?.[2]
+                      ? 2
+                      : item.units?.[1]
+                        ? 1
+                        : 0;
+
+                    const secondaryUnitIndex = item.units?.[0]
+                      ? 0
+                      : item.units?.[1]
+                        ? 1
+                        : 0;
+
+                    const primaryUnitAmount = getUnitAmountFromUnits(
+                      item.units,
+                      primaryUnitIndex,
+                      1,
+                    );
+                    const secondaryUnitAmount = getUnitAmountFromUnits(
+                      item.units,
+                      secondaryUnitIndex,
+                      1,
+                    );
+
+                    const primaryUnitLabel =
+                      item.units?.[primaryUnitIndex]?.description ?? '';
+                    const secondaryUnitLabel =
+                      item.units?.[secondaryUnitIndex]?.description ?? '';
+
+                    return (
+                      <>
+                        <span>
+                          {(
+                            (primaryUnitAmount * amount) /
+                            conversionFactor
+                          ).toFixed(1)}{' '}
+                          {primaryUnitLabel}
+                        </span>
+                        <span>
+                          {(
+                            (secondaryUnitAmount * amount) /
+                            conversionFactor
+                          ).toFixed(1)}{' '}
+                          {secondaryUnitLabel}
+                        </span>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             </div>

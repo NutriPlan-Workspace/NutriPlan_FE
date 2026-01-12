@@ -41,20 +41,28 @@ const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
   });
 
   return (
-    <div className='flex items-center gap-4 p-4'>
+    <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
       <Button
         className={cn(
-          'flex h-[45px] items-center gap-2 border border-black text-gray-600',
-          { 'border-primary text-primary': hasFilter },
+          'flex h-11 items-center gap-2 rounded-2xl border px-4 text-gray-700 shadow-none transition',
+          hasFilter
+            ? 'border-primary bg-primary-50 text-primary'
+            : 'border-gray-200 bg-white/70 hover:bg-white',
         )}
         onClick={() => setOpenModal(true)}
       >
         <GiMeal
-          className={cn('h-6 w-6 text-gray-500', {
+          className={cn('h-5 w-5', {
             'text-primary': hasFilter,
+            'text-gray-500': !hasFilter,
           })}
         />
-        Filters
+        <span className='text-sm font-semibold'>Filters</span>
+        {hasFilter && (
+          <span className='bg-primary-100 text-primary-700 ml-1 rounded-full px-2 py-0.5 text-xs font-semibold'>
+            Active
+          </span>
+        )}
       </Button>
       <ModalFilter
         open={openModal}
@@ -68,7 +76,7 @@ const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
         placeholder='Search...'
         allowClear
         size='large'
-        className='w-[350px] rounded-full py-3'
+        className='w-full rounded-2xl py-2 sm:w-[420px]'
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
         prefix={<SearchOutlined />}

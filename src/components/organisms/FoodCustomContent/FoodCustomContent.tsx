@@ -35,6 +35,7 @@ import {
 } from '@/redux/query/apis/food/foodApis';
 import { foodSelector } from '@/redux/slices/food';
 import { foodSchema } from '@/schemas/foodSchema';
+import HubPageShell from '@/templates/HubPageShell';
 import { showToastError } from '@/utils/toastUtils';
 
 const { TextArea } = Input;
@@ -134,176 +135,230 @@ const FoodCustomContent: React.FC = () => {
   };
 
   return (
-    <div className='relative flex min-h-screen flex-col'>
-      {/* Header */}
-      <div className='sticky top-0 z-10 bg-white pt-2 pb-4 pl-[40px]'>
-        <Button
-          className='ml-[-15px] flex w-[100px] items-center gap-2 rounded-full border-none hover:bg-gray-100'
-          onClick={() => {
-            if (canGoBack) {
-              router.history.back();
-            }
-          }}
-        >
-          <FaArrowLeft />
-          <Paragraph className='m-0'>Cancel</Paragraph>
-        </Button>
-        <p className='mt-[10px] text-[27px]'>Create Custom Food</p>
-      </div>
-
-      {/* Main Content */}
-      <div className='flex-1 overflow-y-auto px-[40px] pb-[50px]'>
-        <div className='mt-[20px] flex w-[800px] flex-col'>
-          {/* Name */}
-          <div className='mb-[12px] flex items-center'>
-            <p className='m-0'>Name</p>
-            <Controller
-              name='name'
-              control={control}
-              render={({ field }) => (
-                <Tooltip
-                  title={errors.name?.message}
-                  open={!!errors.name}
-                  color='orange'
-                >
-                  <Input
-                    {...field}
-                    className='ml-auto w-[200px] rounded-sm border shadow-sm'
-                  />
-                </Tooltip>
-              )}
-            />
-          </div>
-          <Divider className='my-[12px]' />
-
-          {/* Description */}
-          <div className='mb-[12px] flex items-start'>
-            <p className='m-0'>Description</p>
-            <Controller
-              name='description'
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  rows={3}
-                  className='ml-auto w-[200px] resize-none rounded-sm border shadow-sm'
-                />
-              )}
-            />
-          </div>
-          <Divider className='my-[12px]' />
-
-          {/* Image */}
-          <div className='mb-[12px] flex items-center'>
-            <p className='m-0'>Image</p>
-            <div className='ml-auto flex w-[200px] flex-col items-center gap-2'>
-              <Image width={120} src={img} className='rounded-md' />
-              <Button
-                onClick={() => setUpload(!upload)}
-                className='flex items-center gap-2'
-              >
-                <IoCloudUploadOutline />
-                <Paragraph className='m-0'>Upload Image</Paragraph>
-              </Button>
-              <PopupUpload
-                isModalOpen={upload}
-                setModalOpen={setUpload}
-                onUploaded={handleUploaded}
-              />
-            </div>
-          </div>
-
-          {/* Serving Size */}
-          <div className='mt-10'>
-            <p className='text-[25px]'>Serving Size</p>
-            <Paragraph>
-              For conversions to work, make sure the serving sizes represent
-              equivalent amounts.
-            </Paragraph>
-            <div className='mt-4 ml-2'>
-              <Radio.Group
-                value={selectedIndex}
-                onChange={handleChangeDefaultUnit}
-              >
-                {fields.map((field, index) => (
-                  <div key={field.id} className='mb-2 flex items-center gap-2'>
-                    <Radio value={index} />
+    <HubPageShell
+      maxWidthClassName='max-w-7xl'
+      title={
+        <span className='flex items-center gap-3'>
+          <button
+            type='button'
+            onClick={handleCancelClick}
+            className='flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-gray-700 transition hover:bg-white'
+            aria-label='Back'
+          >
+            <FaArrowLeft className='h-4 w-4' />
+          </button>
+          <span>
+            {currentCustomFood ? 'Edit Custom Food' : 'Create Custom Food'}
+          </span>
+        </span>
+      }
+      description='Add serving sizes and nutrition values for your custom food.'
+    >
+      <div className='flex flex-col gap-6'>
+        <div className='grid grid-cols-1 gap-6 lg:grid-cols-12'>
+          <div className='lg:col-span-5'>
+            <div className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <div className='flex flex-col gap-5'>
+                <div className='grid grid-cols-1 gap-2 sm:grid-cols-12 sm:items-center'>
+                  <div className='text-sm font-medium text-gray-700 sm:col-span-4'>
+                    Name
+                  </div>
+                  <div className='sm:col-span-8'>
                     <Controller
-                      name={`units.${index}.amount`}
+                      name='name'
                       control={control}
                       render={({ field }) => (
                         <Tooltip
-                          title={errors?.units?.[index]?.amount?.message}
-                          open={!!errors?.units?.[index]?.amount}
+                          title={errors.name?.message}
+                          open={!!errors.name}
                           color='orange'
-                          placement='bottom'
-                        >
-                          <InputNumber
-                            {...field}
-                            className='w-20 rounded-sm border shadow-sm'
-                            controls={false}
-                          />
-                        </Tooltip>
-                      )}
-                    />
-
-                    <Controller
-                      name={`units.${index}.description`}
-                      control={control}
-                      render={({ field }) => (
-                        <Tooltip
-                          title={errors?.units?.[index]?.description?.message}
-                          open={!!errors?.units?.[index]?.description}
-                          color='orange'
-                          placement='bottom'
                         >
                           <Input
                             {...field}
-                            className='w-50 rounded-sm border shadow-sm'
+                            className='h-11 w-full rounded-2xl border border-gray-200 bg-white/80 shadow-sm'
                           />
                         </Tooltip>
                       )}
                     />
-
-                    {index !== 0 && (
-                      <Button danger onClick={() => remove(index)}>
-                        <FaTrashAlt />
-                      </Button>
-                    )}
                   </div>
-                ))}
-              </Radio.Group>
-              <Button
-                onClick={handleAdd}
-                className='mt-2 flex items-center gap-2'
-              >
-                <FiPlusSquare />
-                Add Serving Size
-              </Button>
+                </div>
+
+                <Divider className='my-0' />
+
+                <div className='grid grid-cols-1 gap-2 sm:grid-cols-12 sm:items-start'>
+                  <div className='pt-2 text-sm font-medium text-gray-700 sm:col-span-4'>
+                    Description
+                  </div>
+                  <div className='sm:col-span-8'>
+                    <Controller
+                      name='description'
+                      control={control}
+                      render={({ field }) => (
+                        <TextArea
+                          {...field}
+                          rows={4}
+                          className='w-full resize-none rounded-2xl border border-gray-200 bg-white/80 shadow-sm'
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className='mt-6 rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <div className='flex items-start justify-between gap-4'>
+                <div>
+                  <p className='m-0 text-base font-semibold text-gray-900'>
+                    Image
+                  </p>
+                  <Paragraph className='m-0 mt-1 text-sm text-gray-600'>
+                    Optional cover image for this food.
+                  </Paragraph>
+                </div>
+              </div>
+
+              <div className='mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-center'>
+                <Image
+                  src={img}
+                  className='aspect-square w-full rounded-2xl object-cover'
+                  preview={false}
+                />
+                <div className='flex flex-col gap-2'>
+                  <Button
+                    onClick={() => setUpload(!upload)}
+                    className='flex h-11 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white/80 font-semibold text-gray-800 hover:bg-white'
+                  >
+                    <IoCloudUploadOutline />
+                    Upload Image
+                  </Button>
+                  <PopupUpload
+                    isModalOpen={upload}
+                    setModalOpen={setUpload}
+                    onUploaded={handleUploaded}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className='mt-6 rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <p className='m-0 text-base font-semibold text-gray-900'>
+                Serving Size
+              </p>
+              <Paragraph className='m-0 mt-1 text-sm text-gray-600'>
+                For conversions to work, make sure the serving sizes represent
+                equivalent amounts.
+              </Paragraph>
+
+              <div className='mt-4'>
+                <Radio.Group
+                  value={selectedIndex}
+                  onChange={handleChangeDefaultUnit}
+                >
+                  <div className='flex flex-col gap-2'>
+                    {fields.map((field, index) => (
+                      <div
+                        key={field.id}
+                        className='flex flex-col gap-2 rounded-2xl border border-gray-200 bg-white/70 p-3 sm:flex-row sm:items-center'
+                      >
+                        <div className='flex items-center gap-2'>
+                          <Radio value={index} />
+                          <span className='text-sm font-medium text-gray-700'>
+                            Default
+                          </span>
+                        </div>
+
+                        <div className='flex flex-1 flex-col gap-2 sm:flex-row sm:items-center'>
+                          <Controller
+                            name={`units.${index}.amount`}
+                            control={control}
+                            render={({ field }) => (
+                              <Tooltip
+                                title={errors?.units?.[index]?.amount?.message}
+                                open={!!errors?.units?.[index]?.amount}
+                                color='orange'
+                                placement='bottom'
+                              >
+                                <InputNumber
+                                  {...field}
+                                  className='h-11 w-full rounded-2xl border border-gray-200 bg-white/80 shadow-sm sm:w-28'
+                                  controls={false}
+                                />
+                              </Tooltip>
+                            )}
+                          />
+
+                          <Controller
+                            name={`units.${index}.description`}
+                            control={control}
+                            render={({ field }) => (
+                              <Tooltip
+                                title={
+                                  errors?.units?.[index]?.description?.message
+                                }
+                                open={!!errors?.units?.[index]?.description}
+                                color='orange'
+                                placement='bottom'
+                              >
+                                <Input
+                                  {...field}
+                                  className='h-11 w-full rounded-2xl border border-gray-200 bg-white/80 shadow-sm'
+                                  placeholder='e.g. serving, cup, 100g'
+                                />
+                              </Tooltip>
+                            )}
+                          />
+                        </div>
+
+                        {index !== 0 && (
+                          <div className='flex justify-end sm:justify-start'>
+                            <Button danger onClick={() => remove(index)}>
+                              <FaTrashAlt />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </Radio.Group>
+
+                <Button
+                  onClick={handleAdd}
+                  className='mt-3 flex items-center gap-2'
+                >
+                  <FiPlusSquare />
+                  Add Serving Size
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Nutrition Value */}
-          <div className='mt-10'>
-            <p className='text-[25px]'>Nutritional Value</p>
-            <div className='w-[400px]'>
-              {nutritionalValue.map((item, index) => (
-                <div key={index} className='mt-2'>
-                  <div className='flex items-center'>
-                    {index !== 0 ? (
-                      <div
-                        className='mr-1 h-2 w-2 rounded-full'
-                        style={{ backgroundColor: `${item.color}` }}
-                      ></div>
-                    ) : (
-                      <div className='mr-1 w-2'></div>
-                    )}
+          <div className='lg:col-span-7'>
+            <div className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <p className='m-0 text-base font-semibold text-gray-900'>
+                Nutritional Value
+              </p>
+              <Paragraph className='m-0 mt-1 text-sm text-gray-600'>
+                Enter nutrition for the default serving size.
+              </Paragraph>
 
-                    <div className='flex w-full items-center'>
-                      <div className='w-1/2'>
-                        <Typography>{item.label}:</Typography>
+              <div className='mt-4 flex flex-col gap-3'>
+                {nutritionalValue.map((item, index) => (
+                  <div key={index} className='flex items-center gap-3'>
+                    <div className='flex w-4 justify-center'>
+                      {index !== 0 ? (
+                        <div
+                          className='h-2 w-2 rounded-full'
+                          style={{ backgroundColor: `${item.color}` }}
+                        />
+                      ) : null}
+                    </div>
+
+                    <div className='grid w-full grid-cols-12 items-center gap-2'>
+                      <div className='col-span-6 text-sm text-gray-800 sm:col-span-7'>
+                        <Typography className='m-0'>{item.label}:</Typography>
                       </div>
-                      <div className='w-1/4'>
+                      <div className='col-span-4 sm:col-span-3'>
                         <Controller
                           name={`nutrition.${item.key}`}
                           control={control}
@@ -318,133 +373,155 @@ const FoodCustomContent: React.FC = () => {
                                 {...field}
                                 type='number'
                                 controls={false}
-                                className='w-full rounded-sm border border-gray-300 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+                                className='h-11 w-full rounded-2xl border border-gray-200 bg-white/80 text-gray-700 shadow-sm'
                               />
                             </Tooltip>
                           )}
                         />
                       </div>
-                      <div className='w-1/6 pl-1'>
-                        <Typography>{item.unit}</Typography>
+                      <div className='col-span-2 text-right text-xs text-gray-500 sm:col-span-2'>
+                        <Typography className='m-0'>{item.unit}</Typography>
                       </div>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            <div className='mt-6 rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <button
+                type='button'
+                className='flex w-full items-center justify-between gap-3 text-left'
+                onClick={() => setShowOptional(!showOptional)}
+              >
+                <div>
+                  <p className='m-0 text-base font-semibold text-gray-900'>
+                    Optional Nutrition
+                  </p>
+                  <Paragraph className='m-0 mt-1 text-sm text-gray-600'>
+                    Add more details if you have them.
+                  </Paragraph>
                 </div>
-              ))}
+                <IoIosArrowForward
+                  className={`shrink-0 transition-transform duration-300 ${
+                    showOptional ? 'rotate-90' : 'rotate-0'
+                  }`}
+                  size={22}
+                />
+              </button>
+
+              <AnimatePresence>
+                {showOptional && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className='mt-4'
+                  >
+                    {nutritionFieldGroup.map((item, index) => (
+                      <div key={index} className='mt-6 first:mt-0'>
+                        {index !== 0 && (
+                          <Typography className='mb-3 text-base font-semibold'>
+                            {item.label1}
+                          </Typography>
+                        )}
+
+                        <div className='flex flex-col gap-3'>
+                          {item.field.map((value, indexVal) => {
+                            if (
+                              index !== 0 ||
+                              ![0, 1, 2, 3].includes(indexVal)
+                            ) {
+                              return (
+                                <div
+                                  key={indexVal}
+                                  className='grid grid-cols-12 items-center gap-2'
+                                >
+                                  <div className='col-span-6 text-sm text-gray-800 sm:col-span-7'>
+                                    <Typography className='m-0'>
+                                      {value.title}:
+                                    </Typography>
+                                  </div>
+                                  <div className='col-span-4 sm:col-span-3'>
+                                    <Controller
+                                      name={`nutrition.${value.key}`}
+                                      control={control}
+                                      render={({ field }) => (
+                                        <Tooltip
+                                          title={
+                                            errors.nutrition?.[value.key]
+                                              ?.message
+                                          }
+                                          open={!!errors.nutrition?.[value.key]}
+                                          color='orange'
+                                          placement='bottom'
+                                        >
+                                          <InputNumber
+                                            {...field}
+                                            type='number'
+                                            controls={false}
+                                            className='h-11 w-full rounded-2xl border border-gray-200 bg-white/80 text-gray-700 shadow-sm'
+                                          />
+                                        </Tooltip>
+                                      )}
+                                    />
+                                  </div>
+                                  <div className='col-span-2 text-right text-xs text-gray-500 sm:col-span-2'>
+                                    <Typography className='m-0'>
+                                      {value.unit}
+                                    </Typography>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
+        </div>
 
-          {/* Optional Nutrition */}
-          <div className='mt-10 w-[400px]'>
-            <button
-              className='flex cursor-pointer items-center gap-2 text-[25px] transition-all duration-300 hover:underline'
-              onClick={() => setShowOptional(!showOptional)}
+        <div className='sticky bottom-0 z-10 -mx-5 border-t border-gray-200/70 bg-white/80 px-5 py-4 backdrop-blur sm:-mx-7 sm:px-7'>
+          <div className='flex flex-wrap justify-end gap-3'>
+            <Button
+              className='px-4 py-5 text-[16px]'
+              onClick={handleCancelClick}
             >
-              <span>Optional Nutrition Value</span>
-              <IoIosArrowForward
-                className={`transition-transform duration-300 ${
-                  showOptional ? 'rotate-90' : 'rotate-0'
-                }`}
-                size={24}
-              />
-            </button>
-            <AnimatePresence>
-              {showOptional && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  {nutritionFieldGroup.map((item, index) => (
-                    <div key={index} className='mt-2'>
-                      {index !== 0 && (
-                        <Typography className='mb-2 text-[20px]'>
-                          {item.label1}:
-                        </Typography>
-                      )}
-                      {item.field.map((value, indexVal) => {
-                        if (index !== 0 || ![0, 1, 2, 3].includes(indexVal)) {
-                          return (
-                            <div
-                              key={indexVal}
-                              className='mt-2 flex items-center'
-                            >
-                              <div className='w-1/2'>
-                                <Typography>{value.title}:</Typography>
-                              </div>
-                              <div className='w-1/4'>
-                                <Controller
-                                  name={`nutrition.${value.key}`}
-                                  control={control}
-                                  render={({ field }) => (
-                                    <Tooltip
-                                      title={
-                                        errors.nutrition?.[value.key]?.message
-                                      }
-                                      open={!!errors.nutrition?.[value.key]}
-                                      color='orange'
-                                      placement='bottom'
-                                    >
-                                      <InputNumber
-                                        {...field}
-                                        type='number'
-                                        controls={false}
-                                        className='w-full rounded-sm border border-gray-300 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                                      />
-                                    </Tooltip>
-                                  )}
-                                />
-                              </div>
-                              <div className='w-1/6 pl-1'>
-                                <Typography>{value.unit}</Typography>
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  ))}
-                </motion.div>
+              Cancel
+            </Button>
+            <Button
+              className={cn(
+                `flex w-[160px] items-center justify-center gap-2 border-none px-4 py-5 text-[16px] text-white ${
+                  isLoading
+                    ? 'cursor-not-allowed bg-gray-400'
+                    : 'bg-primary-400 hover:bg-primary-500'
+                }`,
               )}
-            </AnimatePresence>
+              onClick={handleSubmit(onSubmit)}
+            >
+              {isLoading ? (
+                <Spin
+                  indicator={<LoadingOutlined spin />}
+                  size='small'
+                  className='text-white'
+                />
+              ) : (
+                <span className='flex items-center gap-2'>
+                  <GrDocumentUpdate className='text-[18px]' />
+                  {currentCustomFood ? 'Save' : 'Create'}
+                </span>
+              )}
+            </Button>
           </div>
         </div>
       </div>
-
-      {/* Footer Action */}
-      <div className='sticky bottom-0 z-10 bg-white py-4 shadow-inner'>
-        <div className='flex w-[840px] justify-end gap-4'>
-          <Button className='px-4 py-5 text-[16px]' onClick={handleCancelClick}>
-            Cancel
-          </Button>
-          <Button
-            className={cn(
-              `flex w-[160px] items-center gap-2 border-none px-4 py-5 text-[16px] text-white ${
-                isLoading
-                  ? 'cursor-not-allowed bg-gray-400'
-                  : 'bg-primary-400 hover:bg-primary-500'
-              }`,
-            )}
-            onClick={handleSubmit(onSubmit)}
-          >
-            {isLoading ? (
-              <Spin
-                indicator={<LoadingOutlined spin />}
-                size='small'
-                className='text-white'
-              />
-            ) : (
-              <span className='flex items-center gap-2'>
-                <GrDocumentUpdate className='text-[18px]' />
-                Create
-              </span>
-            )}
-          </Button>
-        </div>
-      </div>
-    </div>
+    </HubPageShell>
   );
 };
 

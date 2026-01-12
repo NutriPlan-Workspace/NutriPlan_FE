@@ -4,6 +4,7 @@ import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { Button } from '@/atoms/Button';
 import { PLAN_TYPES, WEEK_TYPES } from '@/constants/plans';
 import { useDate } from '@/contexts/DateContext';
+import { cn } from '@/helpers/helpers';
 import { DateSelector } from '@/molecules/DateSelector';
 import {
   getWeekRange,
@@ -13,9 +14,20 @@ import {
 } from '@/utils/dateUtils';
 
 const buttonClass =
-  'flex items-center justify-center h-[40px] cursor-pointer py-1 font-[18px] tracking-[0.25px] rounded-sm bg-transparent box-border border border-black/10 text-black hover:text-white hover:bg-[#6c757d]';
+  'flex h-10 items-center justify-center rounded-2xl border border-gray-200 bg-white/90 px-3 text-sm font-semibold text-gray-700 shadow-sm backdrop-blur-sm transition hover:bg-white hover:text-gray-900 active:bg-gray-50';
 
-const NavigationButtons: React.FC = () => {
+const iconButtonClass = cn(
+  buttonClass,
+  'w-10 px-0 text-gray-700 hover:bg-gray-50',
+);
+
+type NavigationButtonsProps = {
+  variant?: 'default' | 'compact';
+};
+
+const NavigationButtons: React.FC<NavigationButtonsProps> = ({
+  variant = 'default',
+}) => {
   const {
     selectedDate,
     setSelectedDate,
@@ -93,11 +105,20 @@ const NavigationButtons: React.FC = () => {
     setSelectedDate(newDate);
   };
 
+  const isCompact = variant === 'compact';
+  const rootClass = isCompact
+    ? 'relative flex items-center gap-1'
+    : 'relative flex items-center justify-center gap-1';
+
+  const compactButtonClass =
+    'flex h-10 items-center justify-center rounded-xl px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 hover:text-gray-900 active:bg-gray-50';
+  const compactIconButtonClass = cn(compactButtonClass, 'w-10 px-0');
+
   return (
-    <div className='relative flex items-center justify-center gap-1'>
+    <div className={rootClass}>
       <Button
         htmlType='button'
-        className={buttonClass}
+        className={isCompact ? compactIconButtonClass : iconButtonClass}
         onClick={handlePrevButton}
       >
         <FaAngleLeft className='h-5 w-5' />
@@ -105,10 +126,12 @@ const NavigationButtons: React.FC = () => {
 
       <Button
         htmlType='button'
-        className={buttonClass}
+        className={
+          isCompact ? cn(compactButtonClass, 'px-3') : cn(buttonClass, 'px-4')
+        }
         onClick={() => handleGetToday()}
       >
-        Jump To Today
+        {isCompact ? 'Current Week' : 'Jump To Today'}
       </Button>
 
       <DateSelector
@@ -116,7 +139,10 @@ const NavigationButtons: React.FC = () => {
         setSelectedOption={setSelectedOption}
       />
 
-      <Button className={buttonClass} onClick={handleNextButton}>
+      <Button
+        className={isCompact ? compactIconButtonClass : iconButtonClass}
+        onClick={handleNextButton}
+      >
         <FaAngleRight className='h-5 w-5' />
       </Button>
     </div>

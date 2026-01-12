@@ -119,7 +119,7 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
                     <HiOutlineAdjustments className='text-[1rem] transition-all duration-75' />
                   }
                   variant='text'
-                  color='gold'
+                  color='primary'
                   shape='circle'
                   className='text-primary hover:bg-primary-100 active:bg-primary-200 transition-text duration-200 hover:text-black'
                 />
@@ -207,7 +207,7 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
           </div>
         ))}
         <Button
-          className='mt-2 w-full border-gray-400 text-gray-600 hover:border-gray-400 hover:bg-gray-200 hover:text-black'
+          className='mt-3 w-full rounded-2xl border border-black/10 bg-white/60 px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-white'
           onClick={() => setIsModalOpen(true)}
         >
           Detailed Nutrition Information

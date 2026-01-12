@@ -14,6 +14,8 @@ interface MealBoxHeaderProps {
   mealItems: MealPlanFood[];
   isHovered: boolean;
   onClearMealItems: () => void;
+  onGenerateOptions: () => void;
+  isGenerating?: boolean;
 }
 
 const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
@@ -23,6 +25,8 @@ const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
   mealItems,
   isHovered,
   onClearMealItems,
+  onGenerateOptions,
+  isGenerating = false,
 }) => (
   <div className='flex items-center justify-between'>
     <div>
@@ -65,11 +69,14 @@ const MealBoxHeader: React.FC<MealBoxHeaderProps> = ({
       )}
     >
       <Button
-        // TODO: IMPLEMENT AUTO GENERATE MEAL PLAN
-        onClick={(e) => e.preventDefault()}
+        onClick={(e) => {
+          e.preventDefault();
+          onGenerateOptions();
+        }}
         type='text'
         shape='circle'
         icon={<HiOutlineArrowPath className='text-xl' />}
+        loading={isGenerating}
       />
       <Button
         onClick={() => {

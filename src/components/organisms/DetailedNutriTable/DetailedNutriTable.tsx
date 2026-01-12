@@ -11,7 +11,7 @@ const DetailedNutriTable: FC<NutritionDetailedTableProps> = ({
   nutrition,
   type,
 }) => (
-  <div className='h-[70vh] w-full overflow-y-scroll border-none px-8 pb-8'>
+  <div className='w-full border-none'>
     <NutritionDetailedTable nutrition={nutrition} type={type} />
   </div>
 );

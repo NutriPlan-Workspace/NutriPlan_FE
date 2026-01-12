@@ -6,6 +6,8 @@ import invariant from 'tiny-invariant';
 import { setDraggingCardHeight } from '@/redux/slices/mealPlan';
 import type { Food } from '@/types/food';
 
+const DOCK_FOOD_DRAG_EVENT = 'nutriplan:dock-food-drag';
+
 export const useFoodCardSideAddDrag = ({ food }: { food: Food }) => {
   const dispatch = useDispatch();
   const foodCardSideAddRef = useRef<HTMLDivElement | null>(null);
@@ -28,12 +30,22 @@ export const useFoodCardSideAddDrag = ({ food }: { food: Food }) => {
             draggingCardHeight: foodCardSideAddElement.clientHeight,
           }),
         );
+        window.dispatchEvent(
+          new CustomEvent(DOCK_FOOD_DRAG_EVENT, {
+            detail: { isDragging: true },
+          }),
+        );
       },
       onDrop: () => {
         setIsDragging(false);
+        window.dispatchEvent(
+          new CustomEvent(DOCK_FOOD_DRAG_EVENT, {
+            detail: { isDragging: false },
+          }),
+        );
       },
     });
-  }, [food, dispatch]);
+  }, [dispatch, food]);
 
   return {
     isDragging,

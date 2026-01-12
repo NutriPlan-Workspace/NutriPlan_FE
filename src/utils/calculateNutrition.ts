@@ -3,6 +3,7 @@ import { IngredientDisplay } from '@/types/ingredient';
 import type { MealPlanFood } from '@/types/mealPlan';
 import { NutritionGoal } from '@/types/user';
 
+import { getUnitAmountFromUnits } from './foodUnits';
 import { roundNumber } from './roundNumber';
 
 export function getTotalCalories(mealItems: MealPlanFood[]): number {
@@ -10,7 +11,8 @@ export function getTotalCalories(mealItems: MealPlanFood[]): number {
     mealItems.reduce(
       (total, food) =>
         total +
-        (food.amount / food.foodId.units[food.unit].amount) *
+        (food.amount /
+          getUnitAmountFromUnits(food.foodId.units, food.unit, 1)) *
           food.foodId.nutrition.calories,
       0,
     ),
@@ -106,7 +108,8 @@ export function getTotalNutrition(mealItems: MealPlanFood[]) {
   };
 
   for (const food of mealItems) {
-    const multiply = food.amount / food.foodId.units[food.unit].amount;
+    const multiply =
+      food.amount / getUnitAmountFromUnits(food.foodId.units, food.unit, 1);
     for (const key in totalNutrition) {
       const nutritionKey = key as NutritionKeys;
       if (food.foodId.nutrition[nutritionKey] !== undefined) {
@@ -137,10 +140,12 @@ export const calculateTotalNutrition = (
 
   for (const ingredient of ingredients) {
     const { food, amount, unit } = ingredient;
-    const unitInfo = food.units[unit];
-    const unitAmount = unitInfo?.amount ?? 1;
-    const defaultUnit = food.units[food.defaultUnit];
-    const defaultUnitAmount = defaultUnit.amount;
+    const unitAmount = getUnitAmountFromUnits(food.units, unit, 1);
+    const defaultUnitAmount = getUnitAmountFromUnits(
+      food.units,
+      food.defaultUnit,
+      1,
+    );
 
     const multiply = (amount / unitAmount) * defaultUnitAmount;
 
@@ -153,6 +158,8 @@ export const calculateTotalNutrition = (
 
   return total;
 };
+
+const MACRO_TOLERANCE_RATIO = 0.05;
 
 export const getInvalidNutritionKeys = (
   nutritionData?: NutritionFields,
@@ -188,7 +195,11 @@ export const getInvalidNutritionKeys = (
       continue;
     }
 
-    if (actual < targetRange.from || actual > targetRange.to) {
+    const tolerance = targetRange.to * MACRO_TOLERANCE_RATIO;
+    const lowerBound = Math.max(0, targetRange.from - tolerance);
+    const upperBound = targetRange.to + tolerance;
+
+    if (actual < lowerBound || actual > upperBound) {
       invalidKeys.push(macro);
     }
   }

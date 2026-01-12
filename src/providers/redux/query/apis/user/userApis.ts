@@ -10,6 +10,7 @@ export const nutritionApi = baseApi.injectEndpoints({
         url: NUTRITION_TARGET_ENDPOINT,
         method: 'GET',
       }),
+      providesTags: ['NutritionTarget'],
     }),
     updateNutritionRequest: builder.mutation<
       ApiResponse<NutritionTarget>,
@@ -20,12 +21,14 @@ export const nutritionApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: body,
       }),
+      invalidatesTags: ['NutritionTarget'],
     }),
     getNutritionTarget: builder.query<NutritionGoalResponse, void>({
       query: () => ({
         url: '/user/nutrition-target',
         method: 'GET',
       }),
+      providesTags: ['NutritionTarget'],
     }),
   }),
 });

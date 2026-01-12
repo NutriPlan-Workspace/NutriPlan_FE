@@ -1,11 +1,9 @@
 import React from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
-import { Typography } from 'antd';
 
 import { RangeSlider } from '@/atoms/RangeSlider';
+import { NUTRITION_TARGET_MIN_GAP } from '@/constants/nutritionTargets';
 import type { NutritionFormSchema } from '@/schemas/nutritionTargetSchema';
-
-const { Title, Paragraph } = Typography;
 
 interface TargetMacrosProps {
   control: Control<NutritionFormSchema>;
@@ -13,31 +11,18 @@ interface TargetMacrosProps {
 }
 
 const TargetMacros: React.FC<TargetMacrosProps> = ({ control, errors }) => (
-  <div>
-    <div className='pb-1'>
-      <Title level={3} className='font-thin'>
-        Target Macros
-      </Title>
-      <Paragraph className='max-w-[500px] text-sm font-thin'>
-        Select the range of each macronutrient you want in your diet. A more
-        flexible range will give you much more variety in your meals.
-      </Paragraph>
-    </div>
-    <div className='flex items-center justify-between'>
-      <Title level={3} className='font-thin'>
-        Calculate macros
-      </Title>
-    </div>
+  <div className='flex flex-col gap-5'>
     <Controller
       name='carbTarget'
       control={control}
       render={({ field }) => (
-        <div className='mb-4'>
+        <div>
           <RangeSlider
             color='lightcoral'
             title='Carbs'
             {...field}
             maxValue={619}
+            minGap={NUTRITION_TARGET_MIN_GAP.CARB}
           />
           {(errors?.carbTarget?.from || errors?.carbTarget?.to) && (
             <p className='mt-1 text-xs text-red-500'>
@@ -53,12 +38,13 @@ const TargetMacros: React.FC<TargetMacrosProps> = ({ control, errors }) => (
       name='fatTarget'
       control={control}
       render={({ field }) => (
-        <div className='mb-4'>
+        <div>
           <RangeSlider
             color='lightblue'
             title='Fats'
             {...field}
             maxValue={275}
+            minGap={NUTRITION_TARGET_MIN_GAP.FAT}
           />
           {(errors?.fatTarget?.from || errors?.fatTarget?.to) && (
             <p className='mt-1 text-xs text-red-500'>
@@ -73,12 +59,13 @@ const TargetMacros: React.FC<TargetMacrosProps> = ({ control, errors }) => (
       name='proteinTarget'
       control={control}
       render={({ field }) => (
-        <div className='mb-4'>
+        <div>
           <RangeSlider
             color='lightgreen'
             title='Proteins'
             {...field}
             maxValue={619}
+            minGap={NUTRITION_TARGET_MIN_GAP.PROTEIN}
           />
           {(errors?.proteinTarget?.from || errors?.proteinTarget?.to) && (
             <p className='mt-1 text-xs text-red-500'>

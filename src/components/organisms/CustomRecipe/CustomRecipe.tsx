@@ -1,16 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { useNavigate } from '@tanstack/react-router';
-import { Typography } from 'antd';
 
 import { Button } from '@/atoms/Button';
 import { SearchAndFilter } from '@/organisms/CustomRecipe';
 import FoodGrid from '@/organisms/FoodGrid/FoodGrid';
 import { useGetFoodsQuery } from '@/redux/query/apis/food/foodApis';
+import HubPageShell from '@/templates/HubPageShell';
 import type { Food } from '@/types/food';
 import { debounceValue } from '@/utils/debounce';
-
-const { Title, Paragraph } = Typography;
 
 const CustomeRecipe: React.FC = () => {
   const navigate = useNavigate();
@@ -100,38 +98,34 @@ const CustomeRecipe: React.FC = () => {
   };
 
   return (
-    <div className='flex flex-col gap-4 p-5'>
-      <div>
-        <Title level={3} className='m-0 font-thin'>
-          Custom Foods & Recipes
-        </Title>
-        <Paragraph className='font-thin text-gray-400'>
-          Can&apos;t find your home-made meal? Create one below or use our{' '}
-        </Paragraph>
-      </div>
-
-      <div className='flex items-center gap-2'>
-        <Button
-          onClick={handleCustomFoodClick}
-          className='bg-secondary-400 hover:bg-secondary-500 flex items-center gap-2 border-transparent p-5 hover:border-transparent'
-        >
-          <FaPlus className='text-white' />
-          <Paragraph className='m-0 font-thin text-white'>
-            Create Custom Food
-          </Paragraph>
-        </Button>
-        <Button
-          className='bg-secondary-400 hover:bg-secondary-500 flex items-center gap-2 border-transparent p-5 hover:border-transparent'
-          onClick={handleCreateRecipeClick}
-        >
-          <FaPlus className='text-white' />
-          <Paragraph className='m-0 font-thin text-white'>
-            Create Custom Recipe
-          </Paragraph>
-        </Button>
-      </div>
-
-      <div className='mt-5'>
+    <HubPageShell
+      title='Custom Foods & Recipes'
+      description='Create your own foods and recipes, then reuse them in plans and collections.'
+      maxWidthClassName='max-w-7xl'
+      actions={
+        <>
+          <Button
+            onClick={handleCustomFoodClick}
+            className='bg-secondary-100 text-secondary-800 hover:!bg-secondary-200 h-11 rounded-2xl border-none px-4 font-semibold'
+          >
+            <span className='flex items-center gap-2'>
+              <FaPlus />
+              Create custom food
+            </span>
+          </Button>
+          <Button
+            onClick={handleCreateRecipeClick}
+            className='bg-secondary-400 hover:!bg-secondary-500 h-11 rounded-2xl border-none px-4 font-semibold text-white'
+          >
+            <span className='flex items-center gap-2'>
+              <FaPlus className='text-white' />
+              Create custom recipe
+            </span>
+          </Button>
+        </>
+      }
+    >
+      <div className='flex flex-col gap-5'>
         <SearchAndFilter
           activeTab={activeTab}
           searchValue={searchValue}
@@ -140,15 +134,14 @@ const CustomeRecipe: React.FC = () => {
           handleInputChange={handleInputChange}
           handleSortChange={handleSortChange}
         />
-        <div className='mt-10 mb-30 flex-1'>
-          <FoodGrid
-            foods={filteredAndSortedFoods}
-            isFetching={isFetching || loading}
-            showPopover={false}
-          />
-        </div>
+        <div className='h-px bg-black/5' />
+        <FoodGrid
+          foods={filteredAndSortedFoods}
+          isFetching={isFetching || loading}
+          showPopover={false}
+        />
       </div>
-    </div>
+    </HubPageShell>
   );
 };
 

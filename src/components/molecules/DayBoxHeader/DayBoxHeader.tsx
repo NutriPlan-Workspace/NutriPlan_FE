@@ -14,6 +14,8 @@ interface DayBoxHeaderProps {
   isHovered: boolean;
   isLoading: boolean;
   onClearMealDay: () => void;
+  onGenerateMealDay: () => void;
+  isGenerating?: boolean;
 }
 
 const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
@@ -21,6 +23,8 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
   isToday,
   isLoading,
   onClearMealDay,
+  onGenerateMealDay,
+  isGenerating = false,
 }) => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const handleConfirmDelete = () => {
@@ -51,11 +55,14 @@ const DayBoxHeader: React.FC<DayBoxHeaderProps> = ({
           )}
         >
           <Button
-            // TODO: IMPLEMENT AUTO GENERATE MEAL PLAN
-            onClick={(e) => e.preventDefault()}
+            onClick={(e) => {
+              e.preventDefault();
+              onGenerateMealDay();
+            }}
             type='text'
             shape='circle'
             icon={<HiOutlineArrowPath className='text-xl' />}
+            loading={isGenerating}
           />
           <Button
             onClick={() => {

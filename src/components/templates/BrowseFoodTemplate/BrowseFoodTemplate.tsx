@@ -32,7 +32,7 @@ const BrowseFoodTemplate: React.FC<BrowseFoodTemplateProps> = ({
           alt='banner'
         />
         <div className='absolute top-1/2 left-10 w-[450px] -translate-y-1/2'>
-          <p className='font-rossanova text-[30px] text-[#FFC84E]'>
+          <p className='font-rossanova text-primary text-[30px]'>
             Plan smarter, eat healthier !
           </p>
           <p className='text-[20px] text-white'>

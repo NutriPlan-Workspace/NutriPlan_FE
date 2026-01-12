@@ -4,9 +4,11 @@ import { Button, Modal } from 'antd';
 
 import { cn } from '@/helpers/helpers';
 import { DayBoxSummary } from '@/molecules/DayBoxSummary';
+import { useAutoGenerateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import { useGetNutritionTargetQuery } from '@/redux/query/apis/user/userApi';
 import { MealPlanDay } from '@/types/mealPlan';
 import { formatDate, getDayOfWeek } from '@/utils/dateUtils';
+import { showToastError } from '@/utils/toastUtils';
 
 interface MealPlanHeaderProps {
   mealDate: string;
@@ -24,10 +26,25 @@ const MealPlanHeader: React.FC<MealPlanHeaderProps> = ({
     ? [...mealItems.breakfast, ...mealItems.lunch, ...mealItems.dinner]
     : undefined;
   const { data } = useGetNutritionTargetQuery();
+  const [autoGenerateMealPlan, { isLoading: isGenerating }] =
+    useAutoGenerateMealPlanMutation();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const handleConfirmDelete = () => {
     onClearMealDay();
     setIsConfirmModalOpen(false);
+  };
+
+  const handleRegenerate = async () => {
+    try {
+      const formattedDate = new Date(mealDate).toISOString();
+      await autoGenerateMealPlan({ date: formattedDate }).unwrap();
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to regenerate meal plan';
+      showToastError(message);
+    }
   };
 
   return (
@@ -51,8 +68,8 @@ const MealPlanHeader: React.FC<MealPlanHeaderProps> = ({
         )}
       >
         <Button
-          // TODO: IMPLEMENT AUTO GENERATE MEAL PLAN
-          onClick={(e) => e.preventDefault()}
+          onClick={handleRegenerate}
+          loading={isGenerating}
           type='text'
           shape='circle'
           icon={<HiOutlineArrowPath className='text-xl' />}
@@ -61,6 +78,7 @@ const MealPlanHeader: React.FC<MealPlanHeaderProps> = ({
           onClick={() => {
             setIsConfirmModalOpen(true);
           }}
+          disabled={isGenerating}
           type='text'
           shape='circle'
           icon={<HiOutlineArchiveBoxXMark className='text-xl' />}

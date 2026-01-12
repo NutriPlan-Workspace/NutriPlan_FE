@@ -15,10 +15,20 @@ import { getItemsSelected } from '@/utils/foodCategory';
 import getItems from './CategoryItem';
 
 interface SideAddFoodProps {
-  setFilterFood: (value: boolean) => void;
+  setFilterFood?: (value: boolean) => void;
+  onClose?: () => void;
+  className?: string;
+  variant?: 'sidebar' | 'dock';
+  showClose?: boolean;
 }
 
-const SideAddFood: React.FC<SideAddFoodProps> = ({ setFilterFood }) => {
+const SideAddFood: React.FC<SideAddFoodProps> = ({
+  setFilterFood,
+  onClose,
+  className,
+  variant = 'sidebar',
+  showClose,
+}) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [menuItem, setMenuItem] = useState(false);
   const [selectedTabLabel, setSelectedTabLabel] = useState('Collection Foods');
@@ -28,6 +38,16 @@ const SideAddFood: React.FC<SideAddFoodProps> = ({ setFilterFood }) => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const dropDownRef = useRef<HTMLDivElement | null>(null);
   const { selectedPlan } = useDate();
+
+  const handleClose = () => {
+    onClose?.();
+    setFilterFood?.(false);
+  };
+
+  const shouldShowClose = useMemo(() => {
+    if (typeof showClose === 'boolean') return showClose;
+    return variant === 'sidebar';
+  }, [showClose, variant]);
 
   const isWeekly = useMemo(
     () => selectedPlan === PLAN_TYPES.WEEKLY_VIEW,
@@ -91,32 +111,69 @@ const SideAddFood: React.FC<SideAddFoodProps> = ({ setFilterFood }) => {
 
   return (
     <div
-      className={cn('w-full flex-col gap-2 rounded-sm py-1 pl-2', {
-        'sticky top-10 left-0': isWeekly,
-      })}
+      className={cn(
+        'flex w-full flex-col gap-2',
+        variant === 'sidebar' && 'rounded-sm py-1 pl-2',
+        variant === 'dock' && 'rounded-2xl p-2',
+        {
+          'sticky top-10 left-0': variant === 'sidebar' && isWeekly,
+        },
+        className,
+      )}
     >
-      <div className='flex w-full items-center justify-between gap-2 p-1'>
+      <div
+        className={cn(
+          'flex w-full items-center justify-between gap-2',
+          variant === 'dock' ? 'p-0' : 'p-1',
+        )}
+      >
         <AntdInput
           placeholder='Search Foods...'
-          suffix={<IoSearch className='h-5 w-5 text-gray-500' />}
-          className='h-[45px] w-[300px] rounded-full border border-black px-4 py-1'
+          suffix={
+            <IoSearch
+              className={cn(
+                'text-gray-500',
+                variant === 'dock' ? 'h-4 w-4' : 'h-5 w-5',
+              )}
+            />
+          }
+          className={cn(
+            'rounded-full border border-gray-200 bg-white px-4 py-1 text-sm',
+            variant === 'dock' ? 'h-[38px] w-full' : 'h-[45px] w-[300px]',
+          )}
           onChange={(e) => setSearchText(e.target.value)}
           value={searchText}
         />
-        <Button
-          className='hover:bg-primary-100 rounded-md border-none py-5 text-black'
-          onClick={() => setFilterFood(false)}
-        >
-          <IoClose className='h-5 w-5' />
-        </Button>
+
+        {shouldShowClose && (
+          <Button
+            className={cn(
+              'rounded-full border-none text-gray-700 hover:bg-gray-100',
+              variant === 'dock' ? 'h-[38px] w-[38px] p-0' : 'py-5',
+            )}
+            onClick={handleClose}
+          >
+            <IoClose
+              className={cn(variant === 'dock' ? 'h-4 w-4' : 'h-5 w-5')}
+            />
+          </Button>
+        )}
       </div>
-      <div className='scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent ml-2 flex h-full max-h-[calc(100vh-180px)] max-w-[285px] min-w-[150px] flex-col gap-2 overflow-y-scroll rounded-sm pr-1'>
+
+      <div
+        className={cn(
+          'side-add-scroll flex w-full flex-col gap-2 overflow-y-auto pr-0',
+          variant === 'sidebar'
+            ? 'ml-2 h-full max-h-[calc(100vh-180px)] max-w-[285px] min-w-[150px] rounded-sm'
+            : 'max-h-full',
+        )}
+      >
         <div className='relative flex w-full items-start gap-2'>
           <Tabs
             activeKey={activeTabKey}
             items={items}
             onChange={(key: string) => setActiveTabKey(key)}
-            className='w-full'
+            className='side-add-tabs w-full'
             tabBarExtraContent={
               <TabActionMenu
                 dropDownRef={dropDownRef}

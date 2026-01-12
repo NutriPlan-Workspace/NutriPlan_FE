@@ -5,6 +5,7 @@ import { Image, Popover, Typography } from 'antd';
 
 import { DropIndicator } from '@/atoms/DropIndicator';
 import { PairButton } from '@/atoms/PairButton';
+import { NUTRITION_POPOVER_BODY_STYLE } from '@/constants/popoverStyles';
 import { cn } from '@/helpers/helpers';
 import { useMealCardDrag } from '@/hooks/useMealCardDrag';
 import { AmountSelector } from '@/molecules/AmountSelector';
@@ -19,8 +20,19 @@ import {
   setIsModalDetailOpen,
   setViewingDetailFood,
 } from '@/redux/slices/food';
+import {
+  closeSwapModal,
+  mealPlanSelector,
+  openSwapModal,
+  setSwapModalData,
+  setSwapModalLoading,
+} from '@/redux/slices/mealPlan';
+import { makeSelectMealPlanByDate } from '@/redux/slices/mealPlan/selectors';
 import type { Food } from '@/types/food';
 import type { MealPlanDay, MealPlanFood } from '@/types/mealPlan';
+import type { MealType, SwapOptionsResponse } from '@/types/mealSwap';
+import { fetchSwapOptions } from '@/utils/mealSwapApi';
+import { showToastError } from '@/utils/toastUtils';
 
 import { getMenuItems } from './MenuItemMealCard';
 
@@ -50,6 +62,7 @@ const MealCardComponent: React.FC<MealCardProps> = ({
 }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+  const swapModal = useSelector(mealPlanSelector).swapModal;
 
   const handleEnterHover = () => setIsHovered(true);
   const handleLeaveHover = () => setIsHovered(false);
@@ -57,6 +70,13 @@ const MealCardComponent: React.FC<MealCardProps> = ({
   const favoriteList = useSelector(collectionSelector).favoriteList;
   const isFavorite = favoriteList.some(
     (item) => item.food === mealItem.foodId._id,
+  );
+  const flashMealCardIds = useSelector(mealPlanSelector).flashMealCardIds;
+  const shouldFlash = flashMealCardIds.includes(mealItem._id);
+  const selectMealPlanByDate = useMemo(makeSelectMealPlanByDate, []);
+  const currentMealPlan = useSelector(
+    (state: import('@/redux/store').RootState) =>
+      selectMealPlanByDate(state, mealDate),
   );
 
   const [updateFavoriteFoods] = useUpdateFavoriteFoodsMutation();
@@ -109,6 +129,58 @@ const MealCardComponent: React.FC<MealCardProps> = ({
     ],
   );
 
+  const handleOpenSwapOptions = useCallback(async () => {
+    const mealPlanDay = currentMealPlan?.mealPlanDay;
+    if (!mealPlanDay?._id) {
+      showToastError('Meal plan not found for this day.');
+      return;
+    }
+
+    dispatch(
+      openSwapModal({
+        swapType: 'food',
+        mealPlanId: mealPlanDay._id,
+        mealDate,
+        mealType: mealType as MealType,
+        targetFoodId: mealItem.foodId._id,
+        targetItemId: mealItem._id,
+        filters: {},
+      }),
+    );
+    dispatch(setSwapModalLoading({ loading: true }));
+    try {
+      const data = await fetchSwapOptions(mealPlanDay._id, {
+        swapType: 'food',
+        mealType: mealType as MealType,
+        targetFoodId: mealItem.foodId._id,
+        targetItemId: mealItem._id,
+        limit: 5,
+        tolerance: 0.2,
+      });
+      dispatch(setSwapModalData({ data: data as SwapOptionsResponse }));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Swap options failed';
+      showToastError(message);
+      dispatch(closeSwapModal());
+    } finally {
+      dispatch(setSwapModalLoading({ loading: false }));
+    }
+  }, [
+    currentMealPlan,
+    dispatch,
+    mealDate,
+    mealItem._id,
+    mealItem.foodId._id,
+    mealType,
+  ]);
+
+  const isSwappingThisCard =
+    swapModal.open &&
+    swapModal.loading &&
+    swapModal.swapType === 'food' &&
+    swapModal.targetItemId === mealItem._id;
+
   return (
     <div className='relative'>
       {dragState && closestEdge === 'top' && (
@@ -119,19 +191,17 @@ const MealCardComponent: React.FC<MealCardProps> = ({
         placement='left'
         color='white'
         styles={{
-          body: {
-            padding: 0,
-            borderRadius: '10px',
-            overflow: 'hidden',
-          },
+          body: NUTRITION_POPOVER_BODY_STYLE,
         }}
+        open={swapModal.open ? false : undefined}
         content={<NutritionPopoverFood mealItem={mealItem} />}
       >
         <div
           ref={mealCardRef}
           className={cn(
-            'flex items-center rounded-[5px] border-2 border-transparent bg-white p-[3px] transition-all duration-200 hover:shadow-md',
+            'flex items-center rounded-2xl border-2 border-white/70 bg-white/85 p-2 shadow-[0_6px_14px_-10px_rgba(15,23,42,0.35)] backdrop-blur-sm transition-all duration-200 hover:shadow-[0_10px_18px_-12px_rgba(15,23,42,0.35)]',
             { 'border-primary-400': isHovered },
+            shouldFlash && 'meal-card-flash',
           )}
           onMouseEnter={handleEnterHover}
           onMouseLeave={handleLeaveHover}
@@ -142,7 +212,7 @@ const MealCardComponent: React.FC<MealCardProps> = ({
               'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/k52mpavgekiqflwmk9ex.avif'
             }
             className={cn(
-              'h-[50px] w-[50px] max-w-[50px] rounded-[10px] border-2 border-transparent object-cover transition-all duration-200',
+              'h-[50px] w-[50px] max-w-[50px] rounded-xl border-2 border-white/60 object-cover transition-all duration-200',
               { 'border-primary-400 border-2': isHovered },
             )}
             loading='lazy'
@@ -178,7 +248,8 @@ const MealCardComponent: React.FC<MealCardProps> = ({
           <PairButton
             isHovered={isHovered}
             menuItems={menuItems}
-            mealDate={new Date(mealDate)}
+            onRotate={handleOpenSwapOptions}
+            isRotating={isSwappingThisCard}
           />
         </div>
       </Popover>

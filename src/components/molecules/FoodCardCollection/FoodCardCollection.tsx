@@ -3,6 +3,7 @@ import { MdDelete } from 'react-icons/md';
 import { Image, Popover, Typography } from 'antd';
 
 import { Button } from '@/atoms/Button';
+import { NUTRITION_POPOVER_BODY_STYLE } from '@/constants/popoverStyles';
 import { cn } from '@/helpers/helpers';
 import { NutritionPopoverFood } from '@/molecules/NutritionPopoverFood';
 import type { Food } from '@/types/food';
@@ -30,11 +31,7 @@ const FoodCardCollection: React.FC<FoodCardCollectionProps> = ({
       placement='left'
       color='white'
       styles={{
-        body: {
-          padding: 0,
-          borderRadius: '10px',
-          overflow: 'hidden',
-        },
+        body: NUTRITION_POPOVER_BODY_STYLE,
       }}
       content={<NutritionPopoverFood mealItem={food} />}
     >

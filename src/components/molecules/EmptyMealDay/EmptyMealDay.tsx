@@ -91,7 +91,7 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
         <Button
           size='large'
           variant='solid'
-          color='gold'
+          color='primary'
           className='bg-primary hover:bg-primary-400 active:bg-primary-500 transition-bg text-black duration-300'
           icon={<HiOutlineArrowPath size={20} />}
           onClick={handleGenerate}
@@ -130,7 +130,7 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
       >
         <Button
           variant='filled'
-          color='gold'
+          color='primary'
           icon={<HiOutlineDocumentAdd size={18} />}
           className={cn('border-borderGray w-fit text-black', {
             'mx-auto': !isWeekly,
@@ -141,7 +141,7 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
         </Button>
         <Button
           variant='filled'
-          color='gold'
+          color='primary'
           icon={<HiOutlineDocumentDuplicate size={18} />}
           className={cn('border-borderGray w-fit text-black', {
             'mx-auto': !isWeekly,

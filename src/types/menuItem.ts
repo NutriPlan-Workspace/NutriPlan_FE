@@ -12,4 +12,5 @@ export interface MenuItem {
 export interface MenuItemDropdown {
   key: string;
   label: string;
+  icon?: React.ReactNode;
 }

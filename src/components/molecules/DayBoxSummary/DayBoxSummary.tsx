@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { IoWarning } from 'react-icons/io5';
 import { LuInfo } from 'react-icons/lu';
 import { Button, Popover, Typography } from 'antd';
@@ -30,10 +30,21 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
   isWeekly,
 }) => {
   const [isTotalCaloriesOpen, setIsTotalCaloriesOpen] = useState(false);
-  const totalNutrition = allDayMealItems
-    ? getTotalNutrition(allDayMealItems)
-    : undefined;
-  const invalidKeys = getInvalidNutritionKeys(totalNutrition, targetNutrition);
+
+  const totalNutrition = useMemo(
+    () => (allDayMealItems ? getTotalNutrition(allDayMealItems) : undefined),
+    [allDayMealItems],
+  );
+
+  const totalCalories = useMemo(
+    () => (allDayMealItems ? getTotalCalories(allDayMealItems) : 0),
+    [allDayMealItems],
+  );
+
+  const invalidKeys = useMemo(
+    () => getInvalidNutritionKeys(totalNutrition, targetNutrition),
+    [totalNutrition, targetNutrition],
+  );
   return (
     <Popover
       mouseEnterDelay={0.5}
@@ -53,7 +64,7 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
         allDayMealItems && (
           <NutritionPopoverDay
             targetNutrition={targetNutrition}
-            nutritionData={getTotalNutrition(allDayMealItems)}
+            nutritionData={totalNutrition}
             onClick={() => setIsTotalCaloriesOpen(false)}
             title='PERCENT CALORIES FROM'
           />
@@ -62,9 +73,9 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
     >
       <Button
         className={cn(
-          'align-center border-borderGray flex h-[42px] w-full justify-start rounded-md border-1 px-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.05),_0_0_2px_0_rgba(35,31,32,0.1)] transition-all duration-200 hover:shadow-[0px_8px_8px_rgba(0,0,0,0.05),_0px_0px_8px_rgba(35,31,32,0.1)]',
+          'align-center flex h-[42px] w-full justify-start rounded-2xl border border-white/70 bg-white/75 px-4 shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35),_0_2px_4px_rgba(15,23,42,0.06)] backdrop-blur-sm transition-all duration-200 hover:shadow-[0_14px_22px_-16px_rgba(15,23,42,0.35),_0_6px_10px_rgba(15,23,42,0.08)]',
           {
-            'border-none shadow-none': isWeekly,
+            'backdrop-blur-0 border-none bg-transparent shadow-none': isWeekly,
             'invisible opacity-0': !allDayMealItems && !isLoading,
           },
         )}
@@ -76,7 +87,7 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
             <div className='flex items-center justify-start gap-2.5'>
               {/* Default calories content */}
               <PieChart
-                nutritionData={getTotalNutrition(allDayMealItems)}
+                nutritionData={totalNutrition}
                 size={25}
                 label={false}
               />
@@ -85,7 +96,7 @@ const DayBoxSummary: React.FC<DayBoxSummaryProps> = ({
                   'cursor-pointer hover:underline': isWeekly,
                 })}
               >
-                {getTotalCalories(allDayMealItems)} Calories
+                {totalCalories} Calories
                 <LuInfo className='text-textGray text-base' />
                 {invalidKeys.length !== 0 && (
                   <IoWarning className='text-[20px] text-yellow-500' />

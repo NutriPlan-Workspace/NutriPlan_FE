@@ -1,13 +1,36 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import type { DishType } from '@/constants/foodFilter';
 import type { MealPlanWithDate } from '@/types/mealPlan';
+import type { MealType, SwapOptionsResponse } from '@/types/mealSwap';
 import { isSameDay } from '@/utils/dateUtils';
+
+export type SwapModalFilters = {
+  q?: string;
+  dishType?: DishType;
+  categoryIds?: number[];
+};
+
+export type SwapModalState = {
+  open: boolean;
+  loading: boolean;
+  data: SwapOptionsResponse | null;
+  swapType: 'food' | 'meal' | null;
+  mealPlanId?: string;
+  mealDate?: string;
+  mealType?: MealType;
+  targetItemId?: string;
+  targetFoodId?: string;
+  filters: SwapModalFilters;
+};
 
 export type MealPlanState = {
   cacheMealPlans: MealPlanWithDate[];
   viewingMealPlans: MealPlanWithDate[];
   draggingCardHeight: number;
   isDragging: boolean;
+  flashMealCardIds: string[];
+  swapModal: SwapModalState;
 };
 
 export const mealPlanInitialState: MealPlanState = {
@@ -15,6 +38,14 @@ export const mealPlanInitialState: MealPlanState = {
   viewingMealPlans: [],
   draggingCardHeight: 0,
   isDragging: false,
+  flashMealCardIds: [],
+  swapModal: {
+    open: false,
+    loading: false,
+    data: null,
+    swapType: null,
+    filters: {},
+  },
 };
 
 const mealPlanSlice = createSlice({
@@ -96,6 +127,72 @@ const mealPlanSlice = createSlice({
     setIsDragging: (state, action: PayloadAction<{ isDragging: boolean }>) => {
       state.isDragging = action.payload.isDragging;
     },
+    setFlashMealCardIds: (
+      state,
+      action: PayloadAction<{ mealCardIds: string[] }>,
+    ) => {
+      state.flashMealCardIds = action.payload.mealCardIds;
+    },
+
+    openSwapModal: (
+      state,
+      action: PayloadAction<{
+        swapType: 'food' | 'meal';
+        mealPlanId: string;
+        mealType: MealType;
+        mealDate?: string;
+        targetItemId?: string;
+        targetFoodId?: string;
+        filters?: SwapModalFilters;
+      }>,
+    ) => {
+      state.swapModal = {
+        open: true,
+        loading: false,
+        data: null,
+        swapType: action.payload.swapType,
+        mealPlanId: action.payload.mealPlanId,
+        mealDate: action.payload.mealDate,
+        mealType: action.payload.mealType,
+        targetItemId: action.payload.targetItemId,
+        targetFoodId: action.payload.targetFoodId,
+        filters: action.payload.filters ?? {},
+      };
+    },
+
+    closeSwapModal: (state) => {
+      state.swapModal.open = false;
+      state.swapModal.loading = false;
+      state.swapModal.data = null;
+      state.swapModal.swapType = null;
+      state.swapModal.mealPlanId = undefined;
+      state.swapModal.mealDate = undefined;
+      state.swapModal.mealType = undefined;
+      state.swapModal.targetItemId = undefined;
+      state.swapModal.targetFoodId = undefined;
+      state.swapModal.filters = {};
+    },
+
+    setSwapModalLoading: (
+      state,
+      action: PayloadAction<{ loading: boolean }>,
+    ) => {
+      state.swapModal.loading = action.payload.loading;
+    },
+
+    setSwapModalData: (
+      state,
+      action: PayloadAction<{ data: SwapOptionsResponse | null }>,
+    ) => {
+      state.swapModal.data = action.payload.data;
+    },
+
+    setSwapModalFilters: (
+      state,
+      action: PayloadAction<{ filters: SwapModalFilters }>,
+    ) => {
+      state.swapModal.filters = action.payload.filters;
+    },
   },
 });
 
@@ -108,5 +205,11 @@ export const {
   updateCacheMealPlanByDate,
   setDraggingCardHeight,
   setIsDragging,
+  setFlashMealCardIds,
+  openSwapModal,
+  closeSwapModal,
+  setSwapModalLoading,
+  setSwapModalData,
+  setSwapModalFilters,
 } = mealPlanSlice.actions;
 export default mealPlanSlice.reducer;
