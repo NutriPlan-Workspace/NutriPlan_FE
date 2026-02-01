@@ -74,8 +74,8 @@ At its core, NutriPlan integrates a **RAG-based AI Agent (NutriBot)** that acts 
 👉 **Live Demo**: [https://nutriplan.minhtran.tech/](https://nutriplan.minhtran.tech/)
 
 <div align="center">
-  <img src="https://via.placeholder.com/1000x500?text=Application+Dashboard+Screenshot" alt="NutriPlan Dashboard" width="100%" />
-  <p><em>Figure 1: The NutriPlan Main Dashboard providing a daily nutritional overview.</em></p>
+  <img src="https://res.cloudinary.com/dtwrwvffl/image/upload/v1769958757/Screenshot_2026-02-01_214124_dquaej.png" alt="NutriPlan Dashboard" width="100%" />
+  <p><em>Figure 1: The NutriPlan homepage.</em></p>
 </div>
 
 ---
@@ -136,7 +136,7 @@ The heart of the application. Users can plan their week using a familiar drag-an
 *   **Copy/Paste Days**: Quickly replicate a meal structure from Monday to Tuesday.
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x400?text=Meal+Planner+Interface" alt="Meal Planner Interface" width="100%" />
+  <img src="https://res.cloudinary.com/dtwrwvffl/image/upload/v1769958756/Screenshot_2026-02-01_213909_jluqrm.png" alt="Meal Planner Interface" width="100%" />
 </div>
 
 ### Food Browser & Search
@@ -146,7 +146,7 @@ A Google-like search experience for food.
 *   **Favorites**: Pin your go-to foods for quick access.
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x400?text=Food+Search+Page" alt="Food Search Page" width="100%" />
+  <img src="https://res.cloudinary.com/dtwrwvffl/image/upload/v1769958930/Screenshot_2026-02-01_214226_fowgza.png" alt="Food Search Page" width="100%" />
 </div>
 
 ### NutriBot AI Assistant
@@ -156,8 +156,8 @@ An always-available chatbot that understands your context.
 *   **Actionable**: Can execute commands like "Swap my lunch for a chicken salad" directly in the chat.
 
 <div align="center">
-  <img src="https://via.placeholder.com/400x600?text=NutriBot+Chat+Interface" alt="NutriBot Chat" width="45%" style="display:inline-block; margin-right: 10px;" />
-  <img src="https://via.placeholder.com/400x600?text=NutriBot+Reasoning+Steps" alt="NutriBot Reasoning" width="45%" style="display:inline-block;" />
+  <img src="https://res.cloudinary.com/dtwrwvffl/image/upload/v1769959145/Screenshot_2026-02-01_221718_hpnxlw.png" alt="NutriBot Chat" width="45%" style="display:inline-block; margin-right: 10px;" />
+  <img src="https://res.cloudinary.com/dtwrwvffl/image/upload/v1769959144/Screenshot_2026-02-01_221817_slpjdj.png" alt="NutriBot Reasoning" width="45%" style="display:inline-block;" />
 </div>
 
 ---
@@ -184,7 +184,7 @@ Beyond the user-facing application, NutriPlan includes a robust **Admin Dashboar
 *   **Global Configurations**: Toggle system-wide announcements or maintenance mode.
 
 <div align="center">
-  <img src="https://via.placeholder.com/1000x500?text=Admin+Dashboard+Overview" alt="Admin Dashboard" width="100%" />
+  <img src="https://res.cloudinary.com/dtwrwvffl/image/upload/v1769959147/Screenshot_2026-02-01_221858_dbzkyh.png" alt="Admin Dashboard" width="100%" />
 </div>
 
 ---
