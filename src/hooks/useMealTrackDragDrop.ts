@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 
+import { DragData } from '@/types/dragDrop';
 import type { Food } from '@/types/food';
 import type { MealItems } from '@/types/mealPlan';
 import { convertFoodCardToMealPlanFood } from '@/utils/mealPlan';
@@ -106,11 +107,19 @@ export const useMealTrackDragDrop = () => {
   );
 
   const handleDrop = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ({ source, location }: { source: any; location: any }) => {
+    ({
+      source,
+      location,
+    }: {
+      source: { data: Record<string, unknown> };
+      location: {
+        current: { dropTargets: { data: Record<string, unknown> }[] };
+      };
+    }) => {
       const destination = location.current.dropTargets.length;
 
       if (!destination) return;
+      const sourceData = source.data as DragData;
 
       /*
        * Two Draggable (source):
@@ -124,10 +133,11 @@ export const useMealTrackDragDrop = () => {
        */
       if (
         destination === 1 &&
-        location.current.dropTargets[0].data.type === 'removeDropzone' &&
-        source.data.type === 'mealCard'
+        (location.current.dropTargets[0].data as DragData).type ===
+          'removeDropzone' &&
+        sourceData.type === 'mealCard'
       ) {
-        const mealCard = source.data;
+        const mealCard = sourceData;
         handleDropLogic({
           sourceMealDate: mealCard.mealDate,
           sourceMealType: mealCard.mealType,
@@ -135,22 +145,24 @@ export const useMealTrackDragDrop = () => {
         });
         return;
       }
-      if (destination === 1 && source.data.type === 'foodCardSideAdd') {
-        const foodCard = source.data.food;
+      if (destination === 1 && sourceData.type === 'foodCardSideAdd') {
+        const foodCard = sourceData.food;
         const [destinationMealBoxRecord] = location.current.dropTargets;
+        const destData = destinationMealBoxRecord.data as DragData;
 
         handleDropLogic({
           foodCard: foodCard,
-          destinationMealDate: destinationMealBoxRecord.data.mealDate,
-          destinationMealType: destinationMealBoxRecord.data.mealType,
+          destinationMealDate: destData.mealDate,
+          destinationMealType: destData.mealType,
           destinationIndex: -1,
         });
         return;
       }
-      if (destination === 2 && source.data.type === 'foodCardSideAdd') {
-        const foodCard = source.data.food;
+      if (destination === 2 && sourceData.type === 'foodCardSideAdd') {
+        const foodCard = sourceData.food;
         const destinationMealCardRecord = location.current.dropTargets[0];
-        const destinationMealCardIndex = destinationMealCardRecord.data.index;
+        const destData = destinationMealCardRecord.data as DragData;
+        const destinationMealCardIndex = destData.index ?? -1;
         const closestEdgeOfTarget = extractClosestEdge(
           destinationMealCardRecord.data,
         );
@@ -161,54 +173,52 @@ export const useMealTrackDragDrop = () => {
 
         handleDropLogic({
           foodCard: foodCard,
-          destinationMealDate: destinationMealCardRecord.data.mealDate,
-          destinationMealType: destinationMealCardRecord.data.mealType,
+          destinationMealDate: destData.mealDate,
+          destinationMealType: destData.mealType,
           destinationIndex: destinationIndex,
         });
         return;
       }
-      if (destination === 1 && source.data.type === 'mealCard') {
+      if (destination === 1 && sourceData.type === 'mealCard') {
         const [destinationMealBoxRecord] = location.current.dropTargets;
-        const isSameMealDate =
-          source.data.mealDate === destinationMealBoxRecord.data.mealDate;
-        const isSameMealType =
-          source.data.mealType === destinationMealBoxRecord.data.mealType;
+        const destData = destinationMealBoxRecord.data as DragData;
+        const isSameMealDate = sourceData.mealDate === destData.mealDate;
+        const isSameMealType = sourceData.mealType === destData.mealType;
 
         handleDropLogic({
-          sourceMealDate: isSameMealDate ? undefined : source.data.mealDate,
+          sourceMealDate: isSameMealDate ? undefined : sourceData.mealDate,
           sourceMealType:
-            isSameMealDate && isSameMealType ? undefined : source.data.mealType,
-          sourceIndex: source.data.index,
-          destinationMealDate: destinationMealBoxRecord.data.mealDate,
-          destinationMealType: destinationMealBoxRecord.data.mealType,
+            isSameMealDate && isSameMealType ? undefined : sourceData.mealType,
+          sourceIndex: sourceData.index,
+          destinationMealDate: destData.mealDate,
+          destinationMealType: destData.mealType,
           destinationIndex: -1,
         });
         return;
       }
-      if (destination === 2 && source.data.type === 'mealCard') {
+      if (destination === 2 && sourceData.type === 'mealCard') {
         const destinationMealCardRecord = location.current.dropTargets[0];
-        const destinationMealCardIndex = destinationMealCardRecord.data.index;
+        const destData = destinationMealCardRecord.data as DragData;
+        const destinationMealCardIndex = destData.index ?? -1;
         const closestEdgeOfTarget = extractClosestEdge(
           destinationMealCardRecord.data,
         );
-        const isSameMealDate =
-          source.data.mealDate === destinationMealCardRecord.data.mealDate;
-        const isSameMealType =
-          source.data.mealType === destinationMealCardRecord.data.mealType;
+        const isSameMealDate = sourceData.mealDate === destData.mealDate;
+        const isSameMealType = sourceData.mealType === destData.mealType;
 
         const destinationIndex = findDestinationIndex({
           isSameMealBox: isSameMealDate && isSameMealType,
-          sourceMealCardIndex: source.data.index,
+          sourceMealCardIndex: sourceData.index,
           destinationMealCardIndex,
           closestEdgeOfTarget,
         });
         handleDropLogic({
-          sourceMealDate: isSameMealDate ? undefined : source.data.mealDate,
+          sourceMealDate: isSameMealDate ? undefined : sourceData.mealDate,
           sourceMealType:
-            isSameMealDate && isSameMealType ? undefined : source.data.mealType,
-          sourceIndex: source.data.index,
-          destinationMealDate: destinationMealCardRecord.data.mealDate,
-          destinationMealType: destinationMealCardRecord.data.mealType,
+            isSameMealDate && isSameMealType ? undefined : sourceData.mealType,
+          sourceIndex: sourceData.index,
+          destinationMealDate: destData.mealDate,
+          destinationMealType: destData.mealType,
           destinationIndex: destinationIndex,
         });
         return;

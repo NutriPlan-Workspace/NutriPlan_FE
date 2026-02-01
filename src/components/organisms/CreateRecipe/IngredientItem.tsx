@@ -16,7 +16,10 @@ const IngredientItem: React.FC<IngredientItemProps> = ({
   <div className='mb-2 flex items-center justify-between gap-4 bg-blue-50'>
     <div className='flex items-center gap-2'>
       <img
-        src={ingredient.food.imgUrls[0]}
+        src={
+          ingredient.food.imgUrls?.[0] ||
+          'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/whuexhkydv7ubiqh5rxe.jpg'
+        }
         alt=''
         className='h-20 w-20 object-cover'
       />

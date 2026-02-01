@@ -9,8 +9,11 @@ interface ItemsProps {
   filter: string;
   dataFavorite: FoodCategory | undefined;
   isFetchingFavorites: boolean;
+  dataCollection: FoodCategory | undefined;
+  isFetchingCollection: boolean;
   data: FoodCategory | undefined;
   isFetching: boolean;
+  hideActions?: boolean;
 }
 
 const getItems = ({
@@ -20,14 +23,21 @@ const getItems = ({
   filter,
   dataFavorite,
   isFetchingFavorites,
+  dataCollection,
+  isFetchingCollection,
   data,
   isFetching,
+  hideActions,
 }: ItemsProps) => [
   {
     key: '1',
     label: <span className='text-[13px]'>All</span>,
     children: (
-      <AllFoodsTab onViewMore={handleViewMore} searchText={debouncedSearch} />
+      <AllFoodsTab
+        onViewMore={handleViewMore}
+        searchText={debouncedSearch}
+        hideActions={hideActions}
+      />
     ),
   },
   {
@@ -38,6 +48,19 @@ const getItems = ({
         foods={dataFavorite?.['favorites']?.foods || []}
         title='Favorites'
         isLoading={isFetchingFavorites}
+        hideActions={hideActions}
+      />
+    ),
+  },
+  {
+    key: '4',
+    label: <span className='text-[13px]'>Collection</span>,
+    children: (
+      <CategoryFood
+        foods={dataCollection?.['collectionFoods']?.foods || []}
+        title='Collection Foods'
+        isLoading={isFetchingCollection}
+        hideActions={hideActions}
       />
     ),
   },
@@ -49,6 +72,7 @@ const getItems = ({
         foods={data?.[filter]?.foods || []}
         title={selectedTabLabel}
         isLoading={isFetching}
+        hideActions={hideActions}
       />
     ),
   },

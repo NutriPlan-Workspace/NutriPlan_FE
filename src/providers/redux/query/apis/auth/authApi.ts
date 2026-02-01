@@ -7,7 +7,7 @@ import {
   UPDATE_AVATAR_ENDPOINT,
 } from '@/constants/endpoints';
 import { HTTP_STATUS } from '@/constants/httpStatus';
-import { baseApi } from '@/redux/query/apis/baseApi';
+import { baseApiWithAuth } from '@/redux/query/apis/baseApi';
 import { setUser } from '@/redux/slices/user';
 import type { RootState } from '@/redux/store/store';
 import type { ChangePasswordSchemaType } from '@/schemas/passwordSchema';
@@ -16,7 +16,7 @@ import type { LoginData, LogoutResponse, RegisterData } from '@/types/auth';
 import type { AuthResponse } from '@/types/auth';
 import type { UserResponse } from '@/types/user';
 
-export const authApi = baseApi.injectEndpoints({
+export const authApi = baseApiWithAuth.injectEndpoints({
   endpoints: (builder) => ({
     loginRequest: builder.mutation<AuthResponse, LoginData>({
       query: (data) => ({
@@ -27,7 +27,21 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         const { data } = await queryFulfilled;
         if (data?.code === HTTP_STATUS.OK) {
-          dispatch(setUser(data.data.payload));
+          // Server now returns tokens in data.data (accessToken, refreshToken)
+          const payload = data.data.payload;
+          dispatch(setUser(payload));
+          try {
+            const accessToken = data.data.accessToken;
+            const refreshToken = data.data.refreshToken;
+            if (accessToken) {
+              localStorage.setItem('accessToken', accessToken);
+            }
+            if (refreshToken) {
+              localStorage.setItem('refreshToken', refreshToken);
+            }
+          } catch {
+            // ignore storage errors
+          }
         }
       },
     }),
@@ -55,6 +69,15 @@ export const authApi = baseApi.injectEndpoints({
         url: LOGOUT_ENDPOINT,
         method: 'POST',
       }),
+      async onQueryStarted(_arg, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          // ignore error
+        }
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      },
     }),
     changePasswordRequest: builder.mutation<
       ApiResponse<void>,

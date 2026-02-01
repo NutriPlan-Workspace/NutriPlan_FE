@@ -13,6 +13,7 @@ import {
 } from '@/schemas/nutritionTargetSchema';
 import type { NutritionTarget } from '@/types/user';
 
+import MealDistribution from './MealDistribution';
 import Micronutrients from './Micronutrients';
 import NutritionTitle from './NutritionFormTitle';
 import TargetMacros from './TargetMacros';
@@ -30,6 +31,8 @@ const NutritionForm: React.FC<NutritionFormProps> = ({
     control,
     handleSubmit,
     reset,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<NutritionFormSchema>({
     resolver: zodResolver(nutritionSchema),
@@ -41,6 +44,10 @@ const NutritionForm: React.FC<NutritionFormProps> = ({
       minimumFiber: 0,
       maxiumSodium: 0,
       maxiumCholesterol: 0,
+      breakfastRatio: 0.3,
+      lunchRatio: 0.4,
+      dinnerRatio: 0.3,
+      snackRatio: 0,
     },
   });
 
@@ -72,6 +79,7 @@ const NutritionForm: React.FC<NutritionFormProps> = ({
 
   return (
     <form
+      data-tour='nutrition-targets-form'
       className='flex w-full flex-col gap-6'
       onSubmit={handleSubmit(onSubmit)}
     >
@@ -91,7 +99,10 @@ const NutritionForm: React.FC<NutritionFormProps> = ({
             </div>
           </section>
 
-          <section className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-30px_rgba(16,24,40,0.28)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/85 sm:p-6'>
+          <section
+            data-tour='nutrition-targets-macros'
+            className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-30px_rgba(16,24,40,0.28)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/85 sm:p-6'
+          >
             <div className='flex flex-col gap-1'>
               <div className='text-sm font-semibold text-gray-900'>
                 Macro ranges
@@ -107,6 +118,19 @@ const NutritionForm: React.FC<NutritionFormProps> = ({
         </div>
 
         <div className='lg:col-span-5'>
+          <section className='mb-6 rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-30px_rgba(16,24,40,0.28)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/85 sm:p-6'>
+            <div className='flex flex-col gap-1'>
+              <div className='text-sm font-semibold text-gray-900'>
+                Meal Distribution
+              </div>
+              <div className='text-xs text-gray-500'>
+                Customize how your daily calories are distributed.
+              </div>
+            </div>
+            <div className='mt-4'>
+              <MealDistribution control={control} setValue={setValue} />
+            </div>
+          </section>
           <section className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-30px_rgba(16,24,40,0.28)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/85 sm:p-6'>
             <div className='flex flex-col gap-1'>
               <div className='text-sm font-semibold text-gray-900'>
@@ -117,7 +141,12 @@ const NutritionForm: React.FC<NutritionFormProps> = ({
               </div>
             </div>
             <div className='mt-4'>
-              <Micronutrients control={control} errors={errors} />
+              <Micronutrients
+                control={control}
+                errors={errors}
+                setValue={setValue}
+                getValues={getValues}
+              />
             </div>
           </section>
         </div>
@@ -125,6 +154,7 @@ const NutritionForm: React.FC<NutritionFormProps> = ({
 
       <div className='flex items-center justify-end'>
         <Button
+          data-tour='nutrition-targets-submit'
           htmlType='submit'
           type='primary'
           loading={isBusy}

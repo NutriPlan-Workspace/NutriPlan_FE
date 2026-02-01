@@ -13,13 +13,16 @@ const socialLinks: SocialLink[] = [
 ];
 
 const SocialLinks: React.FC = () => (
-  <div className='flex max-w-[296px] flex-1/4 flex-col items-center'>
-    <p className='text-[14px] leading-[150%] font-medium tracking-[-0.14px] text-[#d1d1d6]'>
+  <div className='flex max-w-[296px] flex-col items-start gap-3'>
+    <p className='text-[12px] font-semibold tracking-[0.2em] text-slate-400 uppercase'>
       Follow us
     </p>
-    <ul className='mt-2 flex gap-3'>
+    <ul className='flex gap-3'>
       {socialLinks.map(({ icon, href }, index) => (
-        <li key={index} className='rounded-full border border-[#f5f5f5] p-2'>
+        <li
+          key={index}
+          className='rounded-full border border-white/10 bg-white/5 p-2 transition hover:border-white/30 hover:bg-white/10'
+        >
           <a href={href} className='text-lg text-white'>
             {icon}
           </a>

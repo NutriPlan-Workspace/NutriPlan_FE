@@ -8,7 +8,7 @@ interface NutritionTargetModalProps {
   onCancel: () => void;
   oldTarget: NutritionGoalResponse | undefined;
   newTarget: NutritionGoalResponse | undefined;
-  handleSave: () => void;
+  handleSave: () => void | Promise<void>;
 }
 
 const NutritionTargetModal: React.FC<NutritionTargetModalProps> = ({
@@ -22,14 +22,17 @@ const NutritionTargetModal: React.FC<NutritionTargetModalProps> = ({
     title='Update Nutrition Targets'
     open={isModalVisible}
     onCancel={onCancel}
+    modalRender={(node) => (
+      <div data-tour='nutrition-targets-modal'>{node}</div>
+    )}
     footer={[
       <div key='save-footer' className='flex w-full justify-center'>
         <Button
           key='save'
+          data-tour='nutrition-targets-modal-save'
           className='bg-primary hover:bg-primary-400 border-none px-6 py-5 text-[16px] font-bold text-black'
-          onClick={() => {
-            handleSave();
-            onCancel();
+          onClick={async () => {
+            await Promise.resolve(handleSave());
           }}
         >
           Save

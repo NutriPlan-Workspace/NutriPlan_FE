@@ -43,13 +43,23 @@ const Collection: React.FC = () => {
         item.title.toLowerCase().includes(debouncedValue.toLowerCase()),
       );
 
+      const prioritizeDefaults = (item: CollectionType) =>
+        item.isFavorites ? 2 : item.isExclusions ? 1 : 0;
+
       if (selectedKey === '1') {
-        filtered.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
+        filtered.sort((a, b) => {
+          const priority = prioritizeDefaults(b) - prioritizeDefaults(a);
+          if (priority !== 0) return priority;
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        });
       } else if (selectedKey === '2') {
-        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        filtered.sort((a, b) => {
+          const priority = prioritizeDefaults(b) - prioritizeDefaults(a);
+          if (priority !== 0) return priority;
+          return a.title.localeCompare(b.title);
+        });
       }
 
       setSortedCollections(filtered);

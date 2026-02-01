@@ -6,6 +6,8 @@ export interface AuthResponse {
   code: number;
   data: {
     payload: UserAuth;
+    accessToken?: string;
+    refreshToken?: string;
   };
 }
 

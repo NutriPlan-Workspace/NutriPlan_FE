@@ -24,6 +24,7 @@ export const physicalStatsSchema = z.object({
     .nullable(),
   dateOfBirth: z.string().refine(
     (date) => {
+      if (!date) return true;
       const parsedDate = new Date(date);
       parsedDate.setHours(0, 0, 0, 0);
       return parsedDate <= currentDate;

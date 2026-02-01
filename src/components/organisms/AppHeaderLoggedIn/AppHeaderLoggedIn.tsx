@@ -129,6 +129,21 @@ const AppHeaderLoggedIn: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const user = useSelector(userSelector).user;
+
+  useEffect(() => {
+    const handleForceOpen = () => {
+      setIsHubMenuOpen(true);
+      // Ensure the menu DOM has time to mount before notifying listeners.
+      // Small timeout helps the AnimatePresence/motion children render.
+      window.setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('np:hub-menu-opened'));
+      }, 60);
+    };
+
+    window.addEventListener('np:hub-menu-open', handleForceOpen);
+    return () =>
+      window.removeEventListener('np:hub-menu-open', handleForceOpen);
+  }, []);
   const firstName = user.fullName?.split(' ')?.[0] || 'there';
   const userInitials = useMemo(() => {
     const parts = (user.fullName ?? '').trim().split(/\s+/).filter(Boolean);
@@ -255,11 +270,13 @@ const AppHeaderLoggedIn: React.FC = () => {
       to: string;
       label: string;
       isActive: boolean;
+      dataTour?: string;
     }) => (
       <motion.button
         key={opts.to}
         layout
         type='button'
+        data-tour={opts.dataTour}
         onClick={() => go(opts.to)}
         className={cn(
           'relative flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors',
@@ -288,6 +305,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.MEAL_PLAN,
               label: 'Meal Plan',
+              dataTour: 'hub-tab-meal-plan',
               isActive:
                 normalizedPath === PATH.MEAL_PLAN ||
                 normalizedPath.startsWith(`${PATH.MEAL_PLAN}/`),
@@ -295,6 +313,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.GROCERIES,
               label: 'Groceries',
+              dataTour: 'hub-tab-groceries',
               isActive:
                 normalizedPath === PATH.GROCERIES ||
                 normalizedPath.startsWith(`${PATH.GROCERIES}/`),
@@ -302,6 +321,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.NUTRITION_TARGETS,
               label: 'Nutrition Targets',
+              dataTour: 'hub-tab-nutrition-targets',
               isActive:
                 normalizedPath === PATH.NUTRITION_TARGETS ||
                 normalizedPath.startsWith(`${PATH.NUTRITION_TARGETS}/`),
@@ -315,6 +335,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.DISCOVER,
               label: 'Discover',
+              dataTour: 'hub-tab-discover',
               isActive:
                 normalizedPath === PATH.DISCOVER ||
                 normalizedPath.startsWith(`${PATH.DISCOVER}/`),
@@ -322,6 +343,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.COLLECTIONS,
               label: 'Collections',
+              dataTour: 'hub-tab-collections',
               isActive:
                 normalizedPath === PATH.COLLECTIONS ||
                 normalizedPath.startsWith(`${PATH.COLLECTIONS}/`),
@@ -329,6 +351,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.CUSTOM_RECIPES,
               label: 'Custom Recipes',
+              dataTour: 'hub-tab-custom-recipes',
               isActive:
                 normalizedPath === PATH.CUSTOM_RECIPES ||
                 normalizedPath.startsWith(`${PATH.CUSTOM_RECIPES}/`),
@@ -343,6 +366,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.PHYSICAL_STATS,
               label: 'Body & Goal',
+              dataTour: 'hub-tab-physical-stats',
               isActive:
                 normalizedPath === PATH.PHYSICAL_STATS ||
                 normalizedPath.startsWith(`${PATH.PHYSICAL_STATS}/`),
@@ -350,6 +374,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.FOOD_EXCLUSIONS,
               label: 'Food Exclusions',
+              dataTour: 'hub-tab-food-exclusions',
               isActive:
                 normalizedPath === PATH.FOOD_EXCLUSIONS ||
                 normalizedPath.startsWith(`${PATH.FOOD_EXCLUSIONS}/`),
@@ -357,6 +382,7 @@ const AppHeaderLoggedIn: React.FC = () => {
             {renderTab({
               to: PATH.ACCOUNT,
               label: 'Account',
+              dataTour: 'hub-tab-account',
               isActive:
                 normalizedPath === PATH.ACCOUNT ||
                 normalizedPath.startsWith(`${PATH.ACCOUNT}/`),
@@ -405,7 +431,7 @@ const AppHeaderLoggedIn: React.FC = () => {
       <div className='pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-px bg-black/10' />
 
       <div className='flex items-center gap-3'>
-        <Tooltip title='Go to home' overlayClassName='np-tooltip'>
+        <Tooltip title='Go to home' classNames={{ root: 'np-tooltip' }}>
           <Link
             to={PATH.HOME}
             className={cn(
@@ -425,12 +451,30 @@ const AppHeaderLoggedIn: React.FC = () => {
         <div className='relative'>
           <Tooltip
             title='Switch hub'
-            overlayClassName='np-tooltip'
-            placement='bottom'
+            classNames={{ root: 'np-tooltip' }}
+            placement='left'
           >
             <button
               type='button'
-              onClick={() => setIsHubMenuOpen((prev) => !prev)}
+              data-tour='hub-selector'
+              data-tour-open={isHubMenuOpen ? 'true' : 'false'}
+              data-tour-active={activeHub.key}
+              onClick={() =>
+                setIsHubMenuOpen((prev) => {
+                  const next = !prev;
+                  if (next) {
+                    // Delay the 'opened' event slightly so the menu and its
+                    // animated children are present in the DOM when listeners
+                    // try to find the option element.
+                    window.setTimeout(() => {
+                      window.dispatchEvent(
+                        new CustomEvent('np:hub-menu-opened'),
+                      );
+                    }, 40);
+                  }
+                  return next;
+                })
+              }
               className={cn(
                 'flex items-center gap-3 rounded-2xl border bg-gradient-to-r px-3 py-2 text-left transition',
                 'border-white/25 bg-white/45 shadow-[0_12px_30px_-24px_rgba(16,24,40,0.35)]',
@@ -489,6 +533,7 @@ const AppHeaderLoggedIn: React.FC = () => {
                 initial='hidden'
                 animate='show'
                 exit='exit'
+                data-tour='hub-selector-menu'
                 className='absolute left-0 z-[240] mt-2 w-[360px] origin-top-left rounded-3xl border border-white/35 bg-white/92 p-2 shadow-[0_20px_44px_-24px_rgba(16,24,40,0.35)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/96'
               >
                 {HUBS.map((hub) => {
@@ -499,9 +544,17 @@ const AppHeaderLoggedIn: React.FC = () => {
                       key={hub.key}
                       type='button'
                       variants={dropdownItemVariants}
+                      data-tour={`hub-selector-option-${hub.key}`}
                       onClick={() => {
                         setSelectedHubKey(hub.key);
                         setIsHubMenuOpen(false);
+                        if (hub.key === 'user') {
+                          window.dispatchEvent(
+                            new CustomEvent('np:hub-selected', {
+                              detail: { hub: hub.key },
+                            }),
+                          );
+                        }
                       }}
                       className={cn(
                         'flex w-full items-center gap-3 rounded-2xl border bg-gradient-to-r px-4 py-3 text-left transition',
@@ -544,7 +597,10 @@ const AppHeaderLoggedIn: React.FC = () => {
       </div>
 
       <nav className='absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:flex'>
-        <div className='relative z-[220] rounded-full border border-gray-300/80 bg-white/80 px-2 py-1 shadow-[0_18px_44px_-30px_rgba(16,24,40,0.38)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/92'>
+        <div
+          data-tour='hub-tabs'
+          className='relative z-[220] rounded-full border border-gray-300/80 bg-white/80 px-2 py-1 shadow-[0_18px_44px_-30px_rgba(16,24,40,0.38)] saturate-150 backdrop-blur-2xl supports-[backdrop-filter:blur(0px)]:bg-white/92'
+        >
           <AnimatePresence mode='wait'>
             <motion.div
               key={`hub-tabs-${activeHub.key}`}
@@ -578,12 +634,13 @@ const AppHeaderLoggedIn: React.FC = () => {
         <div ref={userMenuRef} className='relative'>
           <Tooltip
             title='Account'
-            overlayClassName='np-tooltip'
+            classNames={{ root: 'np-tooltip' }}
             placement='bottom'
           >
             <button
               type='button'
               aria-label='User menu'
+              data-tour='user-menu'
               onClick={() => setIsUserMenuOpen((prev) => !prev)}
               className={cn(
                 'flex items-center gap-2 rounded-full border border-white/25 bg-white/45 px-2 py-1.5',

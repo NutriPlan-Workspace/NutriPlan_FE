@@ -13,7 +13,7 @@ interface FoodsSectionProps {
   dropdownItems: MenuItemDropdown[];
   foods: CollectionFood[];
   onRemoveFood: (foodId: string) => void;
-  onAddFood: (foodName: string) => void;
+  onAddFood: (foodId: string) => void;
 }
 
 const { Title, Paragraph } = Typography;
@@ -46,8 +46,8 @@ const FoodsSection: React.FC<FoodsSectionProps> = ({
     setSelectedKey(key);
   };
 
-  const handleAddFood = (foodName: string) => {
-    onAddFood(foodName);
+  const handleAddFood = (foodId: string) => {
+    onAddFood(foodId);
     setModalVisible(false);
   };
 
@@ -67,13 +67,14 @@ const FoodsSection: React.FC<FoodsSectionProps> = ({
         </div>
       </div>
       {sortedFoods.length ? (
-        <div className='flex flex-col gap-4'>
+        <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4'>
           {sortedFoods.map((food) => (
-            <FoodCardCollection
-              key={food?._id}
-              food={food?.food}
-              onRemoveFood={onRemoveFood}
-            />
+            <div key={food?.food._id} className='h-[380px]'>
+              <FoodCardCollection
+                food={food?.food}
+                onRemoveFood={onRemoveFood}
+              />
+            </div>
           ))}
         </div>
       ) : (

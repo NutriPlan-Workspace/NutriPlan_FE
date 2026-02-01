@@ -10,6 +10,7 @@ import {
 } from '@/redux/slices/food';
 import type { Food } from '@/types/food';
 
+import FoodQuickActions from '../FoodQuickActions/FoodQuickActions';
 import { NutritionPopoverFood } from '../NutritionPopoverFood';
 
 const CATEGORY_LABEL_BY_VALUE = new Map(
@@ -55,6 +56,12 @@ const FoodCard: React.FC<FoodCardProps> = ({
       }}
     >
       <div className='relative overflow-hidden rounded-2xl border border-white/50 bg-white/60 shadow-[0_16px_40px_-34px_rgba(16,24,40,0.35)] backdrop-blur-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-[0_28px_64px_-44px_rgba(16,24,40,0.55)]'>
+        <div className='absolute top-3 right-3 z-10 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
+          <div onClick={(e) => e.stopPropagation()}>
+            <FoodQuickActions food={foodItem} size='sm' />
+          </div>
+        </div>
+
         <img
           src={imageUrl}
           alt={foodItem.name}

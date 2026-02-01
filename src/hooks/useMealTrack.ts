@@ -93,6 +93,7 @@ export const useMealTrack = (
       from: getMealDate(from),
       to: getMealDate(to),
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
 
   const dayRangeArgs = from && to ? { from, to } : skipToken;
@@ -140,9 +141,10 @@ export const useMealTrack = (
       const adjustingIndex = isForward
         ? mod(next + ADJUST_DISTANCE, NUM_OF_SLIDES)
         : mod(next - ADJUST_DISTANCE, NUM_OF_SLIDES);
-      const adjustingDay = new Date(
-        viewingMealPlans[preAdjustingIndex].mealDate,
-      );
+      const item = viewingMealPlans[preAdjustingIndex];
+      if (!item) return;
+
+      const adjustingDay = new Date(item.mealDate);
       adjustingDay.setDate(adjustingDay.getDate() + (isForward ? 1 : -1));
 
       const mealPlanWithDate = cacheMealPlans.find((mealPlanWithDate) =>
@@ -190,8 +192,11 @@ export const useMealTrack = (
       if (!isLoadingList[getDataIndex]) return;
 
       try {
+        const item = viewingMealPlans[getDataIndex];
+        if (!item) return;
+
         const mealPlan = await getMealPlanSingleDay({
-          date: viewingMealPlans[getDataIndex].mealDate,
+          date: item.mealDate,
         });
         if (mealPlan.data) {
           dispatch(
@@ -210,7 +215,8 @@ export const useMealTrack = (
           return newLoading;
         });
       } catch (error) {
-        toast.error(`Error while fetching Meal Plan: ${error}`);
+        const message = error instanceof Error ? error.message : String(error);
+        toast.error(`Error while fetching Meal Plan: ${message}`);
         setIsLoadingList((prev) => {
           const newLoading = [...prev];
           newLoading[getDataIndex] = false;

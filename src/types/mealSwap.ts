@@ -8,11 +8,16 @@ export type SwapOptionsRequest =
       targetItemId?: string;
       limit?: number;
       tolerance?: number;
+      filters?: { q?: string };
     }
   | {
       swapType: 'meal';
       mealType: MealType;
       limit?: number;
+      deepSearch?: boolean;
+      generationMode?: 'percentage' | 'remaining';
+      targetItemCount?: number;
+      targetRatio?: number;
     };
 
 export type SwapApplyRequest =
@@ -92,6 +97,7 @@ export type SwapOptionsResponse =
         food?: SwapFood;
       };
       options: SwapFoodOption[];
+      notice?: string;
     }
   | {
       mealPlanId: string;
@@ -101,4 +107,5 @@ export type SwapOptionsResponse =
         items: SwapFoodOption[];
       };
       options: SwapMealOption[];
+      notice?: string;
     };

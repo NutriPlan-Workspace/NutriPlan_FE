@@ -41,14 +41,15 @@ const RadioInput: React.FC<RadioInputProps> = ({
         };
 
   useEffect(() => {
-    if (defaultActiveKey) {
-      const matchedOption = options.find(
-        (option) => option.key === defaultActiveKey,
-      );
-      if (matchedOption) {
-        setActive(matchedOption.key);
-      }
+    if (!defaultActiveKey) {
+      setActive('');
+      return;
     }
+
+    const matchedOption = options.find(
+      (option) => option.key === defaultActiveKey,
+    );
+    setActive(matchedOption?.key ?? '');
   }, [defaultActiveKey, options]);
 
   return (

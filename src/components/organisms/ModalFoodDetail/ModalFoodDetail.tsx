@@ -5,7 +5,10 @@ import { Modal } from 'antd';
 
 import { FOOD_CATEGORIES } from '@/constants/foodCategories';
 import { useScale } from '@/contexts/ScaleContext';
-import { useLazyGetFoodByIdQuery } from '@/redux/query/apis/food/foodApis';
+import {
+  useLazyGetFoodByIdQuery,
+  useTrackFoodViewMutation,
+} from '@/redux/query/apis/food/foodApis';
 import {
   foodSelector,
   removePreviousViewingDetailFood,
@@ -35,6 +38,7 @@ const ModalFoodDetail: React.FC = () => {
 
   const [triggerGetFoodById, { data: detailedFood, isFetching }] =
     useLazyGetFoodByIdQuery();
+  const [trackFoodView] = useTrackFoodViewMutation();
 
   const categoryLabelByValue = new Map(
     FOOD_CATEGORIES.map(
@@ -47,6 +51,8 @@ const ModalFoodDetail: React.FC = () => {
 
     setTitleModal(viewingFoodData.name);
     dispatch(setIsModalDetailOpen(true));
+
+    trackFoodView({ foodId: viewingFoodData._id, source: 'modal' });
 
     const fetchDetails = async () => {
       const res = await triggerGetFoodById(viewingFoodData._id);
@@ -67,6 +73,7 @@ const ModalFoodDetail: React.FC = () => {
     setUnit,
     setConversionFactor,
     triggerGetFoodById,
+    trackFoodView,
     dispatch,
     viewingFoodData,
   ]);

@@ -40,6 +40,17 @@ export function useNutritionTargetsPrompt({
     setIsPromptVisible(false);
     setIsModalVisible(true);
 
+    // Notify any guided tour flow waiting for the popup to open.
+    try {
+      window.setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent('np:nutrition-targets-modal-opened'),
+        );
+      }, 50);
+    } catch {
+      // ignore
+    }
+
     // Ensure we have fresh suggestions when opening.
     await Promise.all([refetchOldTarget(), refetchNewTarget()]);
   };
@@ -65,6 +76,12 @@ export function useNutritionTargetsPrompt({
 
     setIsModalVisible(false);
     setIsPromptVisible(false);
+    // Notify any tour flow waiting on the save action.
+    try {
+      window.dispatchEvent(new CustomEvent('np:nutrition-targets-saved'));
+    } catch {
+      // ignore
+    }
   };
 
   const changeGoalType = async (value: string) => {

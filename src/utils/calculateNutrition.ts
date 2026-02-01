@@ -161,6 +161,8 @@ export const calculateTotalNutrition = (
 
 const MACRO_TOLERANCE_RATIO = 0.05;
 
+const CALORIE_TOLERANCE_RATIO = 0.1;
+
 export const getInvalidNutritionKeys = (
   nutritionData?: NutritionFields,
   targetNutrition?: NutritionGoal,
@@ -174,7 +176,7 @@ export const getInvalidNutritionKeys = (
   const targetCalories = targetNutrition?.calories;
   if (
     Math.abs(nutritionData.calories - targetCalories) >
-    targetCalories * 0.05
+    targetCalories * CALORIE_TOLERANCE_RATIO
   ) {
     invalidKeys.push('calories');
   }
@@ -183,9 +185,13 @@ export const getInvalidNutritionKeys = (
   const test: string[] = ['carb', 'fat', 'protein'];
 
   for (const macro of macros) {
-    const targetKey = `${test[macros.indexOf(macro)]}Target`;
-    const actual = nutritionData[macro];
-    const targetRange = targetNutrition[targetKey];
+    const targetKey =
+      `${test[macros.indexOf(macro)]}Target` as keyof NutritionGoal;
+    const actual = nutritionData[macro as keyof NutritionFields] as number;
+    const targetRange = targetNutrition[targetKey] as {
+      from: number;
+      to: number;
+    };
 
     if (
       !targetRange ||
@@ -202,6 +208,29 @@ export const getInvalidNutritionKeys = (
     if (actual < lowerBound || actual > upperBound) {
       invalidKeys.push(macro);
     }
+  }
+  // Fiber (Minimum)
+  if (
+    targetNutrition.minimumFiber &&
+    (nutritionData.fiber || 0) < targetNutrition.minimumFiber * 0.9
+  ) {
+    invalidKeys.push('fiber');
+  }
+
+  // Sodium (Maximum)
+  if (
+    targetNutrition.maxiumSodium &&
+    (nutritionData.sodium || 0) > targetNutrition.maxiumSodium * 1.1
+  ) {
+    invalidKeys.push('sodium');
+  }
+
+  // Cholesterol (Maximum)
+  if (
+    targetNutrition.maxiumCholesterol &&
+    (nutritionData.cholesterol || 0) > targetNutrition.maxiumCholesterol * 1.1
+  ) {
+    invalidKeys.push('cholesterol');
   }
 
   return invalidKeys;

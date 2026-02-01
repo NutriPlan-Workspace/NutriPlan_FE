@@ -26,23 +26,33 @@ const DietOptions: React.FC = () => {
       name='diet'
       control={control}
       render={({ field }) => (
-        <ul className='mb-4 flex justify-center gap-4'>
+        <ul className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
           {dietOptions.map((option) => (
             <li key={option.id}>
               <Card
                 className={cn(
-                  'flex h-28 w-28 cursor-pointer items-center justify-center border-4 text-black transition-all',
+                  'flex w-full cursor-pointer items-center gap-3 rounded-2xl border-2 px-3 py-3 text-left transition-all',
                   field.value === option.label
-                    ? 'border-primary bg-primary-100'
-                    : 'border-gray-300 bg-white',
+                    ? 'border-emerald-500 bg-emerald-50 shadow-[0_12px_24px_-16px_rgba(16,24,40,0.35)]'
+                    : 'border-gray-200 bg-white hover:border-emerald-200',
                 )}
                 onClick={() => field.onChange(option.label)}
               >
-                <div className='flex h-full flex-col items-center justify-center'>
-                  <span className='text-3xl'>{option.icon}</span>
-                  <span className='mt-2 text-sm font-medium'>
+                <div
+                  className={cn(
+                    'flex h-10 w-10 items-center justify-center rounded-xl text-xl',
+                    field.value === option.label
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-gray-100 text-gray-600',
+                  )}
+                >
+                  {option.icon}
+                </div>
+                <div>
+                  <p className='m-0 text-sm font-semibold text-gray-900'>
                     {option.label}
-                  </span>
+                  </p>
+                  <p className='m-0 text-xs text-gray-500'>Tap to select</p>
                 </div>
               </Card>
             </li>

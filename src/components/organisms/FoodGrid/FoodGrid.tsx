@@ -44,7 +44,7 @@ const FoodGrid: React.FC<FoodGridProps> = ({
 
   return (
     <div>
-      <Row gutter={[30, 40]} className={cn('justify-center p-4')}>
+      <Row gutter={[30, 40]} className={cn('justify-start p-4')}>
         {renderContent()}
       </Row>
       {showPopover && (

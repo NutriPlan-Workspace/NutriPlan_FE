@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { FaArrowLeft } from 'react-icons/fa';
 import { GrDocumentUpdate } from 'react-icons/gr';
 import { IoSearch } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +18,7 @@ import {
   timeFields,
 } from '@/constants/recipeForm';
 import { useToast } from '@/contexts/ToastContext';
+import { cn } from '@/helpers/helpers';
 import { NutritionSummary } from '@/molecules/NutritionSummary';
 import {
   AddIngredientModal,
@@ -31,6 +33,7 @@ import {
 } from '@/redux/query/apis/food/foodApis';
 import { foodSelector, removeCurrentCustomFood } from '@/redux/slices/food';
 import { FoodFormSchema, FoodSchema } from '@/schemas/recipeSchema';
+import HubPageShell from '@/templates/HubPageShell';
 import type { Food } from '@/types/food';
 import type { IngredientDisplay, IngredientInput } from '@/types/ingredient';
 import { calculateTotalNutrition } from '@/utils/calculateNutrition';
@@ -227,68 +230,164 @@ const CreateRecipeForm: React.FC = () => {
     setIngredientDisplay(Array.from(mergedMap.values()));
   }, [ingredient, getValues]);
 
+  const handleCancelClick = () => {
+    dispatch(removeCurrentCustomFood());
+    reset();
+    if (canGoBack) {
+      router.history.back();
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className='w-[900px] px-[40px]'>
-        <RecipeBasicInfoSection
-          control={control}
-          errors={errors}
-          img={img}
-          upload={upload}
-          setUpload={setUpload}
-          handleUploaded={handleUploaded}
-        />
-
-        <RecipePropertiesSection
-          control={control}
-          timeFields={timeFields}
-          setValue={setValue}
-          selectedMainDish={selectedMainDish}
-          selectedMeals={selectedMeals}
-          handleMealChange={handleMealChange}
-        />
-
-        {ingredientDisplay.length ? (
-          <div className='mt-4 flex gap-4'>
-            <div className='flex flex-1 flex-col gap-2'>
-              {ingredientDisplay.map((ingredient) => (
-                <IngredientItem
-                  key={ingredient.ingredientFoodId}
-                  ingredient={ingredient}
-                  onRemove={handleRemoveIngredient}
-                />
-              ))}
-              <Button
-                className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
-                onClick={() => setIngredientModalOpen(true)}
-              >
-                <IoSearch />
-                <p>Add Ingredient</p>
-              </Button>
+    <HubPageShell
+      maxWidthClassName='max-w-7xl'
+      title={
+        <span className='flex items-center gap-3'>
+          <button
+            type='button'
+            onClick={handleCancelClick}
+            className='flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-gray-700 transition hover:bg-white'
+            aria-label='Back'
+          >
+            <FaArrowLeft className='h-4 w-4' />
+          </button>
+          <span>
+            {currentCustomFood ? 'Edit Custom Recipe' : 'Create Custom Recipe'}
+          </span>
+        </span>
+      }
+      description='Create your own recipe by combining existing foods.'
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
+        <div className='grid grid-cols-1 gap-6 lg:grid-cols-12'>
+          {/* LEFT COLUMN */}
+          <div className='flex flex-col gap-6 lg:col-span-5'>
+            {/* Basic Info & Image Card */}
+            <div className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <RecipeBasicInfoSection
+                control={control}
+                errors={errors}
+                img={img}
+                upload={upload}
+                setUpload={setUpload}
+                handleUploaded={handleUploaded}
+              />
             </div>
-            <div className='flex-1 pl-10'>
-              <NutritionSummary
-                nutrition={calculateTotalNutrition(ingredientDisplay)}
-                type='food'
+
+            {/* Properties Card */}
+            <div className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <RecipePropertiesSection
+                control={control}
+                timeFields={timeFields}
+                setValue={setValue}
+                selectedMainDish={selectedMainDish}
+                selectedMeals={selectedMeals}
+                handleMealChange={handleMealChange}
               />
             </div>
           </div>
-        ) : (
-          <div className='flex flex-col gap-2'>
-            {errors.ingredients && (
-              <p className='text-sm text-red-500'>
-                {errors.ingredients.message}
-              </p>
-            )}
+
+          {/* RIGHT COLUMN */}
+          <div className='flex flex-col gap-6 lg:col-span-7'>
+            {/* Ingredients & Nutrition Card */}
+            <div className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <h3 className='mb-4 text-base font-semibold text-gray-900'>
+                Ingredients
+              </h3>
+
+              {ingredientDisplay.length ? (
+                <div className='flex flex-col gap-6 xl:flex-row'>
+                  <div className='flex flex-1 flex-col gap-2'>
+                    {ingredientDisplay.map((ingredient) => (
+                      <IngredientItem
+                        key={ingredient.ingredientFoodId}
+                        ingredient={ingredient}
+                        onRemove={handleRemoveIngredient}
+                      />
+                    ))}
+                    <Button
+                      className='border-secondary-200 bg-secondary-50 text-secondary-600 hover:bg-secondary-100 mt-2 flex w-fit items-center gap-2 rounded-xl border px-4 py-2'
+                      onClick={() => setIngredientModalOpen(true)}
+                    >
+                      <IoSearch />
+                      <p className='m-0'>Add Ingredient</p>
+                    </Button>
+                  </div>
+                  <div className='w-full xl:w-[280px]'>
+                    <NutritionSummary
+                      nutrition={calculateTotalNutrition(ingredientDisplay)}
+                      type='food'
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className='flex flex-col gap-2'>
+                  {errors.ingredients && (
+                    <p className='text-sm text-red-500'>
+                      {errors.ingredients.message}
+                    </p>
+                  )}
+                  <div className='flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 py-10'>
+                    <p className='mb-3 text-gray-500'>
+                      No ingredients added yet
+                    </p>
+                    <Button
+                      className='bg-secondary-500 hover:bg-secondary-600 flex items-center gap-2 rounded-xl text-white'
+                      onClick={() => setIngredientModalOpen(true)}
+                    >
+                      <IoSearch />
+                      <p className='m-0'>Add Ingredient</p>
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Directions Card */}
+            <div className='rounded-3xl border border-gray-200/70 bg-white/70 p-5 shadow-[0_14px_36px_-32px_rgba(16,24,40,0.22)] sm:p-6'>
+              <h3 className='mb-4 text-base font-semibold text-gray-900'>
+                Directions
+              </h3>
+              <DirectionsInputList control={control} />
+            </div>
+          </div>
+        </div>
+
+        {/* STICKY FOOTER */}
+        <div className='sticky bottom-0 z-10 -mx-5 border-t border-gray-200/70 bg-white/80 px-5 py-4 backdrop-blur sm:-mx-7 sm:px-7'>
+          <div className='flex flex-wrap justify-end gap-3'>
             <Button
-              className='hover:border-primary hover:text-primary flex max-w-[150px] items-center gap-2 p-4'
-              onClick={() => setIngredientModalOpen(true)}
+              className='px-6 py-5 text-[15px] font-medium'
+              onClick={handleCancelClick}
             >
-              <IoSearch />
-              <p>Add Ingredient</p>
+              Cancel
+            </Button>
+            <Button
+              className={cn(
+                `shadow-secondary-500/20 hover:shadow-secondary-500/30 flex min-w-[140px] items-center justify-center gap-2 border-none px-6 py-5 text-[15px] font-medium text-white shadow-lg transition-all hover:scale-[1.02] ${
+                  isLoading
+                    ? 'cursor-not-allowed bg-gray-400'
+                    : 'bg-secondary-400 hover:bg-secondary-500'
+                }`,
+              )}
+              htmlType='submit'
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Spin
+                  indicator={<LoadingOutlined spin />}
+                  size='small'
+                  className='text-white'
+                />
+              ) : (
+                <span className='flex items-center gap-2'>
+                  <GrDocumentUpdate className='text-[16px]' />
+                  {currentCustomFood ? 'Save Changes' : 'Create Recipe'}
+                </span>
+              )}
             </Button>
           </div>
-        )}
+        </div>
 
         <AddIngredientModal
           open={isIngredientModalOpen}
@@ -296,50 +395,8 @@ const CreateRecipeForm: React.FC = () => {
           onAdd={handleAddIngredient}
           setIngredient={setIngredient}
         />
-
-        <DirectionsInputList control={control} />
-      </div>
-
-      <div className='sticky bottom-0 z-10 bg-white py-4 shadow-inner'>
-        <div className='flex w-[860px] justify-end gap-4'>
-          <Button
-            onClick={() => {
-              dispatch(removeCurrentCustomFood());
-              reset();
-              if (canGoBack) {
-                router.history.back();
-              }
-            }}
-            className='px-4 py-5 text-[16px]'
-          >
-            Cancel
-          </Button>
-          <Button
-            className={`flex w-[160px] items-center gap-2 border-none px-4 py-5 text-[16px] text-white ${
-              isLoading
-                ? 'cursor-not-allowed bg-gray-400'
-                : 'bg-primary-400 hover:bg-primary-500'
-            }`}
-            htmlType='submit'
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Spin
-                indicator={<LoadingOutlined spin />}
-                size='small'
-                className='text-white'
-              />
-            ) : (
-              <span className='flex items-center gap-2'>
-                {' '}
-                <GrDocumentUpdate className='text-[18px]' />
-                Create
-              </span>
-            )}
-          </Button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </HubPageShell>
   );
 };
 

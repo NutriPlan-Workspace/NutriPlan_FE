@@ -2,6 +2,7 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
 import { z } from 'zod';
 
 import { Button } from '@/atoms/Button';
@@ -38,9 +39,14 @@ const LoginFormContent: React.FC = () => {
         onSubmit={handleSubmit(onSubmit)}
         className='flex w-full flex-col gap-4'
       >
-        <p className='font-display text-left text-[16px] font-bold'>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className='font-display text-left text-[16px] font-bold'
+        >
           Log in with email
-        </p>
+        </motion.p>
         {/* Register not work with antd design inputs: [https://github.com/react-hook-form/react-hook-form/issues/245] */}
         <Controller
           name='email'
@@ -49,6 +55,7 @@ const LoginFormContent: React.FC = () => {
             <InputField
               type='email'
               placeholder='Email'
+              autoComplete='email'
               error={errors.email?.message}
               {...field}
             />
@@ -63,6 +70,7 @@ const LoginFormContent: React.FC = () => {
               type='password'
               placeholder='Password'
               showPasswordToggle={false}
+              autoComplete='current-password'
               error={errors.password?.message}
               {...field}
             />

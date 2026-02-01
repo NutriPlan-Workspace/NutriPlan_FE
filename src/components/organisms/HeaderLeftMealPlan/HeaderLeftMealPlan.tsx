@@ -13,8 +13,9 @@ import {
   FaSearch,
   FaThumbtack,
 } from 'react-icons/fa';
-import { useSelector } from 'react-redux';
-import { Tooltip } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { DatePicker, Tooltip } from 'antd';
+import dayjs, { Dayjs } from 'dayjs';
 import { motion } from 'motion/react';
 
 import { DateDisplay } from '@/atoms/DateDisplay';
@@ -25,8 +26,9 @@ import { PLAN_TYPES } from '@/constants/plans';
 import { useDate } from '@/contexts/DateContext';
 import { cn } from '@/helpers/helpers';
 import { NavigationButtons } from '@/molecules/NavigationButtons';
+import PantrySuggestionsDock from '@/molecules/PantrySuggestionsDock/PantrySuggestionsDock';
 import { SideAddFood } from '@/molecules/SideAddFood';
-import { mealPlanSelector } from '@/redux/slices/mealPlan';
+import { mealPlanSelector, setIsDockExpanded } from '@/redux/slices/mealPlan';
 import { shiftDate, shiftRange } from '@/utils/dateUtils';
 
 const DOCK_FOOD_DRAG_EVENT = 'nutriplan:dock-food-drag';
@@ -40,11 +42,23 @@ const HeaderLeftMealPlan: React.FC = () => {
     setSelectedDate,
     setSelectedPlan,
   } = useDate();
-  const isDragging = useSelector(mealPlanSelector).isDragging;
+  const dispatch = useDispatch();
+  const { isDragging, isDockExpanded: isDockExpandedRedux } =
+    useSelector(mealPlanSelector);
   const dockDragPrevExpandedRef = useRef<boolean>(false);
   const dockDragAutoCollapsedRef = useRef<boolean>(false);
   const dockActiveDragCountRef = useRef<number>(0);
   const prevIsDraggingRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (isDockExpandedRedux) {
+      setIsExpanded(true);
+      // Reset redux state to avoid it being stuck true?
+      // Or keep it true? If we keep it true, user closing it locally will cause desync.
+      // Better to treat Redux as "trigger" or keep fully synced.
+      // For now, let's just use it as a trigger.
+    }
+  }, [isDockExpandedRedux]);
 
   const storageKey = useMemo(() => 'mealPlanDock.v1', []);
   const dockRef = useRef<HTMLDivElement | null>(null);
@@ -285,11 +299,13 @@ const HeaderLeftMealPlan: React.FC = () => {
     setIsExpanded((prev) => {
       const next = !prev;
       persist({ position, isExpanded: next, dockMode });
+      // Sync to Redux
+      dispatch(setIsDockExpanded(next));
       return next;
     });
     // after width changes, keep dock in viewport
     setTimeout(() => setPosition((prev) => clampToViewport(prev)), 0);
-  }, [clampToViewport, dockMode, persist, position]);
+  }, [clampToViewport, dispatch, dockMode, persist, position]);
 
   const handleDockModeChange = useCallback(
     (nextMode: string) => {
@@ -385,6 +401,7 @@ const HeaderLeftMealPlan: React.FC = () => {
   return (
     <div
       ref={dockRef}
+      data-tour='planner-dock'
       className={cn('fixed z-[70] transform-gpu select-none')}
       style={dockPositionStyle}
     >
@@ -427,7 +444,7 @@ const HeaderLeftMealPlan: React.FC = () => {
                 >
                   <Tooltip
                     title='Pinned'
-                    overlayClassName='np-tooltip'
+                    classNames={{ root: 'np-tooltip' }}
                     placement='right'
                   >
                     <span className='flex h-3.5 w-3.5 items-center justify-center'>
@@ -438,10 +455,10 @@ const HeaderLeftMealPlan: React.FC = () => {
 
                 <Tooltip
                   title='Dock mode'
-                  overlayClassName='np-tooltip'
+                  classNames={{ root: 'np-tooltip' }}
                   placement='right'
                 >
-                  <div>
+                  <div data-tour='planner-dock-mode'>
                     <DropdownMenu
                       items={PIN_MENU_ITEMS}
                       onSelect={handleDockModeChange}
@@ -454,7 +471,7 @@ const HeaderLeftMealPlan: React.FC = () => {
                 </Tooltip>
               </div>
 
-              <div className='min-w-0 flex-1 px-1 leading-none'>
+              <div className='group relative min-w-0 flex-1 cursor-pointer px-1 leading-none'>
                 <div className='flex items-baseline gap-2 whitespace-nowrap'>
                   <span className='text-primary-600 truncate text-[15px] font-bold tracking-[0.12em] uppercase'>
                     {selectedDate
@@ -465,26 +482,42 @@ const HeaderLeftMealPlan: React.FC = () => {
                     {selectedDate.getFullYear()}
                   </span>
                 </div>
+                {/* Invisible DatePicker Overlay */}
+                <div className='absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100'>
+                  <DatePicker
+                    value={dayjs(selectedDate)}
+                    onChange={(date: Dayjs | null) => {
+                      if (date) setSelectedDate(date.toDate());
+                    }}
+                    allowClear={false}
+                    className='absolute inset-0 h-full w-full opacity-0'
+                    dropdownClassName='dock-date-picker-dropdown'
+                  />
+                </div>
               </div>
 
               <Tooltip
                 title='View mode'
-                overlayClassName='np-tooltip'
+                classNames={{ root: 'np-tooltip' }}
                 placement='right'
               >
-                <div>
+                <div data-tour='planner-view-mode'>
                   <DropdownMenu
                     items={PLAN_MENU_ITEMS}
                     onSelect={handlePlanChange}
                     variant='icon-only'
                     ariaLabel='Plan view'
+                    selectedKey={selectedPlan}
                   />
                 </div>
               </Tooltip>
             </div>
 
             <div className='px-3 pt-2'>
-              <div className='flex items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/55 px-2 py-2 shadow-[0_10px_32px_-20px_rgba(16,24,40,0.45)] saturate-150 backdrop-blur-xl'>
+              <div
+                data-tour='planner-nav-buttons'
+                className='flex items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/55 px-2 py-2 shadow-[0_10px_32px_-20px_rgba(16,24,40,0.45)] saturate-150 backdrop-blur-xl'
+              >
                 <NavigationButtons />
               </div>
             </div>
@@ -493,6 +526,7 @@ const HeaderLeftMealPlan: React.FC = () => {
               <div className='relative mt-3 h-full overflow-hidden rounded-2xl border border-black/10 bg-white/55 p-2 shadow-[0_10px_28px_-24px_rgba(16,24,40,0.55)] saturate-150 backdrop-blur-xl supports-[backdrop-filter:blur(0px)]:bg-white/30'>
                 <div className='side-add-scroll h-full overflow-y-auto pr-0 pb-6'>
                   <SideAddFood variant='dock' showClose={false} />
+                  <PantrySuggestionsDock />
                 </div>
                 <div className='pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent to-white/80' />
               </div>
@@ -524,7 +558,7 @@ const HeaderLeftMealPlan: React.FC = () => {
               {/* drag area */}
               <Tooltip
                 title='Drag to move dock'
-                overlayClassName='np-tooltip'
+                classNames={{ root: 'np-tooltip' }}
                 placement='right'
               >
                 <button
@@ -549,7 +583,7 @@ const HeaderLeftMealPlan: React.FC = () => {
               <div className='mt-2 flex w-full items-center justify-center px-2'>
                 <Tooltip
                   title='Dock mode'
-                  overlayClassName='np-tooltip'
+                  classNames={{ root: 'np-tooltip' }}
                   placement='right'
                 >
                   <div>
@@ -568,7 +602,7 @@ const HeaderLeftMealPlan: React.FC = () => {
               <div className='mt-2 flex w-full items-center justify-center px-2'>
                 <Tooltip
                   title='View mode'
-                  overlayClassName='np-tooltip'
+                  classNames={{ root: 'np-tooltip' }}
                   placement='right'
                 >
                   <div>
@@ -577,6 +611,7 @@ const HeaderLeftMealPlan: React.FC = () => {
                       onSelect={handlePlanChange}
                       variant='icon-only'
                       ariaLabel='Plan view'
+                      selectedKey={selectedPlan}
                     />
                   </div>
                 </Tooltip>
@@ -597,7 +632,7 @@ const HeaderLeftMealPlan: React.FC = () => {
                   >
                     <Tooltip
                       title='Previous day'
-                      overlayClassName='np-tooltip'
+                      classNames={{ root: 'np-tooltip' }}
                       placement='right'
                     >
                       <span className='flex h-4 w-4 items-center justify-center'>
@@ -630,7 +665,7 @@ const HeaderLeftMealPlan: React.FC = () => {
                   >
                     <Tooltip
                       title='Next day'
-                      overlayClassName='np-tooltip'
+                      classNames={{ root: 'np-tooltip' }}
                       placement='right'
                     >
                       <span className='flex h-4 w-4 items-center justify-center'>
@@ -657,7 +692,7 @@ const HeaderLeftMealPlan: React.FC = () => {
                 >
                   <Tooltip
                     title={isExpanded ? 'Close search' : 'Open search'}
-                    overlayClassName='np-tooltip'
+                    classNames={{ root: 'np-tooltip' }}
                     placement='right'
                   >
                     <span className='flex h-3.5 w-3.5 items-center justify-center'>
@@ -715,6 +750,7 @@ const HeaderLeftMealPlan: React.FC = () => {
                 <div className='relative mt-3 h-[420px] overflow-hidden rounded-2xl border border-black/10 bg-white/55 p-2 shadow-[0_10px_28px_-24px_rgba(16,24,40,0.55)] saturate-150 backdrop-blur-xl supports-[backdrop-filter:blur(0px)]:bg-white/30'>
                   <div className='side-add-scroll h-full overflow-y-auto pr-0 pb-3'>
                     <SideAddFood variant='dock' showClose={false} />
+                    <PantrySuggestionsDock />
                   </div>
                   <div className='pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent to-white/80' />
                 </div>

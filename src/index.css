@@ -1,6 +1,5 @@
 @layer theme, base, antd, components, utilities;
 @import 'tailwindcss';
-@import 'react-day-picker/dist/style.css';
 
 @plugin 'tailwind-scrollbar' {
   nocompatible: true;
@@ -10,7 +9,7 @@
   --font-display: 'TT Norms', sans-serif;
   --font-secondary: 'Poppins', sans-serif;
   --font-third: 'Roboto', sans-serif;
-  --font-rossanova: 'Rossanova Personal Use', serif;
+  --font-rossanova: 'DM Serif Display', serif;
   /* softened primary (was too saturated) */
   --color-primary: #6fb478;
   --color-primary-50: #f4faf4;
@@ -69,6 +68,21 @@
   --toastify-icon-color-error: #f16f7c;
   --toastify-icon-color-warning: #8fbf7a;
   --toastify-icon-color-info: #3fa6b6;
+}
+
+.discover-tab-panel {
+  animation: discover-tab-enter 240ms ease;
+}
+
+@keyframes discover-tab-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ant-card-body {
@@ -195,6 +209,161 @@
   border-left-color: #dcdde1;
 }
 
+.article-content {
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.85;
+  letter-spacing: -0.01em;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4 {
+  color: #0f172a;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+}
+
+.article-content h1 {
+  font-size: 2rem;
+}
+
+.article-content h2 {
+  font-size: 1.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.article-content h3 {
+  font-size: 1.2rem;
+}
+
+.article-content p {
+  margin: 0.9em 0;
+  color: #334155;
+}
+
+.article-content ul,
+.article-content ol {
+  margin: 0.9em 0 0.9em 1.35em;
+}
+
+.article-content li {
+  margin: 0.35em 0;
+  color: #334155;
+}
+
+.article-content ul {
+  list-style: disc;
+}
+
+.article-content ol {
+  list-style: decimal;
+}
+
+.article-content a {
+  color: #047857;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(4, 120, 87, 0.35);
+}
+
+.article-content a:hover {
+  border-bottom-color: rgba(4, 120, 87, 0.7);
+}
+
+.article-content blockquote {
+  border-left: 4px solid #86efac;
+  background: #f0fdf4;
+  padding: 0.75rem 1rem;
+  color: #0f172a;
+  margin: 1.2em 0;
+  border-radius: 12px;
+}
+
+.article-content hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.5em 0;
+}
+
+.article-content code {
+  background: #e2e8f0;
+  border-radius: 6px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.92em;
+}
+
+.article-content img {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  margin: 1.2em 0;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.article-content figure {
+  margin: 1.4em 0;
+}
+
+.article-content figure img {
+  margin: 0;
+}
+
+.article-content figcaption {
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.article-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 0.95rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  table-layout: fixed;
+}
+
+.article-content thead {
+  background: #f8fafc;
+}
+
+.article-content th,
+.article-content td {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  text-align: left;
+  vertical-align: top;
+  color: #334155;
+  word-break: break-word;
+}
+
+.article-content th:last-child,
+.article-content td:last-child {
+  border-right: none;
+}
+
+.article-content tr:last-child td {
+  border-bottom: none;
+}
+
+.article-content tbody tr:nth-child(even) {
+  background: #fbfdff;
+}
+
 .ant-tabs-tab {
   margin-right: 18px;
   margin-left: 2px;
@@ -241,6 +410,19 @@
 
 .np-tooltip .ant-tooltip-arrow::before {
   background: rgba(15, 23, 42, 0.92);
+}
+
+/* Typography helpers */
+.entry-title {
+  font-family: var(--font-rossanova);
+}
+
+.font-body {
+  font-family: var(--font-display);
+}
+
+.mealplan-card .ant-card-body {
+  width: 100%;
 }
 /* Make Tailwind scrollbar utilities slimmer where used */
 .scrollbar-thin::-webkit-scrollbar {
@@ -346,38 +528,37 @@
     opacity 120ms ease;
 }
 
-@keyframes mealFlash {
+@keyframes shimmer-sweep {
   0% {
-    box-shadow: 0 0 0 0 rgba(50, 213, 131, 0.6);
-    transform: translateY(0);
-  }
-  50% {
-    box-shadow: 0 0 0 6px rgba(50, 213, 131, 0.35);
-    transform: translateY(-2px);
+    background-position: 200% 0;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(50, 213, 131, 0);
-    transform: translateY(0);
-  }
-}
-
-@keyframes dockSheen {
-  0% {
-    opacity: 0;
-    transform: translateX(-140%) skewX(-12deg);
-  }
-  15% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(140%) skewX(-12deg);
+    background-position: -200% 0;
   }
 }
 
 .meal-card-flash {
-  border-color: var(--color-primary-400);
-  animation: mealFlash 700ms ease-out;
+  position: relative;
+  overflow: hidden; /* Ensure shimmer doesn't overflow */
+}
+
+.meal-card-flash::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.2s ease-out;
+  pointer-events: none; /* Let clicks pass through */
+  z-index: 10;
 }
 
 /* subtle bounce when another card is hovering on top/bottom edge */
@@ -397,4 +578,133 @@
   .meal-card-flash {
     animation: none;
   }
+}
+
+/* ----- Guided tour (driver.js) ----- */
+.np-tour-popover.driver-popover {
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 44px -24px rgba(16, 24, 40, 0.35);
+  backdrop-filter: blur(18px);
+  pointer-events: none;
+  z-index: 10060;
+}
+
+.np-tour-popover.driver-popover * {
+  pointer-events: auto;
+}
+
+.driver-overlay {
+  z-index: 10040;
+  pointer-events: none;
+}
+
+.driver-stage {
+  pointer-events: none;
+}
+
+/* driver.js uses the class name `driver-active` on the root and
+   `driver-active-element` for the highlighted element. Ensure the
+   highlighted element (and its children) remain interactive while the
+   rest of the page is inert when a tour is active. */
+.driver-active .driver-overlay,
+.driver-active * {
+  pointer-events: none !important;
+}
+
+.driver-active .driver-active-element,
+.driver-active .driver-active-element *,
+.driver-popover,
+.driver-popover * {
+  pointer-events: auto !important;
+}
+
+.driver-active [data-tour='hub-selector'],
+.driver-active [data-tour='hub-selector'] * {
+  cursor: pointer;
+  pointer-events: auto !important;
+}
+
+.driver-active [data-tour='hub-selector-menu'],
+.driver-active [data-tour='hub-selector-menu'] *,
+.driver-active [data-tour^='hub-selector-option-'],
+.driver-active [data-tour^='hub-selector-option-'] * {
+  cursor: pointer;
+  pointer-events: auto !important;
+}
+
+/* Fix layout không bị vỡ khi highlight element ở cuối trang (save-changes step) */
+.driver-active-element[data-tour='userhub-save-changes-container'] {
+  position: relative !important;
+  z-index: 10050 !important;
+}
+
+/* Đảm bảo popover được đặt đúng vị trí khi target element ở cuối */
+body:has(.driver-active-element[data-tour='userhub-save-changes-container'])
+  .driver-popover {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+body:has(.driver-active-element[data-tour='hub-tabs']) .driver-popover {
+  transform: translateY(6px);
+}
+
+.np-tour-popover .driver-popover-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.np-tour-popover .driver-popover-description {
+  color: rgba(15, 23, 42, 0.75);
+  line-height: 1.45;
+}
+
+.np-tour-popover .driver-popover-footer {
+  gap: 8px;
+}
+
+.np-tour-popover .driver-popover-footer,
+.np-tour-popover .driver-popover-btn {
+  border-radius: 9999px;
+  border: 1px solid rgba(2, 6, 23, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.np-tour-popover .driver-popover-close-btn {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.np-tour-popover .driver-popover-btn:hover {
+  background: white;
+}
+
+.np-tour-popover .driver-popover-btn.driver-popover-next-btn {
+  border-color: rgba(111, 180, 120, 0.35);
+  background: rgba(111, 180, 120, 0.16);
+}
+
+.np-tour-popover .driver-popover-btn.driver-popover-next-btn:hover {
+  background: rgba(111, 180, 120, 0.22);
+}
+
+/* Hide the Back button for guided tours per product request */
+.np-tour-popover .driver-popover-btn.driver-popover-prev-btn,
+.driver-popover-prev-btn {
+  display: none !important;
+}
+
+/* When a modal is opened from the tour (nutrition targets), hide the
+   driver's overlay and popover so modal controls (Save) remain interactive. */
+body.np-tour-modal-open .driver-popover {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }

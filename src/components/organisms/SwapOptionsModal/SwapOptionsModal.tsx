@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { EyeOutlined } from '@ant-design/icons';
-import { Button, Empty, Image, Input, Modal, Select, Spin } from 'antd';
+import { Button, Empty, Image, Input, Modal, Radio, Select, Spin } from 'antd';
 
 import { FOOD_CATEGORIES } from '@/constants/foodCategories';
 import type { DishType } from '@/constants/foodFilter';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   setIsModalDetailOpen,
   setViewingDetailFood,
@@ -30,6 +31,15 @@ type SwapOptionsModalProps = {
   title: string;
   filters?: SwapModalFilters;
   onFiltersChange?: (filters: SwapModalFilters) => void;
+  generationMode?: 'percentage' | 'remaining';
+  onGenerationModeChange?: (mode: 'percentage' | 'remaining') => void;
+  onDeepSearch?: () => void;
+  isDeepSearching?: boolean;
+  targetItemCount?: number;
+  onTargetItemCountChange?: (count?: number) => void;
+
+  swapType?: 'food' | 'meal';
+  currentMealRatio?: number;
 };
 
 const formatMacros = (nutrition?: SwapNutrition) => {
@@ -57,11 +67,23 @@ const SwapOptionsModal: React.FC<SwapOptionsModalProps> = ({
   title,
   filters,
   onFiltersChange,
+  generationMode = 'percentage',
+  onGenerationModeChange,
+  onDeepSearch,
+  isDeepSearching = false,
+  targetItemCount,
+  onTargetItemCountChange,
+
+  swapType,
+  currentMealRatio,
 }) => {
   const dispatch = useDispatch();
 
   const categoryMap = useMemo(
-    () => new Map(FOOD_CATEGORIES.map((item) => [item.value, item.label])),
+    () =>
+      new Map<number, string>(
+        FOOD_CATEGORIES.map((item) => [item.value, item.label]),
+      ),
     [],
   );
 
@@ -229,18 +251,56 @@ const SwapOptionsModal: React.FC<SwapOptionsModalProps> = ({
   );
 
   const normalizedFilters: SwapModalFilters = filters ?? {};
-  const searchText = (normalizedFilters.q ?? '').trim().toLowerCase();
-  const categoryIds = normalizedFilters.categoryIds ?? [];
+
+  // Local state for search input
+  const [localSearchText, setLocalSearchText] = React.useState(
+    normalizedFilters.q ?? '',
+  );
+
+  // Update local state when filters are cleared externally
+  React.useEffect(() => {
+    setLocalSearchText(normalizedFilters.q ?? '');
+  }, [normalizedFilters.q]);
+
+  const debouncedSearchText = useDebouncedValue(localSearchText, 300);
+
+  // Effect to sync debounced text with parent filters
+  React.useEffect(() => {
+    if (!onFiltersChange) return;
+    const currentFilterQ = normalizedFilters.q ?? '';
+    // Only update if differ to avoid loops, and handle trimmed check
+    if (debouncedSearchText.trim() !== currentFilterQ) {
+      const next: SwapModalFilters = { ...normalizedFilters };
+      const trimmed = debouncedSearchText.trim();
+      if (!trimmed) {
+        delete next.q;
+      } else {
+        next.q = trimmed;
+      }
+      // Avoid dispatching if effectively same
+      if ((next.q ?? '') !== (normalizedFilters.q ?? '')) {
+        onFiltersChange(next);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchText]); // normalizedFilters is dependency but mindful of loops
+
+  const categoryIds = useMemo(
+    () => normalizedFilters.categoryIds ?? [],
+    [normalizedFilters.categoryIds],
+  );
   const dishType = normalizedFilters.dishType;
+
+  const filterSearchText = (normalizedFilters.q ?? '').trim().toLowerCase();
 
   const filteredOptions = useMemo(() => {
     if (!data) return [];
     const base = data.options ?? [];
 
     const matchesText = (value?: string) => {
-      if (!searchText) return true;
+      if (!filterSearchText) return true;
       if (!value) return false;
-      return value.toLowerCase().includes(searchText);
+      return value.toLowerCase().includes(filterSearchText);
     };
 
     const matchesCategories = (categories?: number[]) => {
@@ -275,18 +335,10 @@ const SwapOptionsModal: React.FC<SwapOptionsModalProps> = ({
 
       return okText && okCategories && okDishType;
     });
-  }, [categoryIds, data, dishType, searchText]);
+  }, [categoryIds, data, dishType, filterSearchText]);
 
   const handleSearchChange = (value: string) => {
-    if (!onFiltersChange) return;
-    const next: SwapModalFilters = { ...normalizedFilters };
-    const trimmed = value.trim();
-    if (!trimmed) {
-      delete next.q;
-    } else {
-      next.q = value;
-    }
-    onFiltersChange(next);
+    setLocalSearchText(value);
   };
 
   const handleDishTypeChange = (value?: DishType) => {
@@ -312,8 +364,12 @@ const SwapOptionsModal: React.FC<SwapOptionsModalProps> = ({
   };
 
   const handleClearFilters = () => {
+    setLocalSearchText('');
     onFiltersChange?.({});
   };
+
+  // Determine swapType: prefer prop, fallback to data
+  const effectiveSwapType = swapType || data?.swapType;
 
   return (
     <Modal
@@ -321,12 +377,107 @@ const SwapOptionsModal: React.FC<SwapOptionsModalProps> = ({
       onCancel={onClose}
       footer={null}
       title={title}
-      width={600}
+      width={700}
+      centered
     >
+      {effectiveSwapType === 'meal' && (
+        <div className='mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4'>
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+            {/* Generation Budget Section */}
+            {onGenerationModeChange && (
+              <div className='flex flex-col space-y-2'>
+                <span className='text-sm font-semibold text-gray-700'>
+                  Generation Budget
+                </span>
+                <Radio.Group
+                  value={generationMode}
+                  onChange={(e) => onGenerationModeChange(e.target.value)}
+                  optionType='button'
+                  buttonStyle='solid'
+                  size='middle'
+                  className='flex w-full'
+                >
+                  <Radio.Button
+                    value='percentage'
+                    className='flex-1 text-center'
+                  >
+                    Percentage
+                  </Radio.Button>
+                  <Radio.Button
+                    value='remaining'
+                    className='flex-1 text-center'
+                  >
+                    Remaining
+                  </Radio.Button>
+                </Radio.Group>
+                <p className='text-xs text-gray-500'>
+                  {generationMode === 'percentage'
+                    ? `Targets a balanced meal based on your settings${currentMealRatio ? ` (${currentMealRatio}% for ${swapType === 'meal' ? 'this meal' : 'item'})` : ' (e.g., 30% of daily needs)'}.`
+                    : 'Optimizes the meal to strictly fill your remaining daily nutritional gaps.'}
+                </p>
+              </div>
+            )}
+
+            {/* Item Count Section */}
+            {onTargetItemCountChange && (
+              <div className='flex flex-col space-y-2'>
+                <span className='text-sm font-semibold text-gray-700'>
+                  Meal Composition
+                </span>
+                <Radio.Group
+                  value={targetItemCount ?? 0}
+                  onChange={(e) =>
+                    onTargetItemCountChange(
+                      e.target.value === 0 ? undefined : e.target.value,
+                    )
+                  }
+                  optionType='button'
+                  buttonStyle='solid'
+                  size='middle'
+                  className='flex w-full'
+                >
+                  <Radio.Button
+                    value={0}
+                    className='flex-1 px-0 text-center whitespace-nowrap'
+                  >
+                    Auto
+                  </Radio.Button>
+                  <Radio.Button
+                    value={1}
+                    className='flex-1 px-0 text-center whitespace-nowrap'
+                  >
+                    1 Item
+                  </Radio.Button>
+                  <Radio.Button
+                    value={2}
+                    className='flex-1 px-0 text-center whitespace-nowrap'
+                  >
+                    2 Items
+                  </Radio.Button>
+                  <Radio.Button
+                    value={3}
+                    className='flex-1 px-0 text-center whitespace-nowrap'
+                  >
+                    3 Items
+                  </Radio.Button>
+                </Radio.Group>
+                <p className='text-xs text-gray-500'>
+                  {!targetItemCount
+                    ? 'Automatically determines the best combination (usually 2 items: Main + Side).'
+                    : `Forces the meal to consist of exactly ${targetItemCount} ${
+                        targetItemCount === 1 ? 'item' : 'items'
+                      }.`}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className='mb-3 space-y-2'>
         <Input
           placeholder='Filter by name...'
-          value={normalizedFilters.q ?? ''}
+          value={localSearchText}
           onChange={(e) => handleSearchChange(e.target.value)}
           allowClear
           disabled={!onFiltersChange}
@@ -341,8 +492,9 @@ const SwapOptionsModal: React.FC<SwapOptionsModalProps> = ({
             onChange={handleCategoriesChange}
             disabled={!onFiltersChange}
             maxTagCount='responsive'
+            optionFilterProp='label'
           />
-          {data?.swapType === 'food' ? (
+          {effectiveSwapType === 'food' ? (
             <Select
               className='w-[160px]'
               placeholder='Dish type'
@@ -362,19 +514,46 @@ const SwapOptionsModal: React.FC<SwapOptionsModalProps> = ({
         </div>
       </div>
 
-      {isLoading ? (
-        <div className='flex items-center justify-center py-8'>
-          <Spin />
-        </div>
-      ) : filteredOptions.length === 0 ? (
-        <Empty description='No suggestions available.' />
-      ) : (
-        <div className='scrollbar-thin max-h-[70vh] space-y-3 overflow-y-auto pr-1'>
-          {data?.swapType === 'meal'
-            ? (filteredOptions as SwapMealOption[]).map(renderMealOption)
-            : (filteredOptions as SwapFoodOption[]).map(renderFoodOption)}
-        </div>
-      )}
+      <div className='h-[60vh] overflow-hidden'>
+        {isLoading ? (
+          <div className='flex h-full items-center justify-center'>
+            <Spin />
+          </div>
+        ) : filteredOptions.length === 0 ? (
+          <div className='flex h-full items-center justify-center'>
+            <Empty
+              description={
+                <div className='flex flex-col items-center gap-2'>
+                  <span>
+                    {data?.notice ? data.notice : 'No suggestions available.'}
+                  </span>
+                  <div className='flex gap-2'>
+                    {onDeepSearch && (
+                      <Button
+                        type='primary'
+                        ghost
+                        onClick={onDeepSearch}
+                        loading={isDeepSearching}
+                      >
+                        Deep Search
+                      </Button>
+                    )}
+                    <Button href='/browse-foods' target='_blank'>
+                      Browse Foods
+                    </Button>
+                  </div>
+                </div>
+              }
+            />
+          </div>
+        ) : (
+          <div className='scrollbar-thin h-full space-y-3 overflow-y-auto pr-1'>
+            {data?.swapType === 'meal'
+              ? (filteredOptions as SwapMealOption[]).map(renderMealOption)
+              : (filteredOptions as SwapFoodOption[]).map(renderFoodOption)}
+          </div>
+        )}
+      </div>
     </Modal>
   );
 };

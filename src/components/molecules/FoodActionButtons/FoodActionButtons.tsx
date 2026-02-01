@@ -1,12 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import { HiOutlinePencilAlt } from 'react-icons/hi';
-import { HiOutlineStar } from 'react-icons/hi2';
+import { HiOutlineStar, HiOutlineXCircle } from 'react-icons/hi2';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from '@tanstack/react-router';
 import { Popconfirm, Spin } from 'antd';
 
 import { cn } from '@/helpers/helpers';
-import { useUpdateFavoriteFoodsMutation } from '@/redux/query/apis/collection/collectionApi';
+import {
+  useGetExclusionCollectionQuery,
+  useUpdateExclusionFoodsMutation,
+  useUpdateFavoriteFoodsMutation,
+} from '@/redux/query/apis/collection/collectionApi';
 import {
   addToFavoriteList,
   collectionSelector,
@@ -32,12 +36,21 @@ const FoodActionButtons: React.FC<FoodActionButtonsProps> = ({
 }) => {
   const dispatch = useDispatch();
   const [loadingFavorite, setLoadingFavorite] = useState(false);
+  const [loadingExclude, setLoadingExclude] = useState(false);
   const navigate = useNavigate();
 
   const favoriteList = useSelector(collectionSelector).favoriteList;
   const isFavorite = favoriteList.some((item) => item.food === food._id);
 
+  const { data: exclusionCollection } = useGetExclusionCollectionQuery();
+  const exclusionFoods = exclusionCollection?.data?.foods ?? [];
+  const excludedIds = exclusionFoods.map((item) =>
+    typeof item.food === 'string' ? item.food : item.food._id,
+  );
+  const isExcluded = excludedIds.includes(food._id);
+
   const [updateFavoriteFoods] = useUpdateFavoriteFoodsMutation();
+  const [updateExclusionFoods] = useUpdateExclusionFoodsMutation();
 
   const toggleFavorite = async () => {
     setLoadingFavorite(true);
@@ -68,10 +81,33 @@ const FoodActionButtons: React.FC<FoodActionButtonsProps> = ({
     }
   };
 
+  const toggleExclude = async () => {
+    setLoadingExclude(true);
+    try {
+      const baseList = exclusionFoods.map((item) => ({
+        food: typeof item.food === 'string' ? item.food : item.food._id,
+        date: item.date ?? new Date().toISOString(),
+      }));
+      const updatedExclusions = isExcluded
+        ? baseList.filter((item) => item.food !== food._id)
+        : [...baseList, { food: food._id, date: new Date().toISOString() }];
+
+      await updateExclusionFoods({ data: updatedExclusions }).unwrap();
+    } catch {
+      showToastError('Failed to update exclusions');
+    } finally {
+      setLoadingExclude(false);
+    }
+  };
+
   const handleEdit = useCallback(() => {
     if (food.isCustom) {
       if (food.isRecipe) {
-        navigate({ to: `/custom-recipes/${food._id}` });
+        dispatch(setCurrentCustomFood(food));
+        if (listIngredient) {
+          dispatch(setCurrentCustomIngredients(listIngredient));
+        }
+        navigate({ to: '/custom-recipes/create-recipe' });
         dispatch(removePreviousViewingDetailFood());
         dispatch(setIsModalDetailOpen(false));
       } else {
@@ -80,22 +116,22 @@ const FoodActionButtons: React.FC<FoodActionButtonsProps> = ({
         dispatch(setIsModalDetailOpen(false));
       }
     }
-  }, [food, navigate, dispatch]);
+  }, [food, navigate, dispatch, listIngredient]);
 
   const handleConfirm = useCallback(() => {
     if (food.isRecipe) {
-      navigate({ to: `/custom-recipes/create-recipe/` });
+      navigate({ to: '/custom-recipes/create-recipe' });
       dispatch(setCurrentCustomFood(food));
       dispatch(setCurrentCustomIngredients(listIngredient!));
       dispatch(removePreviousViewingDetailFood());
       dispatch(setIsModalDetailOpen(false));
     } else {
-      navigate({ to: `/custom-recipes/custom-food/` });
+      navigate({ to: '/custom-recipes/custom-food' });
       dispatch(setCurrentCustomFood(food));
       dispatch(removePreviousViewingDetailFood());
       dispatch(setIsModalDetailOpen(false));
     }
-  }, [food, navigate, dispatch]);
+  }, [food, navigate, dispatch, listIngredient]);
 
   return (
     <div className='z-1 flex w-full cursor-pointer justify-center rounded-b-md border-x border-b border-gray-200'>
@@ -120,7 +156,28 @@ const FoodActionButtons: React.FC<FoodActionButtonsProps> = ({
         </span>
       </div>
 
-      {/* Block */}
+      {/* Exclusion */}
+      <div
+        className='flex h-10 w-full flex-col items-center justify-center border-l border-gray-200 text-gray-500 transition-all hover:bg-rose-50 hover:text-rose-600'
+        onClick={toggleExclude}
+      >
+        {loadingExclude ? (
+          <Spin size='small' className='flex h-[20px] items-center' />
+        ) : (
+          <HiOutlineXCircle
+            className={cn('mb-0.5 text-lg', {
+              'text-rose-500': isExcluded,
+            })}
+          />
+        )}
+        <span
+          className={cn('text-[10px] font-medium', {
+            'text-rose-500': isExcluded,
+          })}
+        >
+          {isExcluded ? 'Excluded' : 'Exclude'}
+        </span>
+      </div>
 
       {/* Edit */}
       {food.isCustom ? (

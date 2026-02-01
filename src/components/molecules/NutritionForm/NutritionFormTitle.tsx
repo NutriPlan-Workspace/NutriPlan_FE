@@ -27,7 +27,7 @@ const NutritionTitle: React.FC<NutritionTitleProps> = ({ control, errors }) => (
           title={errors.calories?.message}
           open={!!errors.calories}
           placement='topLeft'
-          overlayClassName='np-tooltip'
+          classNames={{ root: 'np-tooltip' }}
         >
           <InputField
             {...field}

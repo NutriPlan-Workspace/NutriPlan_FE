@@ -154,7 +154,7 @@ const PrimaryDiet: React.FC<PrimaryDietProps> = ({
       onDietChange?.(selected as PrimaryDietType);
       updateDiet();
     }
-  }, [selected, primaryDietData, updatePrimaryDiet]);
+  }, [selected, primaryDietData, updatePrimaryDiet, onDietChange]);
 
   const selectedDetails =
     selected && selected !== ''
@@ -189,7 +189,12 @@ const PrimaryDiet: React.FC<PrimaryDietProps> = ({
           We&apos;ll base your meals off this main diet type. Choose
           &quot;Anything&quot; to customize your own unique diet from scratch
           and set specific exclusions from the{' '}
-          <Link to={PATH.FOOD_EXCLUSIONS} className='text-primary-400'>
+          <Link
+            to={PATH.FOOD_EXCLUSIONS}
+            // @ts-expect-error: params required by route but not available in context
+            params={{}}
+            className='text-primary-400'
+          >
             &quot;Exclusions&quot; menu screen.
           </Link>
         </p>
@@ -197,7 +202,10 @@ const PrimaryDiet: React.FC<PrimaryDietProps> = ({
 
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start'>
         <div className='lg:col-span-7'>
-          <div className='flex flex-col gap-3'>
+          <div
+            className='flex flex-col gap-3'
+            data-tour='userhub-primary-diet-picker'
+          >
             {PRIMARY_DIET.map((diet) => (
               <PrimaryDietCard
                 key={diet.key}

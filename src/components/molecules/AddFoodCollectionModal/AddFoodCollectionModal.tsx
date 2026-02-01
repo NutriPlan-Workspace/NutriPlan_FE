@@ -17,7 +17,7 @@ import SelectedFoodDetail from './SelectedFoodDetail';
 interface AddFoodCollectionModalProps {
   visible: boolean;
   onClose: () => void;
-  onAddFood: (foodName: string) => void;
+  onAddFood: (foodId: string) => void;
 }
 
 const { Paragraph } = Typography;
@@ -84,6 +84,7 @@ const AddFoodCollectionModal: React.FC<AddFoodCollectionModalProps> = ({
                     key={food._id}
                     food={food}
                     onClick={() => handleFoodClick(food)}
+                    variant='list'
                   />
                 ))
               : showNoFoods && <Paragraph>No foods found.</Paragraph>}

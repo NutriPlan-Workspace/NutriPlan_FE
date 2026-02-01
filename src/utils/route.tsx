@@ -7,9 +7,20 @@ import { store } from '@/redux/store';
 import type { AuthResponse } from '@/types/auth';
 
 export const getUserData = async () => {
-  const { data } = await store.dispatch(authApi.endpoints.getUser.initiate());
-  if (data?.data) {
-    return data.data;
+  const accessToken = localStorage.getItem('accessToken');
+  const refreshToken = localStorage.getItem('refreshToken');
+
+  if (!accessToken && !refreshToken) {
+    return null;
+  }
+
+  try {
+    const { data } = await store.dispatch(authApi.endpoints.getUser.initiate());
+    if (data?.data) {
+      return data.data;
+    }
+  } catch {
+    // ignore error
   }
   return null;
 };

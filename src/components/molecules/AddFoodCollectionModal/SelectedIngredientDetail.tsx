@@ -45,7 +45,10 @@ const SelectedIngredientDetail: React.FC<SelectedIngredientDetailProps> = ({
       </Title>
       <Image
         width='300'
-        src={selectedFood.imgUrls[0]}
+        src={
+          selectedFood.imgUrls?.[0] ||
+          'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/whuexhkydv7ubiqh5rxe.jpg'
+        }
         alt='Image food'
         className='rounded-md object-cover'
       />
@@ -69,7 +72,7 @@ const SelectedIngredientDetail: React.FC<SelectedIngredientDetailProps> = ({
       <div className='flex items-center gap-4'>
         <Button
           onClick={handleAdd}
-          className='bg-primary hover:border-primary w-[120px] hover:text-black'
+          className='bg-secondary-400 hover:!bg-secondary-500 hover:!border-secondary-500 w-[120px] text-white'
         >
           Add Ingredient
         </Button>

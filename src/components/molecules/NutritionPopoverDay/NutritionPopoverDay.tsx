@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import { HiOutlineAdjustments, HiOutlineX } from 'react-icons/hi';
-import { RiErrorWarningLine } from 'react-icons/ri';
-import { Button, Col, Row, Tooltip, Typography } from 'antd';
+import { IoWarning } from 'react-icons/io5';
+import { useNavigate } from '@tanstack/react-router';
+import { Button, Tooltip } from 'antd';
 
-import { nutritionFormat, targetKeyMap } from '@/constants/nutritionFormat';
+import {
+  NUTRITION_HEX_COLOR,
+  nutritionFormat,
+  targetKeyMap,
+} from '@/constants/nutritionFormat';
+import { PATH } from '@/constants/path';
 import { cn } from '@/helpers/helpers';
 import { PieChart } from '@/molecules/PieChart';
 import ModalNutritionDetail from '@/organisms/ModalNutritionDetail/ModalNutritionDetail';
@@ -12,14 +18,13 @@ import type { NutritionGoal } from '@/types/user';
 import { getInvalidNutritionKeys } from '@/utils/calculateNutrition';
 import { roundNumber } from '@/utils/roundNumber';
 
-const { Title } = Typography;
-
 interface NutritionPopoverDayProps {
   title: string;
   nutritionData: NutritionFields | undefined;
   targetNutrition?: NutritionGoal;
   onClick?: () => void;
   isSingleDay?: boolean;
+  targetPercentage?: number;
 }
 
 const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
@@ -28,197 +33,219 @@ const NutritionPopoverDay: React.FC<NutritionPopoverDayProps> = ({
   targetNutrition,
   onClick,
   isSingleDay = false,
+  targetPercentage,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
   const invalidKeys = getInvalidNutritionKeys(nutritionData, targetNutrition);
 
   return (
     <div
-      className={cn('flex flex-col items-center', {
-        'w-[400px]': !isSingleDay,
-      })}
+      className={cn(
+        'flex flex-col overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5',
+        {
+          'w-[400px]': !isSingleDay,
+          'w-full shadow-none ring-0': isSingleDay, // Adopt parent width if single day (embedded)
+        },
+      )}
     >
+      {/* Header */}
       <div
         className={cn(
-          'relative w-full',
-          isSingleDay
-            ? 'bg-transparent'
-            : 'bg-[url("https://res.cloudinary.com/dtwrwvffl/image/upload/v1742271174/qr8amnrc7vkbcy04ftty.jpg")] bg-cover bg-center',
+          'flex items-center justify-between border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-slate-50 px-5 py-3',
+          {
+            'justify-center border-none bg-transparent px-0 py-0': isSingleDay,
+          },
         )}
       >
-        <div className='flex w-full flex-col items-center gap-2 bg-white/85 pt-3.5 pb-2'>
-          {!isSingleDay && (
-            <HiOutlineX
-              className='absolute top-[8px] right-[8px] cursor-pointer text-xl text-black'
-              onClick={onClick}
-            />
-          )}
-          <div className='bg-white shadow-[0_0_10px_10px_white]'>
-            <Title
-              className={cn(
-                'm-0 text-center text-base leading-none text-black',
-                {
-                  'text-[12px] font-thin': isSingleDay,
-                },
-              )}
-              level={5}
-            >
-              {title}
-            </Title>
-          </div>
-          {nutritionData && (
-            <PieChart
-              className='rounded-[75px] bg-white shadow-[0_0_8px_8px_white]'
-              nutritionData={nutritionData}
-              size={isSingleDay ? 200 : 150}
-              label={true}
-            />
+        <div className={cn('flex flex-col', { 'items-center': isSingleDay })}>
+          <h3 className='text-md m-0 font-bold text-emerald-950'>{title}</h3>
+          {targetPercentage && targetPercentage !== 100 && !isSingleDay && (
+            <Tooltip title='Percentage of your daily nutrition goals allocated to this meal/day.'>
+              <span className='w-fit cursor-help rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800'>
+                Goal: {targetPercentage}% of Day
+              </span>
+            </Tooltip>
           )}
         </div>
+        {!isSingleDay && (
+          <div className='flex items-center gap-2'>
+            <Tooltip title='Adjust Targets'>
+              <Button
+                size='small'
+                icon={<HiOutlineAdjustments />}
+                type='text'
+                shape='circle'
+                className='text-emerald-700 hover:bg-emerald-100'
+                onClick={() => navigate({ to: PATH.NUTRITION_TARGETS })}
+              />
+            </Tooltip>
+            {onClick && (
+              <HiOutlineX
+                className='cursor-pointer text-xl text-slate-400 hover:text-slate-600'
+                onClick={onClick}
+              />
+            )}
+          </div>
+        )}
       </div>
-      {invalidKeys.length !== 0 && (
-        <div className='flex items-center'>
-          <p className='my-2 text-center text-[#8C5A09]'>
-            Some targets are not being met
-          </p>
-          <RiErrorWarningLine className='ml-2 text-[20px] text-yellow-500' />
+
+      {/* Chart Section */}
+      <div className='flex justify-center bg-white py-4'>
+        {nutritionData && (
+          <PieChart
+            nutritionData={nutritionData}
+            size={isSingleDay ? 200 : 140}
+            label={true}
+          />
+        )}
+      </div>
+
+      {/* Warning Banner */}
+      {invalidKeys.length > 0 && (
+        <div className='mx-4 mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-2 text-sm text-amber-800'>
+          <IoWarning className='text-lg text-amber-500' />
+          <span className='font-medium'>
+            Adjustment needed for {invalidKeys.join(', ')}
+          </span>
         </div>
       )}
-      <div className='w-full p-3.5'>
-        <Row className='w-full'>
-          {/* CURRENT TOTAL */}
-          <Col span={14} className='w-full'>
-            <div className='align-center flex justify-center'>
-              <Title
-                className={cn(
-                  'mb-0 text-center text-[14px] leading-[24px] text-black',
-                  { 'text-[12px] font-thin': isSingleDay },
-                )}
-                level={5}
-              >
-                CURRENT TOTALS
-              </Title>
-            </div>
-          </Col>
-          {/* TARGET */}
-          <Col span={10}>
-            <div className='align-center flex justify-center gap-1'>
-              <Title
-                className={cn(
-                  'mb-0 flex items-center gap-1 text-[14px] text-black',
-                  { 'text-[12px] font-thin': isSingleDay },
-                )}
-                level={5}
-              >
-                TARGETS
-              </Title>
-              <Tooltip title='Adjust Targets'>
-                <Button
-                  size='small'
-                  icon={
-                    <HiOutlineAdjustments className='text-[1rem] transition-all duration-75' />
-                  }
-                  variant='text'
-                  color='primary'
-                  shape='circle'
-                  className='text-primary hover:bg-primary-100 active:bg-primary-200 transition-text duration-200 hover:text-black'
+
+      {/* Table Header */}
+      <div className='grid grid-cols-[1fr_80px_80px] bg-slate-50 px-5 py-2 text-xs font-semibold tracking-wider text-slate-500 uppercase'>
+        <div>Nutrient</div>
+        <div className='text-right'>Total</div>
+        <div className='text-right'>Target</div>
+      </div>
+
+      {/* List */}
+      <div className='flex flex-col px-1'>
+        {nutritionFormat.map((item) => {
+          const isInvalid = invalidKeys.includes(item.key);
+          const keyMap = targetKeyMap[item.key];
+          const targetVal = targetNutrition?.[keyMap];
+
+          let targetText = '-';
+          if (item.key === 'calories' && typeof targetVal === 'number') {
+            targetText = `${roundNumber(targetVal, 0)}`; // Calories usually int
+          } else if (
+            targetVal &&
+            typeof targetVal === 'object' &&
+            'from' in targetVal &&
+            'to' in targetVal
+          ) {
+            targetText = `${roundNumber(targetVal.from, 1)} - ${roundNumber(targetVal.to, 1)}`;
+          } else if (typeof targetVal === 'number') {
+            if (item.key === 'fiber') {
+              targetText = `> ${roundNumber(targetVal, 1)}`;
+            } else if (
+              ['sodium', 'cholesterol'].includes(item.key) &&
+              targetVal > 0
+            ) {
+              targetText = `< ${roundNumber(targetVal, 1)}`;
+            }
+          }
+
+          // Colors
+          let dotColor = '#cbd5e1'; // slate-300
+          if (item.key === 'carbs') dotColor = NUTRITION_HEX_COLOR.CARBS;
+          if (item.key === 'fats') dotColor = NUTRITION_HEX_COLOR.FATS;
+          if (item.key === 'proteins') dotColor = NUTRITION_HEX_COLOR.PROTEINS;
+          if (item.key === 'calories') dotColor = NUTRITION_HEX_COLOR.CALORIES;
+          if (item.key === 'fiber') dotColor = NUTRITION_HEX_COLOR.FIBER;
+          if (item.key === 'sodium') dotColor = NUTRITION_HEX_COLOR.SODIUM;
+          if (item.key === 'cholesterol')
+            dotColor = NUTRITION_HEX_COLOR.CHOLESTEROL; // Highlight background
+
+          const isCalories = item.key === 'calories';
+
+          return (
+            <div
+              key={item.key}
+              className={cn(
+                'grid grid-cols-[1fr_80px_80px] items-center border-b border-slate-100 px-4 py-2.5 text-sm transition-colors last:border-0 hover:bg-slate-50',
+                {
+                  'bg-amber-50/40': isInvalid,
+                  'bg-slate-50/50 py-3': isCalories, // Highlight background
+                },
+              )}
+            >
+              <div className='flex items-center gap-2.5'>
+                <span
+                  className='h-2.5 w-2.5 rounded-full'
+                  style={{ backgroundColor: dotColor }}
                 />
-              </Tooltip>
-            </div>
-          </Col>
-        </Row>
-        {nutritionFormat.map((item, index) => (
-          <div key={index}>
-            {index === 4 && <br key={-1} />}
-            <Row className='w-full'>
-              <Col span={14} className='px-2'>
-                <div className='flex justify-between'>
-                  {['Carbs', 'Fats', 'Proteins'].includes(item.label) ? (
-                    <div className='flex items-center gap-2'>
-                      {item.label === 'Carbs' && (
-                        <span className='h-3 w-3 rounded-full bg-yellow-500' />
-                      )}
-                      {item.label === 'Fats' && (
-                        <span className='h-3 w-3 rounded-full bg-blue-500' />
-                      )}
-                      {item.label === 'Proteins' && (
-                        <span className='h-3 w-3 rounded-full bg-purple-500' />
-                      )}
-                      <Typography
-                        className={cn(
-                          { 'text-[16px]': isSingleDay },
-                          invalidKeys.includes(item.key) && 'text-[#8C5A09]',
-                        )}
-                      >
-                        {item.label}
-                      </Typography>
-                    </div>
-                  ) : (
-                    <Typography
-                      className={cn(
-                        { 'text-[16px]': isSingleDay },
-                        invalidKeys.includes(item.key)
-                          ? 'text-[#8C5A09]'
-                          : item.color,
-                      )}
-                    >
-                      {item.label}
-                    </Typography>
+                <span
+                  className={cn('font-medium', {
+                    'text-amber-800': isInvalid,
+                    'text-slate-700': !isInvalid,
+                    'text-base font-bold text-gray-800': isCalories, // Highlight Text
+                  })}
+                >
+                  {item.label}
+                </span>
+                {isInvalid && (
+                  <IoWarning className='text-amber-500' title='Target missed' />
+                )}
+              </div>
+
+              {/* Value */}
+              <div
+                className={cn('text-right font-semibold text-slate-800', {
+                  'text-amber-700': isInvalid,
+                  'text-base font-bold text-gray-900': isCalories, // Highlight Value
+                })}
+              >
+                {nutritionData &&
+                  roundNumber(
+                    nutritionData[item.key as keyof NutritionFields],
+                    1,
                   )}
+                <span
+                  className={cn('ml-0.5 text-xs font-normal text-slate-400', {
+                    'font-semibold text-gray-500': isCalories,
+                  })}
+                >
+                  {item.unit}
+                </span>
+              </div>
 
-                  <Typography
-                    className={cn(
-                      invalidKeys.includes(item.key)
-                        ? 'text-[#8C5A09]'
-                        : item.color,
-                    )}
-                  >
-                    {nutritionData && roundNumber(nutritionData[item.key], 2)}
-                    {item.unit}
-                  </Typography>
-                </div>
-              </Col>
+              {/* Target */}
+              <div className='text-right text-xs font-medium text-slate-500'>
+                {targetText !== '-' ? (
+                  <span>
+                    {targetText}
+                    <span className='ml-0.5 text-[10px] text-slate-400'>
+                      {item.unit}
+                    </span>
+                  </span>
+                ) : (
+                  <span className='text-slate-300'>-</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-              <Col span={10}>
-                <div className='flex justify-center'>
-                  <Typography
-                    className={cn(
-                      invalidKeys.includes(item.key)
-                        ? 'text-[#8C5A09]'
-                        : item.color,
-                    )}
-                  >
-                    {item.key === 'calories'
-                      ? roundNumber(
-                          isNaN(targetNutrition?.[targetKeyMap[item.key]])
-                            ? 0
-                            : targetNutrition?.[targetKeyMap[item.key]],
-                          2,
-                        )
-                      : `${isNaN(targetNutrition?.[targetKeyMap[item.key]]?.from) ? '' : roundNumber(targetNutrition?.[targetKeyMap[item.key]]?.from, 2)} -
-       ${isNaN(targetNutrition?.[targetKeyMap[item.key]]?.to) ? '' : roundNumber(targetNutrition?.[targetKeyMap[item.key]]?.to, 2)}`}
-                    {isNaN(targetNutrition?.[targetKeyMap[item.key]]?.to)
-                      ? ''
-                      : item.unit}
-                  </Typography>
-                </div>
-              </Col>
-            </Row>
-          </div>
-        ))}
+      <div className='border-t border-slate-100 bg-slate-50 p-4'>
         <Button
-          className='mt-3 w-full rounded-2xl border border-black/10 bg-white/60 px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-white'
+          block
+          type='default'
+          className='border-slate-200 font-medium text-slate-600 shadow-sm hover:border-emerald-500 hover:text-emerald-600'
           onClick={() => setIsModalOpen(true)}
         >
-          Detailed Nutrition Information
+          View Detailed Analysis
         </Button>
-        <ModalNutritionDetail
-          nutrition={nutritionData}
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          type='day'
-        />
       </div>
+
+      <ModalNutritionDetail
+        nutrition={nutritionData}
+        targetNutrition={targetNutrition}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        type='day'
+      />
     </div>
   );
 };

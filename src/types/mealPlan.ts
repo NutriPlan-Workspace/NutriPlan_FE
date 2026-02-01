@@ -19,6 +19,7 @@ export interface MealPlanFoodDetail {
   name: string;
   imgUrls: string[];
   categories?: number[];
+  defaultUnit?: number;
   property: PropertySummaryFields;
   nutrition: NutritionFields;
   units: {
@@ -26,12 +27,25 @@ export interface MealPlanFoodDetail {
     amount: number;
     description: string;
   }[];
+  ingredients?: {
+    ingredientFoodId: {
+      _id: string;
+      name: string;
+      units: { _id: string; amount: number; description: string }[];
+      imgUrls?: string[];
+      nutrition?: NutritionFields;
+      categories?: number[];
+    };
+    amount: number;
+    unit: number;
+  }[];
 }
 export interface MealPlanFood {
   _id: string;
   foodId: MealPlanFoodDetail;
   amount: number;
   unit: number;
+  isEaten?: boolean;
 }
 
 export interface MealItems {
@@ -40,10 +54,13 @@ export interface MealItems {
   dinner: MealPlanFood[];
 }
 
+export type MealType = keyof MealItems;
+
 export interface MealPlanDay {
   _id: string;
   mealDate: string;
   mealItems: MealItems;
+  targetPercentage?: number; // 60-120, default 100
 }
 
 export interface MealPlanWithDate {
@@ -58,16 +75,19 @@ export interface MealPlanDatabaseDTO {
       foodId: string;
       amount: number;
       unit: number;
+      isEaten?: boolean;
     }[];
     lunch: {
       foodId: string;
       amount: number;
       unit: number;
+      isEaten?: boolean;
     }[];
     dinner: {
       foodId: string;
       amount: number;
       unit: number;
+      isEaten?: boolean;
     }[];
   };
 }
@@ -79,16 +99,19 @@ export interface MealPlanBody {
       foodId: string;
       amount: number;
       unit: number;
+      isEaten?: boolean;
     }[];
     lunch: {
       foodId: string;
       amount: number;
       unit: number;
+      isEaten?: boolean;
     }[];
     dinner: {
       foodId: string;
       amount: number;
       unit: number;
+      isEaten?: boolean;
     }[];
   };
 }
@@ -126,7 +149,7 @@ export interface MealPlanDayRangeResponse {
 export interface MealPlanSingleDayResponse {
   success: boolean;
   total: number;
-  data: MealPlanDay;
+  data: MealPlanDay[];
   message: string;
   additionalData: object;
 }

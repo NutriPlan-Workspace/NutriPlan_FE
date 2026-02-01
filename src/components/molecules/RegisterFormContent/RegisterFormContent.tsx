@@ -4,6 +4,7 @@ import { HiArrowLeft, HiMiniArrowTopRightOnSquare } from 'react-icons/hi2';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from '@tanstack/react-router';
 import { Checkbox } from 'antd';
+import { motion } from 'framer-motion';
 import z from 'zod';
 
 import { Button } from '@/atoms/Button';
@@ -63,14 +64,19 @@ const RegisterFormContent: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className='flex w-full flex-col'>
         <Link
           to={PATH.LOGIN}
-          className='text-primary flex items-center py-1 py-2 font-medium hover:underline'
+          className='text-primary flex items-center py-2 font-medium hover:underline'
         >
           <HiArrowLeft className='mr-1 h-5 w-5' />
           Back to Login
         </Link>
-        <p className='mb-3 text-left text-[16px] font-bold'>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className='mb-3 text-left text-[16px] font-bold'
+        >
           Register with your email
-        </p>
+        </motion.p>
 
         {formFields.map(
           ({ name, type, placeholder, showPasswordToggle = true }) => (

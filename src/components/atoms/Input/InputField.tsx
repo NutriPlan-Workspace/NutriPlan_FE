@@ -10,30 +10,22 @@ interface InputFieldProps extends AntdInputProps {
 }
 
 const InputField = forwardRef<InputRef, InputFieldProps>(
-  ({ type, error, showPasswordToggle = true, ...props }, ref) => {
-    const inputProps =
-      type === 'password' && !showPasswordToggle
-        ? { iconRender: () => null }
-        : {};
+  ({ type, error, ...props }, ref) => (
+    <div>
+      <Input
+        ref={ref}
+        type={type}
+        className={cn(
+          'min-h-[44px] min-w-[300px] rounded-full border text-[14px] leading-[20px] focus:border-2',
+          error ? 'border-error' : 'border-gray-300',
+          'shadow-none outline-none focus:shadow-none',
+        )}
+        {...props}
+      />
 
-    return (
-      <div>
-        <Input
-          ref={ref}
-          type={type}
-          {...inputProps}
-          className={cn(
-            'min-h-[44px] min-w-[300px] rounded-full border text-[14px] leading-[20px] focus:border-2',
-            error ? 'border-error' : 'border-gray-300',
-            'shadow-none outline-none focus:shadow-none',
-          )}
-          {...props}
-        />
-
-        {error && <ErrorMessage message={error} />}
-      </div>
-    );
-  },
+      {error && <ErrorMessage message={error} />}
+    </div>
+  ),
 );
 
 InputField.displayName = 'InputField';

@@ -6,8 +6,10 @@ import {
 import { HiOutlineArrowPath } from 'react-icons/hi2';
 
 import { Button } from '@/atoms/Button';
+import { TargetPercentageSelect } from '@/atoms/TargetPercentageSelect';
 import { useToast } from '@/contexts/ToastContext';
 import { cn } from '@/helpers/helpers';
+import { useMealPlanSetupStatus } from '@/hooks/useMealPlanSetupStatus';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
 import { useAutoGenerateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import { getDayOfWeek } from '@/utils/dateUtils';
@@ -26,8 +28,10 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
   isWeekly = false,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [targetPercentage, setTargetPercentage] = useState(100);
   const [autoGenerateMealPlan] = useAutoGenerateMealPlanMutation();
   const { showToastError } = useToast();
+  const { canGenerate, nextSetupPath } = useMealPlanSetupStatus();
 
   const handleAction = async (action: () => Promise<void>) => {
     setIsLoading(true);
@@ -42,29 +46,34 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
   };
 
   const handleGenerate = async () => {
+    if (!canGenerate) {
+      showToastError(
+        'Please complete Body & Goal and Nutrition Target before generating meals.',
+      );
+      return;
+    }
+
     await handleAction(async () => {
       // Format date to ISO string to match datetime format
       const formattedDate = new Date(mealDate).toISOString();
       await autoGenerateMealPlan({
         date: formattedDate,
+        targetPercentage,
       }).unwrap();
     });
   };
 
   if (isLoading) {
     return (
-      <div className='w-full rounded-sm bg-white px-4 py-4 shadow-md'>
-        <div
-          className={cn('flex', {
-            'flex-col gap-1': !isWeekly,
-            'flex-row justify-between gap-4': isWeekly,
-          })}
-        >
-          {[0, 1, 2].map((index) => (
-            <div key={index} className='h-50'>
-              <MealBoxSkeleton />
-            </div>
-          ))}
+      <div className='space-y-2 pt-2'>
+        <div className='w-full rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35),_0_2px_4px_rgba(15,23,42,0.06)]'>
+          <MealBoxSkeleton />
+        </div>
+        <div className='w-full rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35),_0_2px_4px_rgba(15,23,42,0.06)]'>
+          <MealBoxSkeleton />
+        </div>
+        <div className='w-full rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35),_0_2px_4px_rgba(15,23,42,0.06)]'>
+          <MealBoxSkeleton />
         </div>
       </div>
     );
@@ -87,14 +96,35 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
           <p className='text-center'>Want to build it right now?</p>
         </>
       )}
-      <div className={cn('mt-6 flex justify-center', { 'mt-2': isWeekly })}>
+      <div
+        className={cn('mt-6 flex items-center justify-center gap-2', {
+          'mt-2': isWeekly,
+        })}
+      >
+        {!canGenerate && (
+          <a
+            data-tour='planner-setup-link'
+            href={nextSetupPath}
+            className='mr-3 rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-100'
+          >
+            Complete setup to enable generate
+          </a>
+        )}
+        <TargetPercentageSelect
+          value={targetPercentage}
+          onChange={setTargetPercentage}
+          disabled={!canGenerate}
+          size='middle'
+        />
         <Button
+          data-tour='planner-generate-day'
           size='large'
           variant='solid'
           color='primary'
           className='bg-primary hover:bg-primary-400 active:bg-primary-500 transition-bg text-black duration-300'
           icon={<HiOutlineArrowPath size={20} />}
           onClick={handleGenerate}
+          disabled={!canGenerate}
         >
           Generate
         </Button>
@@ -104,6 +134,11 @@ const EmptyMealDay: React.FC<EmptyMealDayProps> = ({
         <span className='text-primary-400 pl-1'>
           {getDayOfWeek(new Date(mealDate))}&apos;s preferences
         </span>
+        {targetPercentage !== 100 && (
+          <span className='text-primary-400 pl-1'>
+            at {targetPercentage}% target
+          </span>
+        )}
       </p>
       <p className={cn('my-5 text-center font-bold', { 'my-2': isWeekly })}>
         - or -

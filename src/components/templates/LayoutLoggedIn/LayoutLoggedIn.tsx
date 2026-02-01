@@ -59,11 +59,11 @@ const LayoutLoggedIn: React.FC<LayoutLoggedInProps> = ({ children }) => {
       <div className='pointer-events-none absolute inset-0 -z-10'>
         <div className='absolute inset-0 bg-[#fafafa]' />
         <div
-          className='absolute -top-32 -left-24 h-[520px] w-[520px] rounded-full blur-3xl'
+          className='absolute -top-36 -left-40 h-[440px] w-[440px] rounded-full blur-3xl'
           style={{ background: background.left }}
         />
         <div
-          className='absolute -top-24 -right-24 h-[560px] w-[560px] rounded-full blur-3xl'
+          className='absolute -top-28 -right-40 h-[480px] w-[480px] rounded-full blur-3xl'
           style={{ background: background.right }}
         />
       </div>

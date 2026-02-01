@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
-import { DateRange } from 'react-day-picker';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
+import { VIEW_MODE_KEY } from '@/constants/localStorage';
+import { DateRange } from '@/types/date';
 import { getWeekRange } from '@/utils/dateUtils';
 
 interface DateContextType {
@@ -18,7 +19,21 @@ export const DateProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedPlan, setSelectedPlan] = useState<string>('1');
+  const [selectedPlan, setSelectedPlan] = useState<string>(() => {
+    try {
+      return localStorage.getItem(VIEW_MODE_KEY) || '2';
+    } catch {
+      return '2';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_MODE_KEY, selectedPlan);
+    } catch {
+      // ignore
+    }
+  }, [selectedPlan]);
   const [rangeDate, setRangeDate] = useState<DateRange>(
     getWeekRange(selectedDate),
   );

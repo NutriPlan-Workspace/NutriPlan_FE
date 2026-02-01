@@ -15,24 +15,26 @@ const ActivityLevelSelect: React.FC<ActivityLevelSelectProps> = ({
   onChange,
   className,
 }) => {
-  const [selectedLevel, setSelectedLevel] = useState<string>(
-    ACTIVITY_LEVEL[0]?.key || '',
+  const [selectedLevel, setSelectedLevel] = useState<string | undefined>(
+    defaultSelectedKey || undefined,
   );
 
   useEffect(() => {
-    if (defaultSelectedKey) {
-      const matchedLevel = ACTIVITY_LEVEL.find(
-        (level) => level.key === defaultSelectedKey,
-      );
-      if (matchedLevel) {
-        setSelectedLevel(matchedLevel.key);
-      }
+    if (!defaultSelectedKey) {
+      setSelectedLevel(undefined);
+      return;
     }
+
+    const matchedLevel = ACTIVITY_LEVEL.find(
+      (level) => level.key === defaultSelectedKey,
+    );
+    setSelectedLevel(matchedLevel?.key);
   }, [defaultSelectedKey]);
 
-  const handleChange = (value: string) => {
+  const handleChange = (value?: string) => {
+    const nextValue = value ?? '';
     setSelectedLevel(value);
-    onChange?.(value);
+    onChange?.(nextValue);
   };
 
   return (
@@ -43,8 +45,16 @@ const ActivityLevelSelect: React.FC<ActivityLevelSelectProps> = ({
       )}
       value={selectedLevel}
       onChange={handleChange}
+      allowClear
       placeholder='Select activity level'
-      dropdownStyle={{ borderRadius: '0.5rem', padding: '0.5rem' }}
+      styles={{
+        popup: {
+          root: { borderRadius: '0.5rem', padding: '0.5rem' },
+        },
+      }}
+      // If there is no initial value, let the dropdown open upwards so it
+      // doesn't get clipped by the page overlay.
+      placement={!defaultSelectedKey ? 'topLeft' : undefined}
     >
       {ACTIVITY_LEVEL.map((level) => (
         <Select.Option key={level.key} value={level.key}>

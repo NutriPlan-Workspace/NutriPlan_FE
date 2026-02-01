@@ -1,5 +1,18 @@
 export const PATH = {
   ADMIN: '/admin',
+  ADMIN_ARTICLES: '/admin/articles',
+  ADMIN_ARTICLE_CREATE: '/admin/articles/create',
+  ADMIN_ARTICLE_EDIT: '/admin/articles/$id',
+  ADMIN_USERS: '/admin/users',
+  ADMIN_FOODS: '/admin/foods',
+  ADMIN_FOOD_CREATE: '/admin/foods/create',
+  ADMIN_FOOD_EDIT: '/admin/foods/$id',
+  ADMIN_COLLECTIONS: '/admin/collections',
+  ADMIN_COLLECTION_CREATE: '/admin/collections/create',
+  ADMIN_COLLECTION_DETAIL: '/admin/collections/$id',
+  ADMIN_MEAL_PLANS: '/admin/meal-plans',
+  ADMIN_CATEGORIES: '/admin/categories',
+  ADMIN_SETTINGS: '/admin/settings',
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
@@ -21,6 +34,9 @@ export const PATH = {
   FOR_PROFESSIONALS: '/for-professionals',
   ABOUT_US: '/about-us',
   MEAL_PLAN: '/meal-plan',
+
+  ARTICLES: '/articles',
+  ARTICLE_DETAIL: '/articles/$slug',
 
   GROCERIES: '/groceries',
   DISCOVER: '/discover',

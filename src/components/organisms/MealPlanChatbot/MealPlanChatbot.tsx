@@ -5,19 +5,30 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { FaPaperPlane, FaTimes } from 'react-icons/fa';
+import { FaPaperPlane, FaSpinner, FaTimes } from 'react-icons/fa';
+import ReactMarkdown from 'react-markdown';
 import { useDispatch, useSelector } from 'react-redux';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
+import remarkGfm from 'remark-gfm';
 
 import { env } from '@/configs/env';
+import { ChatMessage, Language, useChatContext } from '@/contexts/ChatContext';
 import { useDate } from '@/contexts/DateContext';
-import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
+import {
+  useApplySwapMutation,
+  useGetSwapOptionsMutation,
+  useLazyGetMealPlanSingleDayQuery,
+  useUpdateMealPlanMutation,
+} from '@/redux/query/apis/mealPlan/mealPlanApi';
+import { useUpsertPantryItemMutation } from '@/redux/query/apis/pantry/pantryApi';
 import {
   closeSwapModal,
   mealPlanSelector,
   openSwapModal,
+  setDockSearchQuery,
   setFlashMealCardIds,
+  setIsDockExpanded,
   setSwapModalData,
   setSwapModalFilters,
   setSwapModalLoading,
@@ -25,9 +36,13 @@ import {
   updateCacheMealPlanByDate,
   updateViewingMealPlanByDates,
 } from '@/redux/slices/mealPlan';
+import { ChatbotCommandParams } from '@/types/chatbot';
 import type { DetailedFoodResponse, Food } from '@/types/food';
 import type { MealPlanDay, MealPlanFood } from '@/types/mealPlan';
-import type { SwapOptionsResponse as PlannerSwapOptionsResponse } from '@/types/mealSwap';
+import type {
+  SwapOptionsRequest,
+  SwapOptionsResponse as PlannerSwapOptionsResponse,
+} from '@/types/mealSwap';
 import { getMealDate } from '@/utils/dateUtils';
 import {
   getMealPlanDayAfterAddAndRemoveMealItem,
@@ -35,11 +50,56 @@ import {
 } from '@/utils/mealPlan';
 import { showToastError } from '@/utils/toastUtils';
 
+// --- 1. Keyframes & Animation Styles (Shimmer) ---
+const shimmerStyles = `
+  @keyframes thinking-wave {
+    0% {
+      background-position: 0% 50%;
+      opacity: 0.75;
+    }
+    50% {
+      background-position: 100% 50%;
+      opacity: 1;
+    }
+    100% {
+      background-position: 0% 50%;
+      opacity: 0.75;
+    }
+  }
+
+  .shimmer-text {
+    background: linear-gradient(
+      110deg,
+      #6b7280 0%,
+      #6b7280 35%,
+      #d1d5db 50%,
+      #6b7280 65%,
+      #6b7280 100%
+    );
+    background-size: 300% 100%;
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    animation: thinking-wave 4.5s linear infinite;
+  }
+
+  .shimmer-text p,
+  .shimmer-text span,
+  .shimmer-text li,
+  .shimmer-text strong,
+  .shimmer-text em {
+    background: inherit;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+`;
+
 type MealType = 'breakfast' | 'lunch' | 'dinner';
 
-type Language = 'vi' | 'en';
-
-type ChatMessage = { role: 'user' | 'assistant'; content: string };
+// Types moved to ChatContext
 
 type UndoEntry = {
   mealDate: string;
@@ -92,6 +152,14 @@ type MealAction =
       mealType: MealType;
       targetIndex: number;
     }
+  | {
+      type: 'get_meal_plan';
+      mealDate: string;
+    }
+  | {
+      type: 'add_to_grocery';
+      ingredients: { name: string; quantity?: number; unit?: string }[];
+    }
   | { type: 'message'; text: string };
 
 type AiChatMessage = { role: 'system' | 'user' | 'assistant'; content: string };
@@ -134,20 +202,6 @@ type PendingSwap = {
   options: FoodSwapOption[];
 };
 
-const HELLO_MESSAGE: Record<Language, string> = {
-  vi: 'Chào bạn! Mình có thể giúp bạn đổi vị trí món trong ngày đang xem, gợi ý thay thế món, và trả lời câu hỏi dinh dưỡng như “Món này có hợp ăn sáng không?” hoặc “Món này tốt cho mình không?”.',
-  en: 'Hi! I can help you reorder meals for the active day, suggest swaps, and answer nutrition questions like “Is this dish good for breakfast?” or “Is this food healthy for me?”.',
-};
-
-const getInitialLanguage = (): Language => {
-  try {
-    const navLang = typeof navigator !== 'undefined' ? navigator.language : '';
-    return navLang?.toLowerCase().startsWith('vi') ? 'vi' : 'en';
-  } catch {
-    return 'en';
-  }
-};
-
 const detectLanguage = (text: string): Language => {
   const input = text.trim();
   if (!input) return 'en';
@@ -165,10 +219,6 @@ const detectLanguage = (text: string): Language => {
   return 'en';
 };
 
-const createInitialMessages = (language: Language): ChatMessage[] => [
-  { role: 'assistant', content: HELLO_MESSAGE[language] },
-];
-
 const MEAL_TYPE_LABELS: Record<MealType, string> = {
   breakfast: 'bữa sáng',
   lunch: 'bữa trưa',
@@ -178,67 +228,105 @@ const MEAL_TYPE_LABELS: Record<MealType, string> = {
 const buildSystemPrompt = (
   language: Language,
 ) => `You are the NutriPlan assistant.
-Return ONLY valid JSON (no markdown).
+If you need to perform an action (swap, reorder, move, replace, food_info), return ONLY valid JSON.
+If you are chatting, explaining, or answering a question, return PLAIN TEXT (do not wrap in JSON).
 Always respond in the same language as the user's latest message. The user's language is: ${
   language === 'vi' ? 'Vietnamese' : 'English'
 }.
-Supported types:
+IMPORTANT: If the user asks to swap/replace with a specific food name in Vietnamese (e.g. "đổi sang Trứng", "thay bằng Phở"), you MUST translate the food name to English for the 'replacementQuery' field in JSON (e.g. "Egg", "Pho").
+Supported JSON actions:
 - {"type":"reorder","mealDate":"YYYY-MM-DD","mealType":"breakfast|lunch|dinner","fromIndex":1,"toIndex":3}
 - {"type":"swap","mealDate":"YYYY-MM-DD","mealType":"breakfast|lunch|dinner","indexA":1,"indexB":3}
 - {"type":"move","mealDate":"YYYY-MM-DD","fromMealType":"breakfast|lunch|dinner","fromIndex":1,"toMealType":"breakfast|lunch|dinner","toIndex":2}
 - {"type":"replace_food","mealDate":"YYYY-MM-DD","mealType":"breakfast|lunch|dinner","targetIndex":1,"limit":5,"tolerance":0.2,"replacementQuery":"optional", "filters":{"q":"...","dishType":"main|side","categoryIds":[1,2]}}
 - {"type":"apply_swap_option","optionIndex":1}
 - {"type":"food_info","mealDate":"YYYY-MM-DD","mealType":"breakfast|lunch|dinner","targetIndex":1}
-- {"type":"message","text":"..."}
-- If the user asks how to use the NutriPlan app, reply with type "message" and clear step-by-step guidance.
-- If the user asks general nutrition/health questions or wants feedback on a meal, reply with type "message" and a helpful explanation/suggestions without changing the meal plan.
-Use 1-based indices. If anything is missing or ambiguous, return type "message" and ask a short follow-up.`;
+- {"type":"get_meal_plan","mealDate":"YYYY-MM-DD"} (Use this IMMEDIATELY if the user mentions a date different from the provided 'Default date'. Do not ask for confirmation).
+
+Use 1-based indices. If you are unsure, just ask in plain text.`;
 
 const DEFAULT_API_BASE_URL = 'http://localhost:3000/api';
-const AI_CHAT_PATH = '/ai/chat';
-const PLANNER_PATH = '/planner';
+
 const FOODS_PATH = '/foods';
-const getAiEndpoint = () =>
-  `${env.API_BASE_URL || DEFAULT_API_BASE_URL}${AI_CHAT_PATH}`;
-const getPlannerEndpoint = (mealPlanId: string, suffix: string) =>
-  `${env.API_BASE_URL || DEFAULT_API_BASE_URL}${PLANNER_PATH}/${mealPlanId}${suffix}`;
+const getAiEndpoint = () => env.AI_SERVICE_URL;
 const getFoodEndpoint = (foodId: string) =>
   `${env.API_BASE_URL || DEFAULT_API_BASE_URL}${FOODS_PATH}/${foodId}`;
-
-const buildMealContext = (
-  mealPlanDay: MealPlanDay | undefined,
-  mealDate: string,
-) => {
-  const mealItems = mealPlanDay?.mealItems ?? {
-    breakfast: [],
-    lunch: [],
-    dinner: [],
-  };
-
-  return {
-    mealDate: mealPlanDay?.mealDate ?? mealDate,
-    meals: {
-      breakfast: mealItems.breakfast.map((meal, index) => ({
-        index: index + 1,
-        name: meal.foodId.name,
-      })),
-      lunch: mealItems.lunch.map((meal, index) => ({
-        index: index + 1,
-        name: meal.foodId.name,
-      })),
-      dinner: mealItems.dinner.map((meal, index) => ({
-        index: index + 1,
-        name: meal.foodId.name,
-      })),
-    },
-  };
-};
 
 const isMealType = (value: unknown): value is MealType =>
   value === 'breakfast' || value === 'lunch' || value === 'dinner';
 
 const toNumber = (value: unknown) =>
   typeof value === 'number' ? value : Number(value);
+
+const convertFrontendCommandToMealAction = (
+  parsed: unknown,
+): MealAction | null => {
+  const p = parsed as {
+    type: string;
+    action: string;
+    params?: Record<string, unknown>;
+  };
+  if (p.type !== 'FRONTEND_COMMAND') return null;
+  const action = p.action;
+
+  const params = (p.params || {}) as ChatbotCommandParams;
+
+  if (action === 'add_to_grocery') {
+    return { type: 'add_to_grocery', ingredients: params.ingredients ?? [] };
+  }
+  if (action === 'reorder' && isMealType(params.mealType)) {
+    return {
+      type: 'reorder',
+      mealDate: params.mealDate,
+      mealType: String(params.mealType).toLowerCase() as MealType,
+      fromIndex: toNumber(params.fromIndex) || toNumber(params.newOrder?.[0]),
+      toIndex: toNumber(params.toIndex) || toNumber(params.newOrder?.[1]),
+    };
+  }
+  if (action === 'replace_food') {
+    return {
+      type: 'replace_food',
+      mealDate: params.mealDate,
+      mealType: String(params.mealType).toLowerCase() as MealType,
+      targetIndex: toNumber(params.targetIndex),
+      replacementQuery: params.replacementQuery,
+      limit: params.limit !== undefined ? toNumber(params.limit) : undefined,
+      tolerance:
+        params.tolerance !== undefined ? Number(params.tolerance) : undefined,
+      autoPick: params.autoPick,
+      filters: params.filters,
+    };
+  }
+  if (action === 'food_info') {
+    return {
+      type: 'food_info',
+      mealDate: params.mealDate,
+      mealType: params.mealType as MealType,
+      targetIndex: toNumber(params.targetIndex),
+    };
+  }
+  // NEW: Support swap_food (mapped to replace_food logic)
+  if (action === 'swap_food') {
+    // If we have strict from/to, we can treat it as replace_food.
+    // If targetIndex is missing (which is likely from LLM),
+    // we need to set a flag or special property to let handleMealAction infer it.
+    // We'll reuse 'replace_food' but maybe pass filter data.
+    return {
+      type: 'replace_food',
+      mealDate: params.mealDate,
+      mealType: String(params.mealType).toLowerCase() as MealType,
+      targetIndex: toNumber(params.targetIndex), // Might be NaN
+      replacementQuery: params.to, // "to" becomes the search query
+      // Store "from" name to find index if necessary
+      filters: {
+        q: params.to,
+        fromName: params.from,
+      } as unknown as SwapModalFilters,
+    };
+  }
+
+  return null;
+};
 
 const parseMealAction = (rawText: string): MealAction => {
   if (!rawText) {
@@ -249,10 +337,11 @@ const parseMealAction = (rawText: string): MealAction => {
   }
 
   const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+  // If no JSON found, or if the text is primarily a message, treat as plain text.
   if (!jsonMatch) {
     return {
       type: 'message',
-      text: 'Mình chưa hiểu yêu cầu. Bạn có thể nói rõ món và vị trí không?',
+      text: rawText,
     };
   }
 
@@ -350,10 +439,27 @@ const parseMealAction = (rawText: string): MealAction => {
         targetIndex,
       };
     }
+
+    if (parsed.type === 'FRONTEND_COMMAND') {
+      const converted = convertFrontendCommandToMealAction(parsed);
+      if (converted) return converted;
+    }
+
+    if (
+      parsed.type === 'get_meal_plan' &&
+      typeof parsed.mealDate === 'string'
+    ) {
+      return {
+        type: 'get_meal_plan',
+        mealDate: parsed.mealDate,
+      };
+    }
   } catch {
+    // If JSON parsing fails, assume it might be a text message that happens to have braces
+    // or malformed JSON. We fallback to returning the raw text.
     return {
       type: 'message',
-      text: 'Mình gặp lỗi khi đọc phản hồi. Bạn thử lại với câu ngắn hơn nhé.',
+      text: rawText,
     };
   }
 
@@ -393,52 +499,6 @@ const inferSwapFiltersFromText = (text: string): SwapModalFilters => {
   }
 
   return filters;
-};
-
-const readEventStream = async (response: Response) => {
-  if (!response.body) return '';
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-  let fullText = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    buffer += decoder.decode(value, { stream: true });
-
-    while (true) {
-      const lineEnd = buffer.indexOf('\n');
-      if (lineEnd === -1) break;
-
-      const line = buffer.slice(0, lineEnd).trim();
-      buffer = buffer.slice(lineEnd + 1);
-
-      if (!line.startsWith('data:')) continue;
-      const payload = line.slice(5).trim();
-
-      if (payload === '[DONE]') {
-        return fullText;
-      }
-
-      try {
-        const json = JSON.parse(payload);
-        const delta =
-          json?.choices?.[0]?.delta?.content ??
-          json?.choices?.[0]?.message?.content ??
-          '';
-        if (typeof delta === 'string') {
-          fullText += delta;
-        }
-      } catch {
-        // Ignore invalid chunks.
-      }
-    }
-  }
-
-  return fullText;
 };
 
 const MAX_HISTORY = 6;
@@ -544,22 +604,86 @@ const BotResultDurationMs = 2400;
 
 type AssistantAnimationState = 'hello' | 'sad' | 'idle' | 'done' | 'neutral';
 
-const MealPlanChatbot: React.FC = () => {
+type MealPlanChatbotProps = {
+  embedded?: boolean;
+  initialMessage?: string | null;
+  headerless?: boolean;
+  resetNonce?: number | null;
+  hideComposer?: boolean;
+  externalMessage?: string | null;
+  sendNonce?: number | null;
+  onBack?: () => void;
+};
+
+type StreamEvent =
+  | { status: 'thinking'; message: string }
+  | { status: 'token'; content: string }
+  | { status: 'done'; commands?: unknown[] }
+  | { status: 'error'; message: string };
+
+async function readNDJSONStream(
+  response: Response,
+  onEvent: (event: StreamEvent) => void,
+): Promise<string> {
+  const reader = response.body?.getReader();
+  if (!reader) return '';
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let finalContent = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try {
+        const event = JSON.parse(line);
+        onEvent(event);
+        if (event.status === 'token' && event.content) {
+          finalContent += event.content;
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }
+  return finalContent;
+}
+
+const MealPlanChatbot: React.FC<MealPlanChatbotProps> = ({
+  embedded = false,
+  initialMessage = null,
+  headerless = false,
+  resetNonce = null,
+  hideComposer = false,
+  externalMessage = null,
+  sendNonce = null,
+  onBack,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [preferredLanguage, setPreferredLanguage] = useState<Language>(() =>
-    getInitialLanguage(),
-  );
-  const [messages, setMessages] = useState<ChatMessage[]>(() =>
-    createInitialMessages(getInitialLanguage()),
-  );
+  const {
+    messages,
+    setMessages,
+    preferredLanguage,
+    setPreferredLanguage,
+    handleNewChat: resetChatContext,
+  } = useChatContext();
+
+  // sessionStorage logic removed as per user request to clear only on F5 (Context handles this)
+
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const panelVisible = isOpen || isClosing;
+  const lastInitialMessageRef = useRef<string | null>(null);
+  const panelVisible = embedded ? true : isOpen || isClosing;
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [pendingSwap, setPendingSwap] = useState<PendingSwap | null>(null);
-  const [avatarLoaded, setAvatarLoaded] = useState(false);
+  const avatarLoaded = true;
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [undoStack, setUndoStack] = useState<UndoEntry[]>([]);
   const [closeCount, setCloseCount] = useState(0);
@@ -568,11 +692,22 @@ const MealPlanChatbot: React.FC = () => {
   );
   const [assistantAnimation, setAssistantAnimation] =
     useState<AssistantAnimationState>('idle');
+  const [streamingReply, setStreamingReply] = useState<string>('');
+  const [thinkingMessage, setThinkingMessage] = useState<string | null>(null);
+
+  const lastResetNonceRef = useRef<number | null>(resetNonce);
+  const lastSendNonceRef = useRef<number | null>(null);
 
   const { selectedDate } = useDate();
   const { viewingMealPlans } = useSelector(mealPlanSelector);
   const dispatch = useDispatch();
   const [updateMealPlan] = useUpdateMealPlanMutation();
+  const [getMealPlanSingleDay] = useLazyGetMealPlanSingleDayQuery();
+  const navigate = useNavigate();
+  // const location = useLocation();
+  const [upsertPantryItem] = useUpsertPantryItemMutation();
+  const [getSwapOptions] = useGetSwapOptionsMutation();
+  const [applySwap] = useApplySwapMutation();
 
   const defaultMealDate = useMemo(
     () => getMealDate(selectedDate),
@@ -591,7 +726,7 @@ const MealPlanChatbot: React.FC = () => {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading, isOpen]);
+  }, [messages, isLoading, isOpen, streamingReply]);
 
   useEffect(() => {
     if (botAnimationTimerRef.current) {
@@ -683,6 +818,52 @@ const MealPlanChatbot: React.FC = () => {
     }, BotHelloDurationMs);
   }, [isOpen]);
 
+  const handleOpenChat = useCallback(() => {
+    if (isOpen) return;
+
+    if (botAnimationTimerRef.current) {
+      clearTimeout(botAnimationTimerRef.current);
+      botAnimationTimerRef.current = null;
+    }
+
+    setIsClosing(false);
+    setIsOpen(true);
+
+    setAssistantAnimation('hello');
+    botAnimationTimerRef.current = setTimeout(() => {
+      setAssistantAnimation('idle');
+      botAnimationTimerRef.current = null;
+    }, BotHelloDurationMs);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (embedded) return;
+    const handleOpen = (e?: Event) => {
+      const detail = (e as CustomEvent | undefined)?.detail as
+        | { message?: string }
+        | undefined;
+      handleOpenChat();
+      const msg = detail?.message;
+      // message will be handled once `handleSend` is available
+      if (msg) {
+        // store pending message on window so the later listener can pick it up
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (window as unknown as Record<string, any>).npPendingChatMessage = msg;
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    window.addEventListener('np:open-chatbot', handleOpen as EventListener);
+    return () =>
+      window.removeEventListener(
+        'np:open-chatbot',
+        handleOpen as EventListener,
+      );
+  }, [embedded, handleOpenChat]);
+
   const pushUndoEntry = useCallback((entry: UndoEntry) => {
     setUndoStack((prev) => {
       const next = [...prev, entry];
@@ -695,15 +876,15 @@ const MealPlanChatbot: React.FC = () => {
       userMessage: string,
       history: AiChatMessage[],
       pendingSwapState: PendingSwap | null,
+      onStream?: (event: StreamEvent) => void,
+      contextDate?: string,
     ): Promise<MealAction> => {
-      const mealPlanDay = findMealPlanDay(defaultMealDate);
-      const context = buildMealContext(mealPlanDay, defaultMealDate);
+      const targetDate = contextDate ?? defaultMealDate;
+      // Removed automatic context injection as per user request to use Backend Fetching.
       const pendingInfo = formatPendingSwapOptions(pendingSwapState);
       const recentChanges = buildRecentChangesContext(undoStack);
       const systemPrompt = buildSystemPrompt(preferredLanguage);
-      const prompt = `Default date: ${defaultMealDate}
-Current meals (1-based index):
-${JSON.stringify(context, null, 2)}
+      const prompt = `Date context: ${targetDate}
 ${pendingInfo ? `${pendingInfo}\n` : ''}${recentChanges ? `${recentChanges}\n` : ''}
 Request: ${userMessage}`;
       const messagesPayload: AiChatMessage[] = [
@@ -712,13 +893,23 @@ Request: ${userMessage}`;
         { role: 'user', content: prompt },
       ];
 
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      try {
+        const storedToken = localStorage.getItem('accessToken');
+        if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+      } catch {
+        // ignore
+      }
+
       const response = await fetch(getAiEndpoint(), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers,
+        credentials: 'include', // Send cookies for cross-origin requests
         body: JSON.stringify({
           messages: messagesPayload,
-          temperature: 0.2,
+          temperature: 0.2, // Low temp for actions
           top_p: 1,
           stream: true,
         }),
@@ -728,18 +919,20 @@ Request: ${userMessage}`;
         throw new Error(`AI API error: ${response.status}`);
       }
 
-      const contentType = response.headers.get('content-type') ?? '';
-      let content = '';
-      if (contentType.includes('text/event-stream')) {
-        content = await readEventStream(response);
-      } else {
-        const data = await response.json();
-        content = data?.content ?? data?.data?.content ?? '';
-      }
+      await readNDJSONStream(response, (event) => {
+        onStream?.(event);
+      });
 
-      return parseMealAction(content);
+      // The 'done' event or accumulated tokens don't directly return the final command object here.
+      // We rely on 'done' event usually containing the commands which we need to grab.
+      // But readNDJSONStream returns the full text content.
+      // We need to parse that content.
+      // Wait, my readNDJSONStream implementation returns finalContent (string).
+      // So I can just parse that.
+
+      return { type: 'message', text: '' }; // Dummy return, logic handled in handleSend's callback accumulation
     },
-    [defaultMealDate, findMealPlanDay],
+    [defaultMealDate, preferredLanguage, undoStack],
   );
 
   const triggerFlash = useCallback(
@@ -779,50 +972,51 @@ Request: ${userMessage}`;
       targetIndex: number,
       limit?: number,
       tolerance?: number,
+      filters?: SwapModalFilters,
     ) => {
       const targetItem = mealPlanDay.mealItems[mealType][targetIndex];
       if (!targetItem) {
         throw new Error('Target item not found');
       }
 
-      const payload: Record<string, unknown> = {
+      const payload: SwapOptionsRequest = {
         swapType: 'food',
         mealType,
-        targetFoodId: targetItem.foodId?._id,
+        targetFoodId:
+          typeof targetItem.foodId === 'string'
+            ? targetItem.foodId
+            : targetItem.foodId?._id,
         targetItemId: targetItem._id,
       };
       if (typeof limit === 'number' && !Number.isNaN(limit)) {
         payload.limit = limit;
+      } else {
+        payload.limit = 20;
       }
       if (typeof tolerance === 'number' && !Number.isNaN(tolerance)) {
         payload.tolerance = tolerance;
+      } else {
+        payload.tolerance = 0.2;
       }
 
-      const response = await fetch(
-        getPlannerEndpoint(mealPlanDay._id, '/swap-options'),
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`Swap options error: ${response.status}`);
+      if (filters?.q) {
+        payload.filters = { q: filters.q };
       }
 
-      const data = await response.json();
-      if (!data?.success || !data?.data) {
-        throw new Error(data?.message || 'Swap options failed');
-      }
+      const data = await getSwapOptions({
+        mealPlanId: mealPlanDay._id,
+        payload,
+      }).unwrap();
+      // Handle case where transformResponse doesn't unwrap the API wrapper
+      const swapData =
+        (data as unknown as { data?: ChatbotSwapOptionsResponse }).data ?? data;
 
       return {
-        swapOptions: data.data as ChatbotSwapOptionsResponse,
+        swapOptions: swapData as ChatbotSwapOptionsResponse,
         targetItemId: targetItem._id,
       };
     },
-    [],
+    [getSwapOptions],
   );
 
   const applySwapOption = useCallback(
@@ -855,37 +1049,26 @@ Request: ${userMessage}`;
         ]);
         return;
       }
-      const replacement: Record<string, unknown> = { foodId: option.foodId };
+      const replacement: { foodId: string; amount?: number; unit?: number } = {
+        foodId: option.foodId,
+      };
       if (option.amount !== undefined) replacement.amount = option.amount;
       if (option.unit !== undefined) replacement.unit = option.unit;
 
       try {
         const previousState = findMealPlanDay(swapState.mealDate);
-        const response = await fetch(
-          getPlannerEndpoint(swapState.mealPlanId, '/swap'),
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-              swapType: 'food',
-              mealType: swapState.mealType,
-              targetItemId: swapState.targetItemId,
-              replacement,
-            }),
+
+        const data = await applySwap({
+          mealPlanId: swapState.mealPlanId,
+          payload: {
+            swapType: 'food',
+            mealType: swapState.mealType,
+            targetItemId: swapState.targetItemId,
+            replacement,
           },
-        );
+        }).unwrap();
 
-        if (!response.ok) {
-          throw new Error(`Swap apply error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (!data?.success || !data?.data) {
-          throw new Error(data?.message || 'Swap apply failed');
-        }
-
-        applyMealPlanFromServer(data.data);
+        applyMealPlanFromServer(data);
         if (swapState.targetItemId) {
           triggerFlash([swapState.targetItemId]);
         }
@@ -931,9 +1114,11 @@ Request: ${userMessage}`;
     },
     [
       applyMealPlanFromServer,
+      applySwap,
       findMealPlanDay,
       preferredLanguage,
       pushUndoEntry,
+      setMessages,
       triggerFlash,
     ],
   );
@@ -1247,11 +1432,19 @@ Request: ${userMessage}`;
         ]);
       }
     },
-    [dispatch, findMealPlanDay, pushUndoEntry, triggerFlash, updateMealPlan],
+    [
+      dispatch,
+      findMealPlanDay,
+      pushUndoEntry,
+      setMessages,
+      triggerFlash,
+      updateMealPlan,
+    ],
   );
 
   const handleMealAction = useCallback(
     async (action: MealAction) => {
+      // --- 1. Global Actions ---
       if (action.type === 'message') {
         setMessages((prev) => [
           ...prev,
@@ -1260,14 +1453,60 @@ Request: ${userMessage}`;
         return;
       }
 
-      if (action.type === 'apply_swap_option') {
-        if (!pendingSwap) {
+      if (action.type === 'add_to_grocery') {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              preferredLanguage === 'vi'
+                ? 'Đang thêm vào danh sách đi chợ...'
+                : 'Adding to grocery list...',
+          },
+        ]);
+
+        try {
+          // Add all ingredients
+          const promises = action.ingredients.map((ing) =>
+            upsertPantryItem({
+              name: ing.name,
+              quantity: ing.quantity || 1,
+              unit: ing.unit || 'serving',
+              status: 'need_buy',
+            }).unwrap(),
+          );
+          await Promise.all(promises);
+
           setMessages((prev) => [
             ...prev,
             {
               role: 'assistant',
-              content: 'No pending options to apply.',
+              content:
+                preferredLanguage === 'vi'
+                  ? 'Đã thêm thành công!'
+                  : 'Added successfully!',
             },
+          ]);
+        } catch {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content:
+                preferredLanguage === 'vi'
+                  ? 'Có lỗi khi thêm vào giỏ.'
+                  : 'Error adding to grocery list.',
+            },
+          ]);
+        }
+        return;
+      }
+
+      if (action.type === 'apply_swap_option') {
+        if (!pendingSwap) {
+          setMessages((prev) => [
+            ...prev,
+            { role: 'assistant', content: 'No pending options to apply.' },
           ]);
           return;
         }
@@ -1275,7 +1514,62 @@ Request: ${userMessage}`;
         return;
       }
 
-      const mealDate = action.mealDate ?? defaultMealDate;
+      if (action.type === 'get_meal_plan') {
+        try {
+          await getMealPlanSingleDay({ date: action.mealDate }).unwrap();
+        } catch {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content:
+                preferredLanguage === 'vi'
+                  ? `Không thể tải dữ liệu ngày ${action.mealDate}.`
+                  : `Could not load meal plan for ${action.mealDate}.`,
+            },
+          ]);
+          return;
+        }
+
+        const latestUserText =
+          [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
+
+        if (!latestUserText) return;
+
+        try {
+          const history = buildChatHistory(messages, MAX_HISTORY);
+          const nextAction = await requestMarketplaceAction(
+            latestUserText,
+            history,
+            pendingSwap,
+            (event: StreamEvent) => {
+              if (event.status === 'token' && event.content) {
+                setStreamingReply((prev) => prev + event.content);
+              }
+            },
+            action.mealDate,
+          );
+
+          setStreamingReply('');
+          await handleMealAction(nextAction);
+        } catch {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content:
+                preferredLanguage === 'vi'
+                  ? 'Mình gặp lỗi khi phân tích lại. Bạn thử lại nhé.'
+                  : 'Error re-processing request. Please try again.',
+            },
+          ]);
+        }
+        return;
+      }
+
+      // --- 2. Meal Plan Specific Actions ---
+      const mealDate =
+        ('mealDate' in action ? action.mealDate : undefined) ?? defaultMealDate;
       const mealPlanDay = findMealPlanDay(mealDate);
 
       if (!mealPlanDay) {
@@ -1342,7 +1636,26 @@ Request: ${userMessage}`;
 
       if (action.type === 'replace_food') {
         const items = mealPlanDay.mealItems[action.mealType];
-        const targetIndex = action.targetIndex - 1;
+        let targetIndex = action.targetIndex - 1;
+
+        // Try to infer index from name if invalid (critical for LLM swap_food)
+        if (
+          !Number.isInteger(targetIndex) ||
+          targetIndex < 0 ||
+          targetIndex >= items.length
+        ) {
+          const fromName = (action.filters as { fromName?: unknown })?.fromName;
+          if (fromName && typeof fromName === 'string') {
+            const lowerFrom = fromName.toLowerCase();
+            const foundIndex = items.findIndex((item) =>
+              item.foodId?.name?.toLowerCase().includes(lowerFrom),
+            );
+            if (foundIndex !== -1) {
+              targetIndex = foundIndex;
+            }
+          }
+        }
+
         if (
           !Number.isInteger(targetIndex) ||
           targetIndex < 0 ||
@@ -1352,7 +1665,7 @@ Request: ${userMessage}`;
             ...prev,
             {
               role: 'assistant',
-              content: 'Food index is not valid.',
+              content: 'Food index is not valid or could not be found.',
             },
           ]);
           return;
@@ -1392,6 +1705,7 @@ Request: ${userMessage}`;
             targetIndex,
             action.limit,
             action.tolerance,
+            mergedFilters,
           );
 
           if (!swapOptions.options?.length) {
@@ -1650,120 +1964,412 @@ Request: ${userMessage}`;
       buildFoodInfoMessage,
       commitMealPlanUpdate,
       defaultMealDate,
+      dispatch,
+      fetchDetailedFood,
+      fetchExternalFoodFacts,
       fetchSwapOptions,
       findMealPlanDay,
+      getMealPlanSingleDay, // Added
+      messages,
       pendingSwap,
+      preferredLanguage,
+      requestMarketplaceAction, // Added
+      setMessages, // Added
+      upsertPantryItem, // Added
     ],
   );
 
-  const handleSend = useCallback(async () => {
-    const trimmed = input.trim();
-    if (!trimmed || isLoading) return;
+  const handleSend = useCallback(
+    async (overrideInput?: string) => {
+      const source = overrideInput ?? input;
+      const trimmed = source.trim();
+      if (!trimmed || isLoading) return;
 
-    const detected = detectLanguage(trimmed);
-    setPreferredLanguage(detected);
+      const detected = detectLanguage(trimmed);
+      setPreferredLanguage(detected);
 
-    if (isRevertCommand(trimmed)) {
-      const steps = parseRevertSteps(trimmed);
-      setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
-      setInput('');
-      setIsLoading(true);
-      try {
-        let lastEntry: UndoEntry | undefined;
-        setUndoStack((prev) => {
-          const next = [...prev];
-          for (let i = 0; i < steps; i += 1) {
-            lastEntry = next.pop();
+      if (isRevertCommand(trimmed)) {
+        const steps = parseRevertSteps(trimmed);
+        setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
+        setInput('');
+        setIsLoading(true);
+        try {
+          let lastEntry: UndoEntry | undefined;
+          setUndoStack((prev) => {
+            const next = [...prev];
+            for (let i = 0; i < steps; i += 1) {
+              lastEntry = next.pop();
+            }
+            return next;
+          });
+
+          if (!lastEntry) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content:
+                  detected === 'vi'
+                    ? 'Hiện chưa có thay đổi nào để hoàn tác.'
+                    : 'There is no recent change to undo.',
+              },
+            ]);
+            return;
           }
-          return next;
-        });
 
-        if (!lastEntry) {
+          await commitMealPlanUpdate(
+            lastEntry.mealDate,
+            lastEntry.previousMealPlanDay,
+            detected === 'vi'
+              ? 'Đã hoàn tác thay đổi gần nhất.'
+              : 'Undid the most recent change.',
+            undefined,
+            false,
+          );
+        } finally {
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      const optionIndex = pendingSwap ? parseOptionSelection(trimmed) : null;
+      if (pendingSwap && optionIndex) {
+        setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
+        setInput('');
+        setIsLoading(true);
+        try {
+          await applySwapOption(pendingSwap, optionIndex);
+        } finally {
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      const history = buildChatHistory(messages, MAX_HISTORY);
+
+      setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
+      if (!overrideInput) setInput('');
+      setIsLoading(true);
+      setStreamingReply('');
+
+      try {
+        let fullContent = '';
+        let finalCommands: unknown[] = [];
+
+        await requestMarketplaceAction(
+          trimmed,
+          history,
+          pendingSwap,
+          (event) => {
+            if (event.status === 'thinking') {
+              setThinkingMessage(event.message);
+            } else if (event.status === 'token') {
+              setThinkingMessage(null); // Clear thinking when tokens start
+              fullContent += event.content;
+              setStreamingReply((prev) => prev + event.content);
+            } else if (event.status === 'done') {
+              finalCommands = event.commands || [];
+            }
+          },
+        );
+
+        // setStreamingReply(''); // Keep it visible until we process actions or finalize
+        // If we have commands, we should process them.
+        // If just text, it's already in streamingReply.
+        // We need to convert this to MealAction to match handleMealAction expectation,
+        // OR refactor handleMealAction to take the new structure.
+        // Easiest is to reconstruct a MealAction.
+
+        // If commands exist, execute them.
+        if (finalCommands.length > 0) {
+          // Assuming priority to the first command if multiple for now,
+          // or we can handle multiple.
+          // Existing logic expects one MealAction.
+          // Let's take the first one and treat others? Or sequentially.
+          // For now, let's just handle the first one + text message.
+
+          // Actually, if there is text (fullContent), we should add it as a message.
+          if (fullContent) {
+            setMessages((prev) => [
+              ...prev,
+              { role: 'assistant', content: fullContent },
+            ]);
+            setStreamingReply('');
+          }
+
+          for (const cmd of finalCommands) {
+            let actionToRun = cmd as MealAction;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if ((cmd as any).type === 'FRONTEND_COMMAND') {
+              actionToRun = convertFrontendCommandToMealAction(
+                cmd,
+              ) as MealAction;
+            }
+            if (actionToRun) await handleMealAction(actionToRun);
+          }
+        } else {
+          // No explicit commands from stream events.
+          // Try to parse the text content as a JSON command (fallback).
+          const fallbackAction = parseMealAction(fullContent);
+
+          if (fallbackAction.type !== 'message') {
+            await handleMealAction(fallbackAction);
+            // Optionally add a small confirmation message if needed,
+            // but usually the action itself provides feedback or UI updates.
+            // If we want to show the reasoning text if mixed?
+            // The parser extracts JSON. If the intent was purely JSON, we don't show text.
+          } else {
+            // It's just a message (or failed to parse as JSON)
+            setMessages((prev) => [
+              ...prev,
+              { role: 'assistant', content: fullContent },
+            ]);
+          }
+          setStreamingReply('');
+        }
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              detected === 'vi'
+                ? 'Mình gặp lỗi khi gọi trợ lý AI. Bạn thử lại giúp mình nhé.'
+                : 'AI request failed. Please try again.',
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      applySwapOption,
+      handleMealAction,
+      input,
+      isLoading,
+      messages,
+      pendingSwap,
+      requestMarketplaceAction,
+      commitMealPlanUpdate,
+      setMessages,
+      setPreferredLanguage,
+    ],
+  );
+
+  // Handle action button clicks from markdown links like #action:type:param1:param2
+  const handleActionClick = useCallback(
+    async (actionType: string, ...params: string[]) => {
+      // swap_with: open swap modal with search query pre-filled
+      // Format: #action:swap_with:mealType:FoodName
+      if (actionType === 'swap_with') {
+        const [mealType, ...foodNameParts] = params;
+        const searchQuery = foodNameParts.join(':'); // In case food name has colons
+        const mealPlanDay = findMealPlanDay(defaultMealDate);
+        if (mealPlanDay && mealType) {
+          const items = mealPlanDay.mealItems[mealType as MealType];
+          if (items && items.length > 0) {
+            const targetItem = items[0];
+            // Set swap modal data with search filter
+            dispatch(
+              openSwapModal({
+                swapType: 'food',
+                mealPlanId: mealPlanDay._id,
+                mealDate: defaultMealDate,
+                mealType: mealType as MealType,
+                targetItemId: targetItem._id,
+                targetFoodId: targetItem.foodId?._id,
+                filters: { q: searchQuery },
+              }),
+            );
+            dispatch(setSwapModalFilters({ filters: { q: searchQuery } }));
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content:
+                  preferredLanguage === 'vi'
+                    ? `Đã mở panel swap với tìm kiếm "${searchQuery}". Bạn có thể chọn món thay thế.`
+                    : `Opened swap panel with search "${searchQuery}". You can choose a replacement.`,
+              },
+            ]);
+          } else {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content:
+                  preferredLanguage === 'vi'
+                    ? `Không có món nào trong ${mealType} để swap.`
+                    : `No items in ${mealType} to swap.`,
+              },
+            ]);
+          }
+        }
+        return;
+      }
+
+      if (actionType === 'swap_option' && pendingSwap) {
+        const optionIndex = parseInt(params[0], 10);
+        if (!isNaN(optionIndex)) {
           setMessages((prev) => [
             ...prev,
-            {
-              role: 'assistant',
-              content:
-                detected === 'vi'
-                  ? 'Hiện chưa có thay đổi nào để hoàn tác.'
-                  : 'There is no recent change to undo.',
-            },
+            { role: 'user', content: `Chọn option ${optionIndex}` },
           ]);
-          return;
+          setIsLoading(true);
+          try {
+            await applySwapOption(pendingSwap, optionIndex);
+          } finally {
+            setIsLoading(false);
+          }
         }
+        return;
+      }
 
-        await commitMealPlanUpdate(
-          lastEntry.mealDate,
-          lastEntry.previousMealPlanDay,
-          detected === 'vi'
-            ? 'Đã hoàn tác thay đổi gần nhất.'
-            : 'Undid the most recent change.',
-          undefined,
-          false,
-        );
-      } finally {
-        setIsLoading(false);
+      // open_swap: opens swap panel for the entire meal type
+      if (actionType === 'open_swap') {
+        const mealType = params[0] as MealType;
+        const searchQuery = params.slice(1).join(':'); // Join remaining params as search query
+
+        const mealPlanDay = findMealPlanDay(defaultMealDate);
+        if (mealPlanDay) {
+          const items = mealPlanDay.mealItems[mealType];
+          if (items && items.length > 0) {
+            // Open swap panel for the entire meal type (not just one item)
+            // If searchQuery is provided, set it in filters
+            const filters = searchQuery ? { q: searchQuery } : undefined;
+            if (filters) {
+              dispatch(setSwapModalFilters({ filters }));
+            }
+
+            dispatch(
+              openSwapModal({
+                swapType: 'meal', // 'meal' instead of 'food' to swap entire meal
+                mealPlanId: mealPlanDay._id,
+                mealDate: defaultMealDate,
+                mealType: mealType,
+                filters: filters,
+              }),
+            );
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content:
+                  preferredLanguage === 'vi'
+                    ? `Đã mở panel swap cho bữa ${mealType}${searchQuery ? ` với tìm kiếm "${searchQuery}"` : ''}. Bạn có thể chọn món thay thế.`
+                    : `Opened swap panel for ${mealType}${searchQuery ? ` with search "${searchQuery}"` : ''}. You can browse and choose replacements.`,
+              },
+            ]);
+          } else {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content:
+                  preferredLanguage === 'vi'
+                    ? `Chưa có món nào trong ${mealType} để swap.`
+                    : `No items in ${mealType} to swap yet.`,
+              },
+            ]);
+          }
+        }
+        return;
+      }
+
+      // search_food: opens food dock with search query
+      if (actionType === 'search_food') {
+        const query = params.join(':'); // Rejoin if it was split by colons
+
+        dispatch(setDockSearchQuery(query));
+        dispatch(setIsDockExpanded(true));
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              preferredLanguage === 'vi'
+                ? `Đã mở tìm kiếm món ăn: "${query}".`
+                : `Opened food search for: "${query}".`,
+          },
+        ]);
+        return;
+      }
+
+      // Unknown action
+      // console.warn('[Chatbot] Unknown action type:', actionType);
+    },
+    [
+      applySwapOption,
+      defaultMealDate,
+      dispatch,
+      findMealPlanDay,
+      pendingSwap,
+      preferredLanguage,
+      setMessages,
+    ],
+  );
+
+  useEffect(() => {
+    if (embedded) {
+      const msg = initialMessage?.trim();
+      if (msg && msg !== lastInitialMessageRef.current) {
+        lastInitialMessageRef.current = msg;
+        handleSend(msg);
       }
       return;
     }
-
-    const optionIndex = pendingSwap ? parseOptionSelection(trimmed) : null;
-    if (pendingSwap && optionIndex) {
-      setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
-      setInput('');
-      setIsLoading(true);
-      try {
-        await applySwapOption(pendingSwap, optionIndex);
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-
-    const history = buildChatHistory(messages, MAX_HISTORY);
-
-    setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
-    setInput('');
-    setIsLoading(true);
 
     try {
-      const action = await requestMarketplaceAction(
-        trimmed,
-        history,
-        pendingSwap,
-      );
-      await handleMealAction(action);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pending = (window as unknown as any).npPendingChatMessage as
+        | string
+        | undefined;
+      if (pending) {
+        handleOpenChat();
+        setTimeout(() => {
+          handleSend(pending);
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            delete (window as unknown as any).npPendingChatMessage;
+          } catch {
+            // ignore
+          }
+        }, 50);
+      }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content:
-            detected === 'vi'
-              ? 'Mình gặp lỗi khi gọi trợ lý AI. Bạn thử lại giúp mình nhé.'
-              : 'AI request failed. Please try again.',
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
+      // ignore
     }
-  }, [
-    applySwapOption,
-    handleMealAction,
-    input,
-    isLoading,
-    messages,
-    pendingSwap,
-    requestMarketplaceAction,
-    commitMealPlanUpdate,
-  ]);
+  }, [embedded, handleOpenChat, handleSend, initialMessage]);
 
   const handleNewChat = useCallback(() => {
-    setMessages(createInitialMessages(preferredLanguage));
+    resetChatContext(); // Use context reset
     setInput('');
     setPendingSwap(null);
     setIsLoading(false);
-  }, [preferredLanguage, setInput, setIsLoading, setMessages, setPendingSwap]);
+  }, [resetChatContext, setInput, setIsLoading, setPendingSwap]);
+
+  useEffect(() => {
+    if (!embedded) return;
+    if (resetNonce === null) return;
+    if (lastResetNonceRef.current === resetNonce) return;
+    lastResetNonceRef.current = resetNonce;
+    handleNewChat();
+  }, [embedded, handleNewChat, resetNonce]);
+
+  useEffect(() => {
+    if (!embedded) return;
+    if (sendNonce === null) return;
+    if (lastSendNonceRef.current === sendNonce) return;
+    lastSendNonceRef.current = sendNonce;
+    const msg = externalMessage?.trim();
+    if (!msg) return;
+    handleSend(msg);
+  }, [embedded, externalMessage, handleSend, sendNonce]);
+
+  const handleBack = useCallback(() => {
+    onBack?.();
+  }, [onBack]);
 
   const shouldShowHelpHint = useMemo(() => {
     if (panelVisible) return false;
@@ -1782,47 +2388,6 @@ Request: ${userMessage}`;
     return hints[closeCount % hints.length];
   }, [closeCount, preferredLanguage]);
 
-  const animatedAvatarUrl = useMemo(() => {
-    if (assistantAnimation === 'hello') {
-      return env.NUTRIBOT_HELLO_URL || env.NUTRIBOT_THINKING_URL;
-    }
-    if (assistantAnimation === 'neutral') {
-      return env.NUTRIBOT_NEUTRAL_URL || env.NUTRIBOT_TALKING_URL;
-    }
-    if (assistantAnimation === 'done') {
-      return env.NUTRIBOT_DONE_URL || env.NUTRIBOT_HAPPY_URL;
-    }
-    if (assistantAnimation === 'sad') {
-      return env.NUTRIBOT_SAD_URL;
-    }
-    return env.NUTRIBOT_IDLE_URL;
-  }, [assistantAnimation]);
-
-  useEffect(() => {
-    let canceled = false;
-    const preload = async () => {
-      if (!animatedAvatarUrl) {
-        setAvatarLoaded(true);
-        return;
-      }
-      setAvatarLoaded(false);
-      try {
-        await fetch(animatedAvatarUrl, { mode: 'no-cors' });
-      } catch {
-        // best-effort preload; ignore failures
-      } finally {
-        if (!canceled) {
-          setAvatarLoaded(true);
-        }
-      }
-    };
-
-    preload();
-    return () => {
-      canceled = true;
-    };
-  }, [animatedAvatarUrl]);
-
   const robotMood = useMemo(() => {
     const lastAssistant = [...messages]
       .reverse()
@@ -1839,34 +2404,6 @@ Request: ${userMessage}`;
 
   const NutriBotAvatar = useCallback(
     ({ width, height }: { width: number; height: number }) => {
-      if (
-        typeof animatedAvatarUrl === 'string' &&
-        animatedAvatarUrl.trim().length > 0
-      ) {
-        const shouldLoop =
-          assistantAnimation === 'idle' || assistantAnimation === 'neutral';
-        return (
-          <div
-            className='overflow-hidden rounded-[32px]'
-            style={{ width, height }}
-          >
-            <DotLottieReact
-              key={animatedAvatarUrl}
-              src={animatedAvatarUrl}
-              autoplay
-              loop={shouldLoop}
-              aria-hidden='true'
-              className='block select-none'
-              style={{
-                width,
-                height,
-                objectFit: 'contain',
-              }}
-            />
-          </div>
-        );
-      }
-
       const moodForSvg =
         assistantAnimation === 'done'
           ? 'happy'
@@ -1888,13 +2425,6 @@ Request: ${userMessage}`;
           height={height}
           viewBox='6 2 20 24'
           aria-hidden='true'
-          className={
-            assistantAnimation === 'neutral'
-              ? 'animate-pulse'
-              : assistantAnimation === 'hello'
-                ? 'animate-bounce'
-                : ''
-          }
         >
           <rect
             x='6.5'
@@ -1931,7 +2461,7 @@ Request: ${userMessage}`;
         </svg>
       );
     },
-    [assistantAnimation, robotMood, animatedAvatarUrl],
+    [assistantAnimation, robotMood],
   );
 
   const avatarWidth = isOpen ? AVATAR_WIDTH_OPEN : AVATAR_WIDTH_DEFAULT;
@@ -1944,6 +2474,323 @@ Request: ${userMessage}`;
     open: { opacity: 1, scale: 1.08, y: -6, rotate: -2 },
     hidden: { opacity: 0, scale: 0.9, y: 6 },
   } as const;
+
+  const isEmbeddedHeaderless = embedded && headerless;
+
+  const chatPanel = (
+    <div
+      className={
+        isEmbeddedHeaderless
+          ? 'flex h-full min-h-0 w-full flex-col'
+          : 'flex h-[420px] w-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl'
+      }
+    >
+      {!isEmbeddedHeaderless && (
+        <div className='flex items-center justify-between border-b border-gray-200 px-4 py-3'>
+          <div>
+            <div className='text-xs font-semibold tracking-[0.2em] text-gray-500 uppercase'>
+              Help center
+            </div>
+            <div className='mt-1 text-base font-semibold text-gray-900'>
+              NutriBot
+            </div>
+          </div>
+          <div className='flex items-center gap-2'>
+            <button
+              className='rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-50'
+              onClick={handleNewChat}
+              type='button'
+            >
+              {preferredLanguage === 'vi' ? 'Chat mới' : 'New chat'}
+            </button>
+            {embedded ? (
+              <button
+                className='rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-50'
+                onClick={handleBack}
+                type='button'
+              >
+                {preferredLanguage === 'vi' ? 'Quay lại Help' : 'Back to Help'}
+              </button>
+            ) : (
+              <button
+                className='rounded-full p-2 text-gray-600 hover:bg-gray-100'
+                onClick={handleToggleChat}
+                aria-label='Close chatbot'
+                type='button'
+              >
+                <FaTimes />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className='min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3 text-sm'>
+        {messages.map((message, index) => (
+          <div
+            key={`${message.role}-${index}`}
+            className={`flex ${
+              message.role === 'user' ? 'justify-end' : 'justify-start'
+            }`}
+          >
+            <div
+              className={`max-w-[85%] rounded-2xl px-3 py-2 leading-relaxed ${
+                message.role === 'user'
+                  ? 'bg-primary whitespace-pre-line text-black'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              {message.role === 'assistant' ? (
+                <div className='prose prose-sm max-w-none text-gray-700'>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({ children }) => (
+                        <p className='my-1 leading-relaxed'>{children}</p>
+                      ),
+                      ul: ({ children }) => (
+                        <ul className='my-1 list-disc space-y-1 pl-5'>
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className='my-1 list-decimal space-y-1 pl-5'>
+                          {children}
+                        </ol>
+                      ),
+                      a: ({ children, href }) => {
+                        // Handle action buttons: #action:type:param1:param2:...
+                        if (href?.startsWith('#action:')) {
+                          const decodedHref = decodeURIComponent(href);
+                          const parts = decodedHref.substring(8).split(':'); // Remove '#action:' and split
+                          const [actionType, ...params] = parts;
+                          return (
+                            <button
+                              onClick={() =>
+                                handleActionClick(actionType, ...params)
+                              }
+                              className='bg-primary my-1 mr-2 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-black shadow-sm transition-all hover:bg-emerald-400 hover:shadow-md active:scale-95'
+                            >
+                              {children}
+                            </button>
+                          );
+                        }
+                        // Handle internal navigation links: /page-path
+                        if (href?.startsWith('/')) {
+                          return (
+                            <button
+                              onClick={() => navigate({ to: href })}
+                              className='font-semibold text-emerald-700 underline underline-offset-4 hover:text-emerald-800'
+                            >
+                              {children}
+                            </button>
+                          );
+                        }
+                        // External links
+                        return (
+                          <a
+                            href={href}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='font-semibold text-emerald-700 underline-offset-4 hover:underline'
+                          >
+                            {children}
+                          </a>
+                        );
+                      },
+                      h1: ({ children }) => (
+                        <h3 className='my-2 text-sm font-semibold'>
+                          {children}
+                        </h3>
+                      ),
+                      h2: ({ children }) => (
+                        <h4 className='my-2 text-sm font-semibold'>
+                          {children}
+                        </h4>
+                      ),
+                      h3: ({ children }) => (
+                        <h5 className='my-2 text-sm font-semibold'>
+                          {children}
+                        </h5>
+                      ),
+                      code: ({ children }) => (
+                        <code className='rounded bg-gray-200 px-1 py-0.5 text-xs'>
+                          {children}
+                        </code>
+                      ),
+                    }}
+                  >
+                    {(() => {
+                      // Normalize content to prevent broken links due to newlines and spaces
+                      // 1. Fix broken links: [Text] \n (#action) -> [Text](#action)
+                      // 2. Encode spaces in action URLs: (#action:foo bar) -> (#action:foo%20bar)
+                      // 3. Hide JSON commands: {"type": "..."}
+                      const normalizedContent = message.content
+                        .replace(/\]\s+\(#action/g, '](#action')
+                        .replace(/\(#action:[^)]+\)/g, (match) =>
+                          match.replace(/ /g, '%20'),
+                        )
+                        .replace(/\{"type":"[^"]+".*?\}/g, '');
+                      return normalizedContent;
+                    })()}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                message.content
+              )}
+            </div>
+          </div>
+        ))}
+
+        {streamingReply && (
+          <div className='flex justify-start'>
+            <div className='max-w-[85%] rounded-2xl bg-gray-100 px-3 py-2 leading-relaxed'>
+              <div className='prose prose-sm max-w-none'>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    p: ({ children }) => (
+                      <p className='my-1 leading-relaxed'>{children}</p>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className='my-1 list-disc space-y-1 pl-5'>
+                        {children}
+                      </ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className='my-1 list-decimal space-y-1 pl-5'>
+                        {children}
+                      </ol>
+                    ),
+                    a: ({ children, href }) => {
+                      // Handle action buttons: #action:type:param1:param2:...
+                      if (href?.startsWith('#action:')) {
+                        const decodedHref = decodeURIComponent(href);
+                        const parts = decodedHref.substring(8).split(':'); // Remove '#action:' and split
+                        const [actionType, ...params] = parts;
+                        return (
+                          <button
+                            onClick={() =>
+                              handleActionClick(actionType, ...params)
+                            }
+                            className='bg-primary my-1 mr-2 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-black shadow-sm transition-all hover:bg-emerald-400 hover:shadow-md active:scale-95'
+                          >
+                            {children}
+                          </button>
+                        );
+                      }
+                      // Handle internal navigation links: /page-path
+                      if (href?.startsWith('/')) {
+                        return (
+                          <button
+                            onClick={() => navigate({ to: href })}
+                            className='font-semibold text-emerald-700 underline underline-offset-4 hover:text-emerald-800'
+                          >
+                            {children}
+                          </button>
+                        );
+                      }
+                      // External links
+                      return (
+                        <a
+                          href={href}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='font-semibold text-emerald-700 underline-offset-4 hover:underline'
+                        >
+                          {children}
+                        </a>
+                      );
+                    },
+                    h1: ({ children }) => (
+                      <h3 className='my-2 text-sm font-semibold'>{children}</h3>
+                    ),
+                    h2: ({ children }) => (
+                      <h4 className='my-2 text-sm font-semibold'>{children}</h4>
+                    ),
+                    h3: ({ children }) => (
+                      <h5 className='my-2 text-sm font-semibold'>{children}</h5>
+                    ),
+                    code: ({ children }) => (
+                      <code className='rounded bg-gray-200 px-1 py-0.5 text-xs'>
+                        {children}
+                      </code>
+                    ),
+                  }}
+                >
+                  {(() => {
+                    const normalizedContent = streamingReply
+                      .replace(/\]\s+\(#action/g, '](#action')
+                      .replace(/\(#action:[^)]+\)/g, (match) =>
+                        match.replace(/ /g, '%20'),
+                      )
+                      .replace(/\{"type":"[^"]+".*?\}/g, '');
+                    return normalizedContent;
+                  })()}
+                </ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {thinkingMessage && (
+          <div className='mb-2 flex justify-start px-4'>
+            <style>{shimmerStyles}</style>
+            <div className='flex items-center gap-2 text-xs'>
+              <FaSpinner className='animate-spin text-emerald-500' />
+              <span className='shimmer-text font-medium'>
+                {thinkingMessage}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {isLoading && !streamingReply && !thinkingMessage && (
+          <div className='text-xs text-gray-500'>
+            {preferredLanguage === 'vi' ? 'Đang xử lý...' : 'Processing...'}
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {!hideComposer && (
+        <div className='border-t border-gray-200 px-3 py-3'>
+          <div className='flex items-end gap-2'>
+            <textarea
+              rows={2}
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  handleSend();
+                }
+              }}
+              className='focus:border-primary-400 flex-1 resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none'
+              placeholder={
+                preferredLanguage === 'vi'
+                  ? 'Ví dụ: Đổi món 1 và 3 trong bữa sáng hôm nay'
+                  : 'Example: Swap item 1 and 3 in today breakfast'
+              }
+            />
+            <button
+              className='bg-primary flex h-10 w-10 items-center justify-center rounded-full text-black disabled:cursor-not-allowed disabled:bg-gray-200'
+              onClick={() => handleSend()}
+              type='button'
+              aria-label='Send'
+              disabled={!input.trim() || isLoading}
+            >
+              <FaPaperPlane />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  if (embedded) {
+    return <div className='h-full min-h-0 w-full'>{chatPanel}</div>;
+  }
 
   return (
     <div className='fixed right-6 bottom-6 z-[70] flex flex-col items-end gap-1'>
@@ -1968,89 +2815,9 @@ Request: ${userMessage}`;
             pointerEvents: isOpen ? 'auto' : 'none',
           }}
           transition={{ duration: 0.24 }}
-          className='flex h-[420px] w-[360px] max-w-[90vw] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl'
+          className='w-[360px] max-w-[90vw]'
         >
-          <div className='bg-primary-100 flex items-center justify-between border-b border-gray-200 px-4 py-3'>
-            <div className='flex items-center gap-2 text-sm font-bold text-gray-800'>
-              NutriBot
-            </div>
-            <div className='flex items-center gap-2'>
-              <button
-                className='rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-50'
-                onClick={handleNewChat}
-                type='button'
-              >
-                {preferredLanguage === 'vi' ? 'Chat mới' : 'New chat'}
-              </button>
-              <button
-                className='rounded-full p-2 text-gray-600 hover:bg-gray-100'
-                onClick={handleToggleChat}
-                aria-label='Close chatbot'
-                type='button'
-              >
-                <FaTimes />
-              </button>
-            </div>
-          </div>
-
-          <div className='flex-1 space-y-3 overflow-y-auto px-4 py-3 text-sm'>
-            {messages.map((message, index) => (
-              <div
-                key={`${message.role}-${index}`}
-                className={`flex ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-              >
-                <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 leading-relaxed whitespace-pre-line ${
-                    message.role === 'user'
-                      ? 'bg-primary text-black'
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {message.content}
-                </div>
-              </div>
-            ))}
-
-            {isLoading && (
-              <div className='text-xs text-gray-500'>
-                {preferredLanguage === 'vi' ? 'Đang xử lý...' : 'Processing...'}
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          <div className='border-t border-gray-200 px-3 py-3'>
-            <div className='flex items-end gap-2'>
-              <textarea
-                rows={2}
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    handleSend();
-                  }
-                }}
-                className='focus:border-primary-400 flex-1 resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none'
-                placeholder={
-                  preferredLanguage === 'vi'
-                    ? 'Ví dụ: Đổi món 1 và 3 trong bữa sáng hôm nay'
-                    : 'Example: Swap item 1 and 3 in today breakfast'
-                }
-              />
-              <button
-                className='bg-primary flex h-10 w-10 items-center justify-center rounded-full text-black disabled:cursor-not-allowed disabled:bg-gray-200'
-                onClick={handleSend}
-                type='button'
-                aria-label='Send'
-                disabled={!input.trim() || isLoading}
-              >
-                <FaPaperPlane />
-              </button>
-            </div>
-          </div>
+          {chatPanel}
         </motion.div>
       )}
 
@@ -2077,7 +2844,7 @@ Request: ${userMessage}`;
         <AnimatePresence mode='wait'>
           {avatarLoaded ? (
             <motion.div
-              key={assistantAnimation + (animatedAvatarUrl || '')}
+              key={assistantAnimation}
               variants={avatarVariants}
               initial='hidden'
               animate={isOpen ? 'open' : 'closed'}

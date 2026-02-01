@@ -10,32 +10,56 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WhyNutriPlanIndexRouteImport } from './routes/why-nutri-plan/index'
 import { Route as WeightGoalIndexRouteImport } from './routes/weight-goal/index'
 import { Route as UnauthorizedIndexRouteImport } from './routes/unauthorized/index'
+import { Route as SupportedDietsIndexRouteImport } from './routes/supported-diets/index'
 import { Route as RegisterIndexRouteImport } from './routes/register/index'
 import { Route as PrimaryDietIndexRouteImport } from './routes/primary-diet/index'
 import { Route as PhysicalStatsIndexRouteImport } from './routes/physical-stats/index'
 import { Route as NutritionTargetsIndexRouteImport } from './routes/nutrition-targets/index'
 import { Route as MealPlanIndexRouteImport } from './routes/meal-plan/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as HowItWorksIndexRouteImport } from './routes/how-it-works/index'
 import { Route as GroceriesIndexRouteImport } from './routes/groceries/index'
 import { Route as FoodExclusionsIndexRouteImport } from './routes/food-exclusions/index'
 import { Route as DiscoverIndexRouteImport } from './routes/discover/index'
 import { Route as CustomRecipesIndexRouteImport } from './routes/custom-recipes/index'
 import { Route as CollectionsIndexRouteImport } from './routes/collections/index'
 import { Route as BrowseFoodsIndexRouteImport } from './routes/browse-foods/index'
+import { Route as ArticlesIndexRouteImport } from './routes/articles/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AccountIndexRouteImport } from './routes/account/index'
+import { Route as AboutUsIndexRouteImport } from './routes/about-us/index'
 import { Route as CustomRecipesCreateRecipeRouteImport } from './routes/custom-recipes/create-recipe'
 import { Route as CustomRecipesIdRouteImport } from './routes/custom-recipes/$id'
 import { Route as CollectionsCreateRouteImport } from './routes/collections/create'
 import { Route as CollectionsIdRouteImport } from './routes/collections/$id'
+import { Route as ArticlesSlugRouteImport } from './routes/articles/$slug'
 import { Route as CustomRecipesCustomFoodIndexRouteImport } from './routes/custom-recipes/custom-food/index'
+import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
+import { Route as AdminSettingsIndexRouteImport } from './routes/admin/settings/index'
+import { Route as AdminMealPlansIndexRouteImport } from './routes/admin/meal-plans/index'
+import { Route as AdminFoodsIndexRouteImport } from './routes/admin/foods/index'
+import { Route as AdminCollectionsIndexRouteImport } from './routes/admin/collections/index'
+import { Route as AdminCategoriesIndexRouteImport } from './routes/admin/categories/index'
+import { Route as AdminArticlesIndexRouteImport } from './routes/admin/articles/index'
 import { Route as CustomRecipesCustomFoodIdRouteImport } from './routes/custom-recipes/custom-food/$id'
+import { Route as AdminFoodsCreateRouteImport } from './routes/admin/foods/create'
+import { Route as AdminFoodsIdRouteImport } from './routes/admin/foods/$id'
+import { Route as AdminCollectionsCreateRouteImport } from './routes/admin/collections/create'
+import { Route as AdminCollectionsIdRouteImport } from './routes/admin/collections/$id'
+import { Route as AdminArticlesCreateRouteImport } from './routes/admin/articles/create'
+import { Route as AdminArticlesIdRouteImport } from './routes/admin/articles/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhyNutriPlanIndexRoute = WhyNutriPlanIndexRouteImport.update({
+  id: '/why-nutri-plan/',
+  path: '/why-nutri-plan/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WeightGoalIndexRoute = WeightGoalIndexRouteImport.update({
@@ -46,6 +70,11 @@ const WeightGoalIndexRoute = WeightGoalIndexRouteImport.update({
 const UnauthorizedIndexRoute = UnauthorizedIndexRouteImport.update({
   id: '/unauthorized/',
   path: '/unauthorized/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportedDietsIndexRoute = SupportedDietsIndexRouteImport.update({
+  id: '/supported-diets/',
+  path: '/supported-diets/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterIndexRoute = RegisterIndexRouteImport.update({
@@ -78,6 +107,11 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HowItWorksIndexRoute = HowItWorksIndexRouteImport.update({
+  id: '/how-it-works/',
+  path: '/how-it-works/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GroceriesIndexRoute = GroceriesIndexRouteImport.update({
   id: '/groceries/',
   path: '/groceries/',
@@ -108,6 +142,11 @@ const BrowseFoodsIndexRoute = BrowseFoodsIndexRouteImport.update({
   path: '/browse-foods/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
+  id: '/articles/',
+  path: '/articles/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -116,6 +155,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AccountIndexRoute = AccountIndexRouteImport.update({
   id: '/account/',
   path: '/account/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutUsIndexRoute = AboutUsIndexRouteImport.update({
+  id: '/about-us/',
+  path: '/about-us/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CustomRecipesCreateRecipeRoute =
@@ -139,196 +183,399 @@ const CollectionsIdRoute = CollectionsIdRouteImport.update({
   path: '/collections/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
+  id: '/articles/$slug',
+  path: '/articles/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CustomRecipesCustomFoodIndexRoute =
   CustomRecipesCustomFoodIndexRouteImport.update({
     id: '/custom-recipes/custom-food/',
     path: '/custom-recipes/custom-food/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
+  id: '/admin/users/',
+  path: '/admin/users/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSettingsIndexRoute = AdminSettingsIndexRouteImport.update({
+  id: '/admin/settings/',
+  path: '/admin/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminMealPlansIndexRoute = AdminMealPlansIndexRouteImport.update({
+  id: '/admin/meal-plans/',
+  path: '/admin/meal-plans/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminFoodsIndexRoute = AdminFoodsIndexRouteImport.update({
+  id: '/admin/foods/',
+  path: '/admin/foods/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCollectionsIndexRoute = AdminCollectionsIndexRouteImport.update({
+  id: '/admin/collections/',
+  path: '/admin/collections/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCategoriesIndexRoute = AdminCategoriesIndexRouteImport.update({
+  id: '/admin/categories/',
+  path: '/admin/categories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminArticlesIndexRoute = AdminArticlesIndexRouteImport.update({
+  id: '/admin/articles/',
+  path: '/admin/articles/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CustomRecipesCustomFoodIdRoute =
   CustomRecipesCustomFoodIdRouteImport.update({
     id: '/custom-recipes/custom-food/$id',
     path: '/custom-recipes/custom-food/$id',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminFoodsCreateRoute = AdminFoodsCreateRouteImport.update({
+  id: '/admin/foods/create',
+  path: '/admin/foods/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminFoodsIdRoute = AdminFoodsIdRouteImport.update({
+  id: '/admin/foods/$id',
+  path: '/admin/foods/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCollectionsCreateRoute = AdminCollectionsCreateRouteImport.update({
+  id: '/admin/collections/create',
+  path: '/admin/collections/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCollectionsIdRoute = AdminCollectionsIdRouteImport.update({
+  id: '/admin/collections/$id',
+  path: '/admin/collections/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminArticlesCreateRoute = AdminArticlesCreateRouteImport.update({
+  id: '/admin/articles/create',
+  path: '/admin/articles/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminArticlesIdRoute = AdminArticlesIdRouteImport.update({
+  id: '/admin/articles/$id',
+  path: '/admin/articles/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
   '/custom-recipes/$id': typeof CustomRecipesIdRoute
   '/custom-recipes/create-recipe': typeof CustomRecipesCreateRecipeRoute
+  '/about-us': typeof AboutUsIndexRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/articles': typeof ArticlesIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
   '/custom-recipes': typeof CustomRecipesIndexRoute
   '/discover': typeof DiscoverIndexRoute
   '/food-exclusions': typeof FoodExclusionsIndexRoute
   '/groceries': typeof GroceriesIndexRoute
+  '/how-it-works': typeof HowItWorksIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
   '/physical-stats': typeof PhysicalStatsIndexRoute
   '/primary-diet': typeof PrimaryDietIndexRoute
   '/register': typeof RegisterIndexRoute
+  '/supported-diets': typeof SupportedDietsIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
   '/weight-goal': typeof WeightGoalIndexRoute
+  '/why-nutri-plan': typeof WhyNutriPlanIndexRoute
+  '/admin/articles/$id': typeof AdminArticlesIdRoute
+  '/admin/articles/create': typeof AdminArticlesCreateRoute
+  '/admin/collections/$id': typeof AdminCollectionsIdRoute
+  '/admin/collections/create': typeof AdminCollectionsCreateRoute
+  '/admin/foods/$id': typeof AdminFoodsIdRoute
+  '/admin/foods/create': typeof AdminFoodsCreateRoute
   '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
+  '/admin/articles': typeof AdminArticlesIndexRoute
+  '/admin/categories': typeof AdminCategoriesIndexRoute
+  '/admin/collections': typeof AdminCollectionsIndexRoute
+  '/admin/foods': typeof AdminFoodsIndexRoute
+  '/admin/meal-plans': typeof AdminMealPlansIndexRoute
+  '/admin/settings': typeof AdminSettingsIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
   '/custom-recipes/custom-food': typeof CustomRecipesCustomFoodIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
   '/custom-recipes/$id': typeof CustomRecipesIdRoute
   '/custom-recipes/create-recipe': typeof CustomRecipesCreateRecipeRoute
+  '/about-us': typeof AboutUsIndexRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/articles': typeof ArticlesIndexRoute
   '/browse-foods': typeof BrowseFoodsIndexRoute
   '/collections': typeof CollectionsIndexRoute
   '/custom-recipes': typeof CustomRecipesIndexRoute
   '/discover': typeof DiscoverIndexRoute
   '/food-exclusions': typeof FoodExclusionsIndexRoute
   '/groceries': typeof GroceriesIndexRoute
+  '/how-it-works': typeof HowItWorksIndexRoute
   '/login': typeof LoginIndexRoute
   '/meal-plan': typeof MealPlanIndexRoute
   '/nutrition-targets': typeof NutritionTargetsIndexRoute
   '/physical-stats': typeof PhysicalStatsIndexRoute
   '/primary-diet': typeof PrimaryDietIndexRoute
   '/register': typeof RegisterIndexRoute
+  '/supported-diets': typeof SupportedDietsIndexRoute
   '/unauthorized': typeof UnauthorizedIndexRoute
   '/weight-goal': typeof WeightGoalIndexRoute
+  '/why-nutri-plan': typeof WhyNutriPlanIndexRoute
+  '/admin/articles/$id': typeof AdminArticlesIdRoute
+  '/admin/articles/create': typeof AdminArticlesCreateRoute
+  '/admin/collections/$id': typeof AdminCollectionsIdRoute
+  '/admin/collections/create': typeof AdminCollectionsCreateRoute
+  '/admin/foods/$id': typeof AdminFoodsIdRoute
+  '/admin/foods/create': typeof AdminFoodsCreateRoute
   '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
+  '/admin/articles': typeof AdminArticlesIndexRoute
+  '/admin/categories': typeof AdminCategoriesIndexRoute
+  '/admin/collections': typeof AdminCollectionsIndexRoute
+  '/admin/foods': typeof AdminFoodsIndexRoute
+  '/admin/meal-plans': typeof AdminMealPlansIndexRoute
+  '/admin/settings': typeof AdminSettingsIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
   '/custom-recipes/custom-food': typeof CustomRecipesCustomFoodIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/collections/create': typeof CollectionsCreateRoute
   '/custom-recipes/$id': typeof CustomRecipesIdRoute
   '/custom-recipes/create-recipe': typeof CustomRecipesCreateRecipeRoute
+  '/about-us/': typeof AboutUsIndexRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/articles/': typeof ArticlesIndexRoute
   '/browse-foods/': typeof BrowseFoodsIndexRoute
   '/collections/': typeof CollectionsIndexRoute
   '/custom-recipes/': typeof CustomRecipesIndexRoute
   '/discover/': typeof DiscoverIndexRoute
   '/food-exclusions/': typeof FoodExclusionsIndexRoute
   '/groceries/': typeof GroceriesIndexRoute
+  '/how-it-works/': typeof HowItWorksIndexRoute
   '/login/': typeof LoginIndexRoute
   '/meal-plan/': typeof MealPlanIndexRoute
   '/nutrition-targets/': typeof NutritionTargetsIndexRoute
   '/physical-stats/': typeof PhysicalStatsIndexRoute
   '/primary-diet/': typeof PrimaryDietIndexRoute
   '/register/': typeof RegisterIndexRoute
+  '/supported-diets/': typeof SupportedDietsIndexRoute
   '/unauthorized/': typeof UnauthorizedIndexRoute
   '/weight-goal/': typeof WeightGoalIndexRoute
+  '/why-nutri-plan/': typeof WhyNutriPlanIndexRoute
+  '/admin/articles/$id': typeof AdminArticlesIdRoute
+  '/admin/articles/create': typeof AdminArticlesCreateRoute
+  '/admin/collections/$id': typeof AdminCollectionsIdRoute
+  '/admin/collections/create': typeof AdminCollectionsCreateRoute
+  '/admin/foods/$id': typeof AdminFoodsIdRoute
+  '/admin/foods/create': typeof AdminFoodsCreateRoute
   '/custom-recipes/custom-food/$id': typeof CustomRecipesCustomFoodIdRoute
+  '/admin/articles/': typeof AdminArticlesIndexRoute
+  '/admin/categories/': typeof AdminCategoriesIndexRoute
+  '/admin/collections/': typeof AdminCollectionsIndexRoute
+  '/admin/foods/': typeof AdminFoodsIndexRoute
+  '/admin/meal-plans/': typeof AdminMealPlansIndexRoute
+  '/admin/settings/': typeof AdminSettingsIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
   '/custom-recipes/custom-food/': typeof CustomRecipesCustomFoodIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/articles/$slug'
     | '/collections/$id'
     | '/collections/create'
     | '/custom-recipes/$id'
     | '/custom-recipes/create-recipe'
+    | '/about-us'
     | '/account'
     | '/admin'
+    | '/articles'
     | '/browse-foods'
     | '/collections'
     | '/custom-recipes'
     | '/discover'
     | '/food-exclusions'
     | '/groceries'
+    | '/how-it-works'
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
     | '/physical-stats'
     | '/primary-diet'
     | '/register'
+    | '/supported-diets'
     | '/unauthorized'
     | '/weight-goal'
+    | '/why-nutri-plan'
+    | '/admin/articles/$id'
+    | '/admin/articles/create'
+    | '/admin/collections/$id'
+    | '/admin/collections/create'
+    | '/admin/foods/$id'
+    | '/admin/foods/create'
     | '/custom-recipes/custom-food/$id'
+    | '/admin/articles'
+    | '/admin/categories'
+    | '/admin/collections'
+    | '/admin/foods'
+    | '/admin/meal-plans'
+    | '/admin/settings'
+    | '/admin/users'
     | '/custom-recipes/custom-food'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/articles/$slug'
     | '/collections/$id'
     | '/collections/create'
     | '/custom-recipes/$id'
     | '/custom-recipes/create-recipe'
+    | '/about-us'
     | '/account'
     | '/admin'
+    | '/articles'
     | '/browse-foods'
     | '/collections'
     | '/custom-recipes'
     | '/discover'
     | '/food-exclusions'
     | '/groceries'
+    | '/how-it-works'
     | '/login'
     | '/meal-plan'
     | '/nutrition-targets'
     | '/physical-stats'
     | '/primary-diet'
     | '/register'
+    | '/supported-diets'
     | '/unauthorized'
     | '/weight-goal'
+    | '/why-nutri-plan'
+    | '/admin/articles/$id'
+    | '/admin/articles/create'
+    | '/admin/collections/$id'
+    | '/admin/collections/create'
+    | '/admin/foods/$id'
+    | '/admin/foods/create'
     | '/custom-recipes/custom-food/$id'
+    | '/admin/articles'
+    | '/admin/categories'
+    | '/admin/collections'
+    | '/admin/foods'
+    | '/admin/meal-plans'
+    | '/admin/settings'
+    | '/admin/users'
     | '/custom-recipes/custom-food'
   id:
     | '__root__'
     | '/'
+    | '/articles/$slug'
     | '/collections/$id'
     | '/collections/create'
     | '/custom-recipes/$id'
     | '/custom-recipes/create-recipe'
+    | '/about-us/'
     | '/account/'
     | '/admin/'
+    | '/articles/'
     | '/browse-foods/'
     | '/collections/'
     | '/custom-recipes/'
     | '/discover/'
     | '/food-exclusions/'
     | '/groceries/'
+    | '/how-it-works/'
     | '/login/'
     | '/meal-plan/'
     | '/nutrition-targets/'
     | '/physical-stats/'
     | '/primary-diet/'
     | '/register/'
+    | '/supported-diets/'
     | '/unauthorized/'
     | '/weight-goal/'
+    | '/why-nutri-plan/'
+    | '/admin/articles/$id'
+    | '/admin/articles/create'
+    | '/admin/collections/$id'
+    | '/admin/collections/create'
+    | '/admin/foods/$id'
+    | '/admin/foods/create'
     | '/custom-recipes/custom-food/$id'
+    | '/admin/articles/'
+    | '/admin/categories/'
+    | '/admin/collections/'
+    | '/admin/foods/'
+    | '/admin/meal-plans/'
+    | '/admin/settings/'
+    | '/admin/users/'
     | '/custom-recipes/custom-food/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArticlesSlugRoute: typeof ArticlesSlugRoute
   CollectionsIdRoute: typeof CollectionsIdRoute
   CollectionsCreateRoute: typeof CollectionsCreateRoute
   CustomRecipesIdRoute: typeof CustomRecipesIdRoute
   CustomRecipesCreateRecipeRoute: typeof CustomRecipesCreateRecipeRoute
+  AboutUsIndexRoute: typeof AboutUsIndexRoute
   AccountIndexRoute: typeof AccountIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  ArticlesIndexRoute: typeof ArticlesIndexRoute
   BrowseFoodsIndexRoute: typeof BrowseFoodsIndexRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
   CustomRecipesIndexRoute: typeof CustomRecipesIndexRoute
   DiscoverIndexRoute: typeof DiscoverIndexRoute
   FoodExclusionsIndexRoute: typeof FoodExclusionsIndexRoute
   GroceriesIndexRoute: typeof GroceriesIndexRoute
+  HowItWorksIndexRoute: typeof HowItWorksIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   MealPlanIndexRoute: typeof MealPlanIndexRoute
   NutritionTargetsIndexRoute: typeof NutritionTargetsIndexRoute
   PhysicalStatsIndexRoute: typeof PhysicalStatsIndexRoute
   PrimaryDietIndexRoute: typeof PrimaryDietIndexRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
+  SupportedDietsIndexRoute: typeof SupportedDietsIndexRoute
   UnauthorizedIndexRoute: typeof UnauthorizedIndexRoute
   WeightGoalIndexRoute: typeof WeightGoalIndexRoute
+  WhyNutriPlanIndexRoute: typeof WhyNutriPlanIndexRoute
+  AdminArticlesIdRoute: typeof AdminArticlesIdRoute
+  AdminArticlesCreateRoute: typeof AdminArticlesCreateRoute
+  AdminCollectionsIdRoute: typeof AdminCollectionsIdRoute
+  AdminCollectionsCreateRoute: typeof AdminCollectionsCreateRoute
+  AdminFoodsIdRoute: typeof AdminFoodsIdRoute
+  AdminFoodsCreateRoute: typeof AdminFoodsCreateRoute
   CustomRecipesCustomFoodIdRoute: typeof CustomRecipesCustomFoodIdRoute
+  AdminArticlesIndexRoute: typeof AdminArticlesIndexRoute
+  AdminCategoriesIndexRoute: typeof AdminCategoriesIndexRoute
+  AdminCollectionsIndexRoute: typeof AdminCollectionsIndexRoute
+  AdminFoodsIndexRoute: typeof AdminFoodsIndexRoute
+  AdminMealPlansIndexRoute: typeof AdminMealPlansIndexRoute
+  AdminSettingsIndexRoute: typeof AdminSettingsIndexRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
   CustomRecipesCustomFoodIndexRoute: typeof CustomRecipesCustomFoodIndexRoute
 }
 
@@ -339,6 +586,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/why-nutri-plan/': {
+      id: '/why-nutri-plan/'
+      path: '/why-nutri-plan'
+      fullPath: '/why-nutri-plan'
+      preLoaderRoute: typeof WhyNutriPlanIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/weight-goal/': {
@@ -353,6 +607,13 @@ declare module '@tanstack/react-router' {
       path: '/unauthorized'
       fullPath: '/unauthorized'
       preLoaderRoute: typeof UnauthorizedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/supported-diets/': {
+      id: '/supported-diets/'
+      path: '/supported-diets'
+      fullPath: '/supported-diets'
+      preLoaderRoute: typeof SupportedDietsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register/': {
@@ -397,6 +658,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/how-it-works/': {
+      id: '/how-it-works/'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/groceries/': {
       id: '/groceries/'
       path: '/groceries'
@@ -439,6 +707,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BrowseFoodsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/articles/': {
+      id: '/articles/'
+      path: '/articles'
+      fullPath: '/articles'
+      preLoaderRoute: typeof ArticlesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/admin'
@@ -451,6 +726,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about-us/': {
+      id: '/about-us/'
+      path: '/about-us'
+      fullPath: '/about-us'
+      preLoaderRoute: typeof AboutUsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/custom-recipes/create-recipe': {
@@ -481,11 +763,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/articles/$slug': {
+      id: '/articles/$slug'
+      path: '/articles/$slug'
+      fullPath: '/articles/$slug'
+      preLoaderRoute: typeof ArticlesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/custom-recipes/custom-food/': {
       id: '/custom-recipes/custom-food/'
       path: '/custom-recipes/custom-food'
       fullPath: '/custom-recipes/custom-food'
       preLoaderRoute: typeof CustomRecipesCustomFoodIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings/': {
+      id: '/admin/settings/'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/meal-plans/': {
+      id: '/admin/meal-plans/'
+      path: '/admin/meal-plans'
+      fullPath: '/admin/meal-plans'
+      preLoaderRoute: typeof AdminMealPlansIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/foods/': {
+      id: '/admin/foods/'
+      path: '/admin/foods'
+      fullPath: '/admin/foods'
+      preLoaderRoute: typeof AdminFoodsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/collections/': {
+      id: '/admin/collections/'
+      path: '/admin/collections'
+      fullPath: '/admin/collections'
+      preLoaderRoute: typeof AdminCollectionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/categories/': {
+      id: '/admin/categories/'
+      path: '/admin/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/articles/': {
+      id: '/admin/articles/'
+      path: '/admin/articles'
+      fullPath: '/admin/articles'
+      preLoaderRoute: typeof AdminArticlesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/custom-recipes/custom-food/$id': {
@@ -495,32 +833,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomRecipesCustomFoodIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/foods/create': {
+      id: '/admin/foods/create'
+      path: '/admin/foods/create'
+      fullPath: '/admin/foods/create'
+      preLoaderRoute: typeof AdminFoodsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/foods/$id': {
+      id: '/admin/foods/$id'
+      path: '/admin/foods/$id'
+      fullPath: '/admin/foods/$id'
+      preLoaderRoute: typeof AdminFoodsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/collections/create': {
+      id: '/admin/collections/create'
+      path: '/admin/collections/create'
+      fullPath: '/admin/collections/create'
+      preLoaderRoute: typeof AdminCollectionsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/collections/$id': {
+      id: '/admin/collections/$id'
+      path: '/admin/collections/$id'
+      fullPath: '/admin/collections/$id'
+      preLoaderRoute: typeof AdminCollectionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/articles/create': {
+      id: '/admin/articles/create'
+      path: '/admin/articles/create'
+      fullPath: '/admin/articles/create'
+      preLoaderRoute: typeof AdminArticlesCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/articles/$id': {
+      id: '/admin/articles/$id'
+      path: '/admin/articles/$id'
+      fullPath: '/admin/articles/$id'
+      preLoaderRoute: typeof AdminArticlesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArticlesSlugRoute: ArticlesSlugRoute,
   CollectionsIdRoute: CollectionsIdRoute,
   CollectionsCreateRoute: CollectionsCreateRoute,
   CustomRecipesIdRoute: CustomRecipesIdRoute,
   CustomRecipesCreateRecipeRoute: CustomRecipesCreateRecipeRoute,
+  AboutUsIndexRoute: AboutUsIndexRoute,
   AccountIndexRoute: AccountIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
+  ArticlesIndexRoute: ArticlesIndexRoute,
   BrowseFoodsIndexRoute: BrowseFoodsIndexRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
   CustomRecipesIndexRoute: CustomRecipesIndexRoute,
   DiscoverIndexRoute: DiscoverIndexRoute,
   FoodExclusionsIndexRoute: FoodExclusionsIndexRoute,
   GroceriesIndexRoute: GroceriesIndexRoute,
+  HowItWorksIndexRoute: HowItWorksIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   MealPlanIndexRoute: MealPlanIndexRoute,
   NutritionTargetsIndexRoute: NutritionTargetsIndexRoute,
   PhysicalStatsIndexRoute: PhysicalStatsIndexRoute,
   PrimaryDietIndexRoute: PrimaryDietIndexRoute,
   RegisterIndexRoute: RegisterIndexRoute,
+  SupportedDietsIndexRoute: SupportedDietsIndexRoute,
   UnauthorizedIndexRoute: UnauthorizedIndexRoute,
   WeightGoalIndexRoute: WeightGoalIndexRoute,
+  WhyNutriPlanIndexRoute: WhyNutriPlanIndexRoute,
+  AdminArticlesIdRoute: AdminArticlesIdRoute,
+  AdminArticlesCreateRoute: AdminArticlesCreateRoute,
+  AdminCollectionsIdRoute: AdminCollectionsIdRoute,
+  AdminCollectionsCreateRoute: AdminCollectionsCreateRoute,
+  AdminFoodsIdRoute: AdminFoodsIdRoute,
+  AdminFoodsCreateRoute: AdminFoodsCreateRoute,
   CustomRecipesCustomFoodIdRoute: CustomRecipesCustomFoodIdRoute,
+  AdminArticlesIndexRoute: AdminArticlesIndexRoute,
+  AdminCategoriesIndexRoute: AdminCategoriesIndexRoute,
+  AdminCollectionsIndexRoute: AdminCollectionsIndexRoute,
+  AdminFoodsIndexRoute: AdminFoodsIndexRoute,
+  AdminMealPlansIndexRoute: AdminMealPlansIndexRoute,
+  AdminSettingsIndexRoute: AdminSettingsIndexRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
   CustomRecipesCustomFoodIndexRoute: CustomRecipesCustomFoodIndexRoute,
 }
 export const routeTree = rootRouteImport

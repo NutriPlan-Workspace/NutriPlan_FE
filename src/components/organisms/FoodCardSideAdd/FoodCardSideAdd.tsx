@@ -5,6 +5,7 @@ import { Image, Popover, Typography } from 'antd';
 import { NUTRITION_POPOVER_BODY_STYLE } from '@/constants/popoverStyles';
 import { cn } from '@/helpers/helpers';
 import { useFoodCardSideAddDrag } from '@/hooks/useFoodCardSideAddDrag';
+import FoodQuickActions from '@/molecules/FoodQuickActions/FoodQuickActions';
 import { NutritionPopoverFood } from '@/molecules/NutritionPopoverFood';
 import {
   setIsModalDetailOpen,
@@ -16,9 +17,13 @@ const { Link } = Typography;
 
 interface FoodCardSideAddProps {
   food: Food;
+  hideActions?: boolean;
 }
 
-const FoodCardSideAdd: React.FC<FoodCardSideAddProps> = ({ food }) => {
+const FoodCardSideAdd: React.FC<FoodCardSideAddProps> = ({
+  food,
+  hideActions,
+}) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -60,15 +65,28 @@ const FoodCardSideAdd: React.FC<FoodCardSideAddProps> = ({ food }) => {
             )}
           />
           <div className='ml-[10px] flex w-full flex-col justify-center gap-[3px] pr-[10px]'>
-            <Link
-              onClick={() => {
-                dispatch(setViewingDetailFood(food));
-                dispatch(setIsModalDetailOpen(true));
-              }}
-              className='leading-4.5 font-bold text-black transition-all duration-200 hover:underline'
-            >
-              {food.name}
-            </Link>
+            <div className='flex items-center justify-between gap-2'>
+              <Link
+                onClick={() => {
+                  dispatch(setViewingDetailFood(food));
+                  dispatch(setIsModalDetailOpen(true));
+                }}
+                className='leading-4.5 font-bold text-black transition-all duration-200 hover:underline'
+              >
+                {food.name}
+              </Link>
+
+              {!hideActions && (
+                <div
+                  className={cn('opacity-0 transition-opacity', {
+                    'opacity-100': isHovered,
+                  })}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FoodQuickActions food={food} size='sm' />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </Popover>

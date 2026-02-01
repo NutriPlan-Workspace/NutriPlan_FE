@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { createRootRoute, Outlet } from '@tanstack/react-router';
-import { useRouterState } from '@tanstack/react-router';
+import {
+  createRootRoute,
+  Outlet,
+  useRouterState,
+} from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { PATH } from '@/constants/path';
+import { TourProvider } from '@/contexts/TourContext';
 import { ModalFoodDetail } from '@/organisms/ModalFoodDetail';
+import { LayoutAdmin } from '@/templates/LayoutAdmin';
 import { LayoutAuth } from '@/templates/LayoutAuth';
 import { LayoutGuest } from '@/templates/LayoutGuest';
 import { LayoutLoggedIn } from '@/templates/LayoutLoggedIn';
@@ -17,16 +22,34 @@ export const Route = createRootRoute({
 function getLayoutKey(pathname: string): string {
   if (pathname === PATH.LOGIN || pathname === PATH.REGISTER) {
     return 'auth';
-  } else if (pathname === PATH.HOME || pathname === PATH.BROWSE_FOODS) {
-    return 'guest';
-  } else {
-    return 'logged-in';
   }
+
+  if (pathname === PATH.ADMIN || pathname.startsWith('/admin/')) {
+    return 'admin';
+  }
+
+  const guestRoutes = new Set<string>([
+    PATH.HOME,
+    PATH.BROWSE_FOODS,
+    PATH.HOW_IT_WORKS,
+    PATH.ABOUT_US,
+    PATH.ARTICLES,
+    PATH.UNAUTHORIZED,
+  ]);
+
+  if (guestRoutes.has(pathname) || pathname.startsWith('/articles/')) {
+    return 'guest';
+  }
+
+  return 'logged-in';
 }
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
+  });
+  const isRouteLoading = useRouterState({
+    select: (state) => state.isLoading,
   });
 
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -52,11 +75,13 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         clearTimeout(hideOverlay);
       };
     }
-  }, [pathname]);
+  }, [pathname, currentLayoutKey]);
 
   let LayoutComponent: React.FC<{ children: React.ReactNode }>;
   if (currentLayoutKey === 'auth') {
     LayoutComponent = LayoutAuth;
+  } else if (currentLayoutKey === 'admin') {
+    LayoutComponent = LayoutAdmin;
   } else if (currentLayoutKey === 'guest') {
     LayoutComponent = LayoutGuest;
   } else {
@@ -65,6 +90,18 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <div className='relative h-full w-full'>
+      <AnimatePresence>
+        {isRouteLoading && (
+          <motion.div
+            key='route-progress'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className='fixed inset-x-0 top-0 z-50 h-1 bg-emerald-500/80'
+          />
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {isTransitioning && (
           <motion.div
@@ -93,12 +130,12 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
 
 function TemplateComponent() {
   return (
-    <>
+    <TourProvider>
       <LayoutWrapper>
         <Outlet />
       </LayoutWrapper>
       <ModalFoodDetail />
-    </>
+    </TourProvider>
   );
 }
 

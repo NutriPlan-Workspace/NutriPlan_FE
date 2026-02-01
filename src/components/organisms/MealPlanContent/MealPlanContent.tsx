@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { HeaderLeftMealPlan } from '@/organisms/HeaderLeftMealPlan';
-import { MealPlanChatbot } from '@/organisms/MealPlanChatbot';
 import { MealSwapModalController } from '@/organisms/MealSwapModalController';
 
 interface MealPlanContentProps {
@@ -23,7 +22,6 @@ const MealPlanContent: React.FC<MealPlanContentProps> = ({ children }) => (
     </div>
 
     <MealSwapModalController />
-    <MealPlanChatbot />
   </div>
 );
 

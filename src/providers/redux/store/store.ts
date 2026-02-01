@@ -7,12 +7,14 @@ import { userReducer } from '@/redux/slices/user';
 
 import { collectionReducer } from '../slices/collection';
 import { mealPlanReducer } from '../slices/mealPlan';
+import { pantryReducer } from '../slices/pantry/pantrySlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     food: foodReducer,
     mealPlan: mealPlanReducer,
+    pantry: pantryReducer,
     collection: collectionReducer,
     [baseApi.reducerPath]: baseApi.reducer,
     [cloudinaryApi.reducerPath]: cloudinaryApi.reducer,

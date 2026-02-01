@@ -21,10 +21,10 @@ const ExclusionButton: React.FC<ExclusionButtonProps> = ({
     className={cn(
       'rounded-sm border px-3.5 py-1.5 text-sm transition-all',
       disabled
-        ? 'cursor-not-allowed border-gray-300 bg-cyan-700 text-white opacity-50'
+        ? 'cursor-not-allowed border-[#e86852]/30 bg-[#e86852]/10 text-[#e86852]/60'
         : isActive
-          ? 'border-gray-500 bg-cyan-700 text-white'
-          : 'border-gray-500 bg-white text-gray-500 hover:bg-blue-100',
+          ? 'border-[#e86852] bg-[#e86852] text-white shadow-sm'
+          : 'border-gray-300 bg-white text-gray-600 hover:border-[#e86852]/30 hover:bg-[#e86852]/5 hover:text-[#e86852]',
     )}
   >
     {item.label}

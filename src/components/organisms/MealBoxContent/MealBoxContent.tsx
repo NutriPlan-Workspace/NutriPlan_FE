@@ -5,9 +5,12 @@ import { Typography } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 
 import { DropIndicator } from '@/atoms/DropIndicator';
+import { useToast } from '@/contexts/ToastContext';
+import { useAutoPantryDeductSetting } from '@/hooks/useAutoPantryDeductSetting';
 import useMealBoxDrop from '@/hooks/useMealBoxDrop';
 import { MealCard } from '@/organisms/MealCard';
 import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
+import { useConsumePantryItemsMutation } from '@/redux/query/apis/pantry/pantryApi';
 import {
   mealPlanSelector,
   updateViewingMealPlanByDate,
@@ -34,8 +37,11 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
   mealItems,
 }) => {
   const dispatch = useDispatch();
+  const { showToastError } = useToast();
   const { draggingCardHeight } = useSelector(mealPlanSelector);
   const [updateMealPlan] = useUpdateMealPlanMutation();
+  const [consumePantryItems] = useConsumePantryItemsMutation();
+  const { enabled: autoDeductEnabled } = useAutoPantryDeductSetting();
   const selectMealPlanByDate = useMemo(makeSelectMealPlanByDate, []);
   const currentMealPlan = useSelector(
     (state: import('@/redux/store').RootState) =>
@@ -143,7 +149,93 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
     const updatedMealPlanDatabaseDTO =
       getMealPlanDayDatabaseDTOByMealPlanDay(updatedMealPlanDay);
 
-    await updateMealPlan({ mealPlan: updatedMealPlanDatabaseDTO });
+    await updateMealPlan({ mealPlan: updatedMealPlanDatabaseDTO }).unwrap();
+  };
+
+  const handleToggleEaten = async (cardId: string, isEaten: boolean) => {
+    const currentMealPlanDay = currentMealPlan;
+
+    if (!currentMealPlanDay?.mealPlanDay) {
+      return;
+    }
+
+    const updatedMealPlanDay = {
+      ...currentMealPlanDay.mealPlanDay,
+      mealItems: {
+        ...currentMealPlanDay.mealPlanDay.mealItems,
+        [mealType]: currentMealPlanDay.mealPlanDay.mealItems[mealType].map(
+          (meal) => (meal._id === cardId ? { ...meal, isEaten } : { ...meal }),
+        ),
+      },
+    };
+
+    dispatch(
+      updateViewingMealPlanByDate({
+        mealPlanWithDate: {
+          mealPlanDay: updatedMealPlanDay,
+          mealDate: mealDate,
+        },
+      }),
+    );
+
+    const updatedMealPlanDatabaseDTO =
+      getMealPlanDayDatabaseDTOByMealPlanDay(updatedMealPlanDay);
+
+    await updateMealPlan({ mealPlan: updatedMealPlanDatabaseDTO }).unwrap();
+
+    if (isEaten && autoDeductEnabled) {
+      const mealItem = updatedMealPlanDay.mealItems[mealType].find(
+        (meal) => meal._id === cardId,
+      );
+      const food = mealItem?.foodId;
+
+      if (mealItem && food?.ingredients?.length && food.units?.length) {
+        const items = food.ingredients
+          .map((ing) => {
+            const ingredient = ing.ingredientFoodId;
+            if (!ingredient) return null;
+            const unitIndex = ing.unit;
+            const ingredientUnit = ingredient.units?.[unitIndex];
+            const baseUnitIndex = food.defaultUnit ?? mealItem.unit;
+            const baseUnit = food.units?.[baseUnitIndex];
+            const servingUnit = food.units?.[mealItem.unit];
+
+            if (!baseUnit || !servingUnit) return null;
+
+            const ingredientAmount =
+              mealItem.unit === baseUnitIndex
+                ? (mealItem.amount * ing.amount) / baseUnit.amount
+                : (mealItem.amount * ing.amount) / servingUnit.amount;
+
+            return {
+              ingredientFoodId: ingredient._id,
+              name: ingredient.name,
+              quantity: ingredientAmount,
+              unit: ingredientUnit?.description ?? 'serving',
+            };
+          })
+          .filter(
+            (
+              item,
+            ): item is {
+              ingredientFoodId?: string;
+              name: string;
+              quantity: number;
+              unit?: string;
+            } => Boolean(item),
+          );
+
+        if (items.length > 0) {
+          try {
+            await consumePantryItems({ items }).unwrap();
+          } catch (error) {
+            showToastError(
+              `Auto-deduct pantry failed. You can still adjust pantry manually. ${error}`,
+            );
+          }
+        }
+      }
+    }
   };
 
   return (
@@ -173,6 +265,7 @@ const MealBoxContent: React.FC<MealBoxContentProps> = ({
             onAmountChange={handleAmountChange}
             onRemoveFood={handleRemoveFood}
             onDuplicateFood={handleDuplicateFood}
+            onToggleEaten={handleToggleEaten}
           />
         ))
       )}

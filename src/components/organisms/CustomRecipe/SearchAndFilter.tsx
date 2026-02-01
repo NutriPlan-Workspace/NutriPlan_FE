@@ -36,7 +36,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
           className={cn(
             'h-11 rounded-none border-0 px-4 text-sm font-semibold',
             activeTab === 'foods'
-              ? '!bg-primary !text-white'
+              ? '!bg-secondary-400 !text-white'
               : '!bg-transparent !text-gray-700 hover:!bg-white',
           )}
           onClick={() => setActiveTab(activeTab === 'foods' ? null : 'foods')}
@@ -50,7 +50,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
           className={cn(
             'h-11 rounded-none border-0 px-4 text-sm font-semibold',
             activeTab === 'recipes'
-              ? '!bg-primary !text-white'
+              ? '!bg-secondary-400 !text-white'
               : '!bg-transparent !text-gray-700 hover:!bg-white',
           )}
           onClick={() =>

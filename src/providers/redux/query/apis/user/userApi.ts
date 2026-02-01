@@ -1,16 +1,16 @@
-import { baseApi } from '@/redux/query/apis/baseApi';
+import { baseApiWithAuth } from '@/redux/query/apis/baseApi';
 import type {
   FoodExclusionsArgs,
   FoodExclusionsResponse,
   NutritionGoal,
   NutritionGoalResponse,
-  PhysicalStat,
   PhysicalStatResponse,
+  PhysicalStatUpdate,
   PrimaryDietArgs,
   PrimaryDietResponse,
 } from '@/types/user';
 
-export const userApi = baseApi.injectEndpoints({
+export const userApi = baseApiWithAuth.injectEndpoints({
   endpoints: (builder) => ({
     getPhysicalStats: builder.query<PhysicalStatResponse, void>({
       query: () => ({
@@ -49,7 +49,10 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['NutritionTarget'],
     }),
-    updatePhysicalStats: builder.mutation<PhysicalStatResponse, PhysicalStat>({
+    updatePhysicalStats: builder.mutation<
+      PhysicalStatResponse,
+      PhysicalStatUpdate
+    >({
       query: (physicalStat) => ({
         url: '/user/stats',
         method: 'PUT',

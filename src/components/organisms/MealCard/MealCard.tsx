@@ -1,7 +1,7 @@
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { EyeOutlined } from '@ant-design/icons';
-import { Image, Popover, Typography } from 'antd';
+import { Checkbox, Image, Popover, Typography } from 'antd';
 
 import { DropIndicator } from '@/atoms/DropIndicator';
 import { PairButton } from '@/atoms/PairButton';
@@ -11,6 +11,7 @@ import { useMealCardDrag } from '@/hooks/useMealCardDrag';
 import { AmountSelector } from '@/molecules/AmountSelector';
 import { NutritionPopoverFood } from '@/molecules/NutritionPopoverFood';
 import { useUpdateFavoriteFoodsMutation } from '@/redux/query/apis/collection/collectionApi';
+import { useGetSwapOptionsMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
 import {
   addToFavoriteList,
   collectionSelector,
@@ -31,7 +32,6 @@ import { makeSelectMealPlanByDate } from '@/redux/slices/mealPlan/selectors';
 import type { Food } from '@/types/food';
 import type { MealPlanDay, MealPlanFood } from '@/types/mealPlan';
 import type { MealType, SwapOptionsResponse } from '@/types/mealSwap';
-import { fetchSwapOptions } from '@/utils/mealSwapApi';
 import { showToastError } from '@/utils/toastUtils';
 
 import { getMenuItems } from './MenuItemMealCard';
@@ -46,12 +46,13 @@ interface MealCardProps {
   onAmountChange: (amount: number, unit: number, cardId: string) => void;
   onRemoveFood: (index: number) => void;
   onDuplicateFood: (index: number) => void;
+  onToggleEaten: (cardId: string, isEaten: boolean) => void;
 }
 
 const isMealPlanFood = (item: MealPlanFood | Food): item is MealPlanFood =>
   (item as MealPlanFood).foodId !== undefined;
 
-const MealCardComponent: React.FC<MealCardProps> = ({
+const MealCard: React.FC<MealCardProps> = ({
   index,
   mealDate,
   mealType,
@@ -59,6 +60,7 @@ const MealCardComponent: React.FC<MealCardProps> = ({
   onAmountChange,
   onRemoveFood,
   onDuplicateFood,
+  onToggleEaten,
 }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
@@ -72,7 +74,9 @@ const MealCardComponent: React.FC<MealCardProps> = ({
     (item) => item.food === mealItem.foodId._id,
   );
   const flashMealCardIds = useSelector(mealPlanSelector).flashMealCardIds;
-  const shouldFlash = flashMealCardIds.includes(mealItem._id);
+  const shouldFlash =
+    flashMealCardIds.includes(mealItem._id) ||
+    flashMealCardIds.includes(mealType);
   const selectMealPlanByDate = useMemo(makeSelectMealPlanByDate, []);
   const currentMealPlan = useSelector(
     (state: import('@/redux/store').RootState) =>
@@ -129,6 +133,7 @@ const MealCardComponent: React.FC<MealCardProps> = ({
     ],
   );
 
+  const [getSwapOptions] = useGetSwapOptionsMutation();
   const handleOpenSwapOptions = useCallback(async () => {
     const mealPlanDay = currentMealPlan?.mealPlanDay;
     if (!mealPlanDay?._id) {
@@ -149,15 +154,25 @@ const MealCardComponent: React.FC<MealCardProps> = ({
     );
     dispatch(setSwapModalLoading({ loading: true }));
     try {
-      const data = await fetchSwapOptions(mealPlanDay._id, {
-        swapType: 'food',
-        mealType: mealType as MealType,
-        targetFoodId: mealItem.foodId._id,
-        targetItemId: mealItem._id,
-        limit: 5,
-        tolerance: 0.2,
-      });
-      dispatch(setSwapModalData({ data: data as SwapOptionsResponse }));
+      const data = await getSwapOptions({
+        mealPlanId: mealPlanDay._id,
+        payload: {
+          swapType: 'food',
+          mealType: mealType as MealType,
+          targetFoodId:
+            typeof mealItem.foodId === 'string'
+              ? mealItem.foodId
+              : mealItem.foodId._id,
+          targetItemId: mealItem._id,
+          limit: 20,
+          tolerance: 0.2,
+        },
+      }).unwrap();
+      // Handle case where transformResponse doesn't unwrap the API wrapper
+      const swapData =
+        (data as unknown as { data?: SwapOptionsResponse }).data ?? data;
+
+      dispatch(setSwapModalData({ data: swapData as SwapOptionsResponse }));
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Swap options failed';
@@ -167,11 +182,12 @@ const MealCardComponent: React.FC<MealCardProps> = ({
       dispatch(setSwapModalLoading({ loading: false }));
     }
   }, [
-    currentMealPlan,
+    currentMealPlan?.mealPlanDay,
     dispatch,
+    getSwapOptions,
     mealDate,
     mealItem._id,
-    mealItem.foodId._id,
+    mealItem.foodId,
     mealType,
   ]);
 
@@ -200,12 +216,24 @@ const MealCardComponent: React.FC<MealCardProps> = ({
           ref={mealCardRef}
           className={cn(
             'flex items-center rounded-2xl border-2 border-white/70 bg-white/85 p-2 shadow-[0_6px_14px_-10px_rgba(15,23,42,0.35)] backdrop-blur-sm transition-all duration-200 hover:shadow-[0_10px_18px_-12px_rgba(15,23,42,0.35)]',
-            { 'border-primary-400': isHovered },
+            {
+              'border-primary-400': isHovered,
+              'bg-gradient-to-r from-emerald-50/80 via-white/80 to-emerald-100/80':
+                mealItem.isEaten,
+            },
             shouldFlash && 'meal-card-flash',
           )}
           onMouseEnter={handleEnterHover}
           onMouseLeave={handleLeaveHover}
         >
+          <div className='mr-2 flex items-center'>
+            <Checkbox
+              checked={mealItem.isEaten ?? false}
+              onChange={(event) =>
+                onToggleEaten(mealItem._id, event.target.checked)
+              }
+            />
+          </div>
           <Image
             src={
               food.imgUrls?.[0] ||
@@ -259,32 +287,5 @@ const MealCardComponent: React.FC<MealCardProps> = ({
     </div>
   );
 };
-
-type ShallowMealItem = {
-  _id?: string;
-  amount?: number;
-  unit?: number;
-};
-
-const areEqual = (prev: MealCardProps, next: MealCardProps) => {
-  if (
-    prev.index !== next.index ||
-    prev.mealDate !== next.mealDate ||
-    prev.mealType !== next.mealType
-  )
-    return false;
-
-  // Compare critical fields of mealItem only
-  const prevItem = prev.mealItem as ShallowMealItem;
-  const nextItem = next.mealItem as ShallowMealItem;
-  if (prevItem?._id !== nextItem?._id) return false;
-  if (prevItem?.amount !== nextItem?.amount) return false;
-  if (prevItem?.unit !== nextItem?.unit) return false;
-
-  // Assume handlers are stable via useCallback upstream.
-  return true;
-};
-
-const MealCard = memo(MealCardComponent, areEqual);
 
 export default MealCard;

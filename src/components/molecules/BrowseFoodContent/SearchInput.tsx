@@ -48,39 +48,37 @@ const SearchInput: React.FC<SearchInputProps> = ({ onFilterChange }) => {
   }, [debouncedValue, modalFilters, onFilterChange]);
 
   return (
-    <div className='flex w-full justify-center'>
-      <div className='flex items-center gap-4'>
-        <Button
-          className={cn(
-            'flex h-[45px] items-center gap-2 border border-black text-gray-600',
-            { 'border-primary text-primary': hasFilter },
-          )}
-          onClick={() => setOpenModal(true)}
-        >
-          <GiMeal
-            className={cn('h-6 w-6 text-gray-500', {
-              'text-primary': hasFilter,
-            })}
-          />
-          Filters
-        </Button>
+    <div className='flex w-full flex-col items-center gap-4 md:flex-row md:justify-center'>
+      <Button
+        className={cn(
+          'flex h-11 items-center gap-2 rounded-full border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-600 shadow-sm',
+          { 'border-emerald-300 text-emerald-600': hasFilter },
+        )}
+        onClick={() => setOpenModal(true)}
+      >
+        <GiMeal
+          className={cn('h-5 w-5 text-gray-500', {
+            'text-emerald-500': hasFilter,
+          })}
+        />
+        Filters
+      </Button>
 
-        <AntdInput
-          placeholder='Search Foods...'
-          suffix={<IoSearch className='h-5 w-5 text-gray-500' />}
-          className='h-[45px] w-[350px] rounded-full border border-black px-4 py-1 italic'
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-        <ModalFilter
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-          onFilterChange={setHasFilter}
-          onFiltersSubmit={(filters) => {
-            setModalFilters(filters);
-          }}
-        />
-      </div>
+      <AntdInput
+        placeholder='Search foods, cuisines, ingredients...'
+        suffix={<IoSearch className='h-5 w-5 text-gray-500' />}
+        className='h-11 w-full max-w-xl rounded-full border border-gray-200 px-4 py-1 text-sm'
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+      />
+      <ModalFilter
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onFilterChange={setHasFilter}
+        onFiltersSubmit={(filters) => {
+          setModalFilters(filters);
+        }}
+      />
     </div>
   );
 };

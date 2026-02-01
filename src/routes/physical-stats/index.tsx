@@ -2,12 +2,19 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { createFileRoute, FileRoutesByPath } from '@tanstack/react-router';
 
+import Button from '@/atoms/Button/Button';
 import PopupButton from '@/atoms/Button/PopupButton';
 import { NutritionTargetModal } from '@/atoms/NutritionTargetModal';
 import { PATH } from '@/constants/path';
 import { useNutritionTargetsPrompt } from '@/hooks/useNutritionTargetsPrompt';
-import { PhysicalStats } from '@/organisms/PhysicalStats';
-import { WeightAndGoal } from '@/organisms/WeightAndGoal';
+import {
+  PhysicalStats,
+  type PhysicalStatsHandle,
+} from '@/organisms/PhysicalStats';
+import {
+  WeightAndGoal,
+  type WeightAndGoalHandle,
+} from '@/organisms/WeightAndGoal';
 import { userSelector } from '@/redux/slices/user';
 import UserHubPageShell from '@/templates/UserHubPageShell';
 import { handleUserRoute } from '@/utils/route';
@@ -15,6 +22,63 @@ import { handleUserRoute } from '@/utils/route';
 const PhysicalStatsPage: React.FC = () => {
   const userId = useSelector(userSelector).user.id;
   const targets = useNutritionTargetsPrompt({ userId });
+  const physicalStatsRef = React.useRef<PhysicalStatsHandle | null>(null);
+  const weightRef = React.useRef<WeightAndGoalHandle | null>(null);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [pendingGoalType, setPendingGoalType] = React.useState('');
+  const [isGoalDirty, setIsGoalDirty] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleOpen = () => {
+      targets.openModal();
+    };
+
+    window.addEventListener('np:open-nutrition-targets', handleOpen);
+    return () =>
+      window.removeEventListener('np:open-nutrition-targets', handleOpen);
+  }, [targets]);
+
+  React.useEffect(() => {
+    if (!isGoalDirty && targets.goalType) {
+      setPendingGoalType(targets.goalType);
+    }
+  }, [isGoalDirty, targets.goalType]);
+
+  const handleSaveAll = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+
+    const [savedPhysical, savedWeight] = await Promise.all([
+      physicalStatsRef.current?.save?.(),
+      weightRef.current?.save?.(),
+    ]);
+
+    const shouldSaveGoal =
+      isGoalDirty && pendingGoalType && pendingGoalType !== targets.goalType;
+
+    if (shouldSaveGoal) {
+      await targets.changeGoalType(pendingGoalType);
+      setIsGoalDirty(false);
+    }
+
+    if (!savedPhysical && !savedWeight && !shouldSaveGoal) {
+      setIsSaving(false);
+      try {
+        window.dispatchEvent(new CustomEvent('np:body-goal-saved'));
+      } catch {
+        // ignore
+      }
+      return;
+    }
+
+    setIsSaving(false);
+
+    try {
+      window.dispatchEvent(new CustomEvent('np:body-goal-saved'));
+    } catch {
+      // ignore
+    }
+  };
 
   return (
     <UserHubPageShell
@@ -28,17 +92,22 @@ const PhysicalStatsPage: React.FC = () => {
               Stats updated — update targets
             </div>
           )}
-          <PopupButton
-            mode='action'
-            variant='userHub'
-            onClick={targets.openModal}
-            label='Update targets based on current stats'
-          />
+          <div data-tour='userhub-update-targets-button'>
+            <PopupButton
+              mode='action'
+              variant='userHub'
+              onClick={targets.openModal}
+              label='Update targets based on current stats'
+            />
+          </div>
         </div>
       }
     >
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-12'>
-        <section className='rounded-3xl border border-rose-100/70 bg-white/70 p-6 shadow-[0_16px_44px_-36px_rgba(16,24,40,0.28)] backdrop-blur-2xl sm:p-7 lg:col-span-8'>
+        <section
+          data-tour='userhub-physical-stats-card'
+          className='rounded-3xl border border-rose-100/70 bg-white/70 p-6 shadow-[0_16px_44px_-36px_rgba(16,24,40,0.28)] backdrop-blur-2xl sm:p-7 lg:col-span-8'
+        >
           <div className='mb-4'>
             <h2 className='text-lg font-semibold text-gray-900'>
               Physical Stats
@@ -52,11 +121,15 @@ const PhysicalStatsPage: React.FC = () => {
             showTitle={false}
             hideWeight
             onTargetsChanged={targets.notifyTargetsChanged}
+            ref={physicalStatsRef}
           />
         </section>
 
         <div className='flex flex-col gap-6 lg:col-span-4'>
-          <section className='rounded-3xl border border-rose-100/70 bg-white/70 p-6 shadow-[0_16px_44px_-36px_rgba(16,24,40,0.28)] backdrop-blur-2xl sm:p-7 lg:sticky lg:top-24'>
+          <section
+            data-tour='userhub-weight-goal-card'
+            className='rounded-3xl border border-rose-100/70 bg-white/70 p-6 shadow-[0_16px_44px_-36px_rgba(16,24,40,0.28)] backdrop-blur-2xl sm:p-7 lg:sticky lg:top-24'
+          >
             <div className='mb-4'>
               <h2 className='text-lg font-semibold text-gray-900'>
                 Today’s Check-in
@@ -69,9 +142,13 @@ const PhysicalStatsPage: React.FC = () => {
             <WeightAndGoal
               embedded
               showTitle={false}
-              goalType={targets.goalType}
-              onGoalTypeChange={targets.changeGoalType}
+              goalType={pendingGoalType}
+              onGoalTypeChange={(value) => {
+                setPendingGoalType(value);
+                setIsGoalDirty(true);
+              }}
               onTargetsChanged={targets.notifyTargetsChanged}
+              ref={weightRef}
             />
 
             <div className='mt-6 rounded-2xl border border-rose-100 bg-rose-50/60 p-4 text-sm text-gray-700'>
@@ -83,6 +160,20 @@ const PhysicalStatsPage: React.FC = () => {
             </div>
           </section>
         </div>
+      </div>
+
+      <div
+        className='mt-8 flex justify-end'
+        data-tour='userhub-save-changes-container'
+      >
+        <Button
+          data-tour='userhub-save-changes'
+          onClick={handleSaveAll}
+          disabled={isSaving}
+          className='h-11 rounded-2xl border-none bg-[#ef7a66] px-6 font-semibold text-white hover:bg-[#e86852] disabled:cursor-not-allowed disabled:bg-gray-400'
+        >
+          {isSaving ? 'Saving…' : 'Save changes'}
+        </Button>
       </div>
 
       <NutritionTargetModal

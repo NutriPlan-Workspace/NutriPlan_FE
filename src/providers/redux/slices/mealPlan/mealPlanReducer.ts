@@ -22,6 +22,9 @@ export type SwapModalState = {
   targetItemId?: string;
   targetFoodId?: string;
   filters: SwapModalFilters;
+  generationMode: 'percentage' | 'remaining';
+  targetItemCount?: number;
+  targetRatio?: number;
 };
 
 export type MealPlanState = {
@@ -31,6 +34,8 @@ export type MealPlanState = {
   isDragging: boolean;
   flashMealCardIds: string[];
   swapModal: SwapModalState;
+  dockSearchQuery: string;
+  isDockExpanded: boolean;
 };
 
 export const mealPlanInitialState: MealPlanState = {
@@ -45,7 +50,12 @@ export const mealPlanInitialState: MealPlanState = {
     data: null,
     swapType: null,
     filters: {},
+    generationMode: 'percentage',
+    targetItemCount: undefined,
+    targetRatio: undefined,
   },
+  dockSearchQuery: '',
+  isDockExpanded: false,
 };
 
 const mealPlanSlice = createSlice({
@@ -157,6 +167,9 @@ const mealPlanSlice = createSlice({
         targetItemId: action.payload.targetItemId,
         targetFoodId: action.payload.targetFoodId,
         filters: action.payload.filters ?? {},
+        generationMode: 'percentage',
+        targetItemCount: undefined,
+        targetRatio: undefined,
       };
     },
 
@@ -171,6 +184,9 @@ const mealPlanSlice = createSlice({
       state.swapModal.targetItemId = undefined;
       state.swapModal.targetFoodId = undefined;
       state.swapModal.filters = {};
+      state.swapModal.generationMode = 'percentage';
+      state.swapModal.targetItemCount = undefined;
+      state.swapModal.targetRatio = undefined;
     },
 
     setSwapModalLoading: (
@@ -193,6 +209,30 @@ const mealPlanSlice = createSlice({
     ) => {
       state.swapModal.filters = action.payload.filters;
     },
+    setSwapModalGenerationMode: (
+      state,
+      action: PayloadAction<{ mode: 'percentage' | 'remaining' }>,
+    ) => {
+      state.swapModal.generationMode = action.payload.mode;
+    },
+    setSwapModalTargetItemCount: (
+      state,
+      action: PayloadAction<{ count?: number }>,
+    ) => {
+      state.swapModal.targetItemCount = action.payload.count;
+    },
+    setSwapModalTargetRatio: (
+      state,
+      action: PayloadAction<{ ratio?: number }>,
+    ) => {
+      state.swapModal.targetRatio = action.payload.ratio;
+    },
+    setDockSearchQuery: (state, action: PayloadAction<string>) => {
+      state.dockSearchQuery = action.payload;
+    },
+    setIsDockExpanded: (state, action: PayloadAction<boolean>) => {
+      state.isDockExpanded = action.payload;
+    },
   },
 });
 
@@ -211,5 +251,10 @@ export const {
   setSwapModalLoading,
   setSwapModalData,
   setSwapModalFilters,
+  setSwapModalGenerationMode,
+  setSwapModalTargetItemCount,
+  setSwapModalTargetRatio,
+  setDockSearchQuery,
+  setIsDockExpanded,
 } = mealPlanSlice.actions;
 export default mealPlanSlice.reducer;

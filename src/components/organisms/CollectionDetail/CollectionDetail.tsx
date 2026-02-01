@@ -3,7 +3,7 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import { IoCloudUpload } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 import { useParams, useRouter } from '@tanstack/react-router';
-import { Image, Modal, Typography } from 'antd';
+import { Image, Modal, Select, Typography } from 'antd';
 import { motion } from 'framer-motion';
 
 import { Button } from '@/atoms/Button';
@@ -15,8 +15,11 @@ import { ActionButtons } from '@/molecules/ActionButtons';
 import { FoodsSection } from '@/molecules/FoodsSection';
 import { PopupUpload } from '@/molecules/PopupUpload';
 import {
+  useCreateCollectionMutation,
   useDeleteCollectionMutation,
   useGetCollectionDetailQuery,
+  useTrackCuratedCollectionCopyMutation,
+  useTrackCuratedCollectionViewMutation,
   useUpdateCollectionMutation,
 } from '@/redux/query/apis/collection/collectionApi';
 import { userSelector } from '@/redux/slices/user';
@@ -34,6 +37,8 @@ const { Title, Paragraph } = Typography;
 
 const DEFAULT_FAVORITE_IMAGE =
   'https://img.freepik.com/free-photo/chicken-fajita-chicken-fillet-fried-with-bell-pepper-lavash-with-bread-slices-white-plate_114579-174.jpg?t=st=1746506112~exp=1746509712~hmac=8bddd99a63709df09e8e40e0d7855c1584bcc4c86310d2e1b79ec6e9ae1f4f82&w=740';
+const DEFAULT_EXCLUSION_IMAGE =
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop';
 const DEFAULT_COLLECTION_IMAGE =
   'https://st.depositphotos.com/1809906/1375/v/950/depositphotos_13755635-stock-illustration-food-collection.jpg';
 
@@ -45,6 +50,10 @@ const CollectionDetail: React.FC = () => {
   const [upload, setUpload] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [img, setImg] = useState<string | undefined>(undefined);
+  const [recurringModalOpen, setRecurringModalOpen] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState<
+    'daily' | 'weekly' | 'monthly'
+  >('weekly');
 
   const user = useSelector(userSelector).user;
   const { showToastError, showToastSuccess } = useToast();
@@ -52,8 +61,17 @@ const CollectionDetail: React.FC = () => {
   const { data, isLoading, refetch } = useGetCollectionDetailQuery(id!, {
     skip: !id,
   });
+  const [createCollection] = useCreateCollectionMutation();
   const [updateCollection] = useUpdateCollectionMutation();
   const [deleteCollection] = useDeleteCollectionMutation();
+  const [trackCuratedCollectionView] = useTrackCuratedCollectionViewMutation();
+  const [trackCuratedCollectionCopy] = useTrackCuratedCollectionCopyMutation();
+
+  useEffect(() => {
+    const collection = data?.data;
+    if (!id || !collection?.isCurated) return;
+    trackCuratedCollectionView({ collectionId: id, source: 'detail' });
+  }, [data?.data, data?.data?.isCurated, id, trackCuratedCollectionView]);
 
   useEffect(() => {
     if (data?.data?.foods) {
@@ -69,7 +87,77 @@ const CollectionDetail: React.FC = () => {
   };
 
   const handleSetAsRecurring = () => {
-    console.log('Set as recurring clicked');
+    const existingFrequency = data?.data?.recurringFrequency;
+    if (existingFrequency) {
+      setRecurringFrequency(existingFrequency);
+    }
+    setRecurringModalOpen(true);
+  };
+
+  const handleConfirmRecurring = async () => {
+    if (!id) return;
+    try {
+      await updateCollection({
+        id,
+        data: {
+          isRecurring: true,
+          recurringFrequency,
+          recurringStartDate: new Date().toISOString(),
+        },
+      }).unwrap();
+      setRecurringModalOpen(false);
+      refetch();
+    } catch {
+      showToastError('Failed to set recurring.');
+    }
+  };
+
+  const handleDisableRecurring = async () => {
+    if (!id) return;
+    try {
+      await updateCollection({
+        id,
+        data: {
+          isRecurring: false,
+        },
+      }).unwrap();
+      setRecurringModalOpen(false);
+      refetch();
+      showToastSuccess('Recurring disabled.');
+    } catch {
+      showToastError('Failed to update recurring.');
+    }
+  };
+
+  const handleMakeCopy = async () => {
+    if (!data?.data) return;
+    try {
+      const payload = {
+        title: `${data.data.title} (Copy)`,
+        description: data.data.description,
+        img: data.data.img,
+        foods: data.data.foods?.map((item) => ({
+          food: item.food._id,
+          date: item.date,
+        })),
+      };
+      const response = await createCollection(payload).unwrap();
+      if (response.data?._id) {
+        if (data.data.isCurated && id) {
+          trackCuratedCollectionCopy({
+            collectionId: id,
+            destinationCollectionId: response.data._id,
+            source: 'detail',
+          });
+        }
+        router.navigate({
+          to: '/collections/$id',
+          params: { id: response.data._id },
+        });
+      }
+    } catch {
+      showToastError('Failed to copy collection.');
+    }
   };
 
   const handleDelete = async () => {
@@ -188,7 +276,9 @@ const CollectionDetail: React.FC = () => {
     img ||
     (data?.data?.isFavorites
       ? DEFAULT_FAVORITE_IMAGE
-      : DEFAULT_COLLECTION_IMAGE);
+      : data?.data?.isExclusions
+        ? DEFAULT_EXCLUSION_IMAGE
+        : DEFAULT_COLLECTION_IMAGE);
 
   return (
     <motion.div
@@ -256,8 +346,13 @@ const CollectionDetail: React.FC = () => {
                   <div className='shrink-0'>
                     <ActionButtons
                       isFavorite={data?.data?.isFavorites || false}
+                      isExclusion={data?.data?.isExclusions || false}
+                      isCurated={data?.data?.isCurated || false}
+                      isRecurring={data?.data?.isRecurring}
+                      recurringFrequency={data?.data?.recurringFrequency}
                       onEdit={handleEdit}
                       onSetAsRecurring={handleSetAsRecurring}
+                      onMakeCopy={handleMakeCopy}
                       onDelete={handleDelete}
                     />
                   </div>
@@ -289,6 +384,52 @@ const CollectionDetail: React.FC = () => {
               }}
               onSubmit={onSubmit}
             />
+          </Modal>
+
+          <Modal
+            title='Set recurring'
+            open={recurringModalOpen}
+            onCancel={() => setRecurringModalOpen(false)}
+            footer={
+              <div className='flex justify-end gap-2 pt-4'>
+                <Button
+                  className='rounded-xl border border-gray-200 bg-white px-4 py-2 font-medium text-gray-600 hover:bg-gray-50'
+                  onClick={() => setRecurringModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                {data?.data?.isRecurring && (
+                  <Button
+                    className='rounded-xl border border-red-200 bg-red-50 px-4 py-2 font-medium text-red-600 hover:bg-red-100'
+                    onClick={handleDisableRecurring}
+                  >
+                    Turn Off
+                  </Button>
+                )}
+                <Button
+                  className='bg-secondary-600 hover:bg-secondary-700 rounded-xl px-4 py-2 font-medium text-white'
+                  onClick={handleConfirmRecurring}
+                >
+                  Save
+                </Button>
+              </div>
+            }
+          >
+            <div className='space-y-3'>
+              <p className='text-sm text-gray-600'>
+                Choose how often to reuse this collection when generating meals.
+              </p>
+              <Select
+                value={recurringFrequency}
+                onChange={(value) => setRecurringFrequency(value)}
+                className='w-full'
+                options={[
+                  { value: 'daily', label: 'Daily' },
+                  { value: 'weekly', label: 'Weekly' },
+                  { value: 'monthly', label: 'Monthly' },
+                ]}
+              />
+            </div>
           </Modal>
         </div>
       </HubPageShell>

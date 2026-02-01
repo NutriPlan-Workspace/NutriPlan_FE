@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { IoSearch } from 'react-icons/io5';
 import { Input, Modal } from 'antd';
 
-import { cn } from '@/helpers/helpers';
 import { SelectedIngredientDetail } from '@/molecules/AddFoodCollectionModal';
 import {
   FoodCardCollection,
@@ -64,7 +63,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
       setDebouncedValue(searchValue.trim());
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchValue]);
+  }, [searchValue, open]);
 
   useEffect(() => {
     const shouldShow = !isFetching && foods.length < 20 && debouncedValue;
@@ -84,7 +83,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     if (Array.isArray(data?.data)) {
       setFoods((prev) => (page === 1 ? data.data : [...prev, ...data.data]));
     }
-  }, [data]);
+  }, [data, page]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
     const target = e.currentTarget;
@@ -102,14 +101,17 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
       onCancel={onClose}
       centered={true}
       footer={null}
-      width={800}
-      bodyStyle={{ maxHeight: 'calc(100vh - 100px)', overflow: 'auto' }}
+      width={1000}
     >
-      <div className='flex gap-5'>
-        <div className='flex flex-1 flex-col'>
+      <div className='flex h-[80vh] gap-2 p-2'>
+        <div
+          className='flex h-full flex-1 flex-col gap-2 overflow-y-scroll'
+          onScroll={handleScroll}
+          ref={scrollContainerRef}
+        >
           <div className='sticky top-0 z-50 flex items-center justify-between gap-4 bg-white p-2'>
             <Input
-              placeholder='Search...'
+              placeholder='Search ingredients...'
               allowClear
               size='large'
               className='w-[300px] rounded-full py-2'
@@ -119,19 +121,13 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
             />
           </div>
 
-          <div
-            className={cn(
-              'max-h-[800px] min-h-[600px] flex-1 overflow-y-scroll px-2',
-              isFetching && foods.length === 0 && 'min-h-[600px]',
-            )}
-            onScroll={handleScroll}
-            ref={scrollContainerRef}
-          >
+          <div className='flex-1 px-2'>
             {foods.map((food) => (
               <FoodCardCollection
                 key={food._id}
                 food={food}
                 onClick={() => setSelectedFood(food)}
+                variant='list'
               />
             ))}
 
@@ -141,12 +137,14 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
               ))}
 
             {delayedNoFoods && (
-              <p className='mt-4 text-center text-gray-500'>No foods found.</p>
+              <p className='mt-4 text-center text-gray-500'>
+                No ingredients found.
+              </p>
             )}
           </div>
         </div>
 
-        <div className='flex-1 pl-4'>
+        <div className='h-full flex-1 overflow-y-scroll'>
           {selectedFood ? (
             <SelectedIngredientDetail
               selectedFood={selectedFood}
@@ -154,9 +152,9 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
               onBack={() => setSelectedFood(null)}
             />
           ) : (
-            <p className='text-gray-400 italic'>
-              Select a food to view details.
-            </p>
+            <div className='flex h-full items-center justify-center text-gray-400 italic'>
+              Select a food to add as ingredient.
+            </div>
           )}
         </div>
       </div>

@@ -3,11 +3,13 @@ import { IoClose } from 'react-icons/io5';
 import { Modal } from 'antd';
 
 import type { NutritionFields } from '@/types/food';
+import type { NutritionGoal } from '@/types/user';
 
 import { DetailedNutriTable } from '../DetailedNutriTable';
 
 type ModalNutritionDetailProps = {
   nutrition: NutritionFields | undefined;
+  targetNutrition?: NutritionGoal; // Add this
   isModalOpen: boolean;
   setIsModalOpen: (isOpen: boolean) => void;
   type?: string;
@@ -15,6 +17,7 @@ type ModalNutritionDetailProps = {
 
 const ModalNutritionDetail: React.FC<ModalNutritionDetailProps> = ({
   nutrition,
+  targetNutrition,
   isModalOpen,
   setIsModalOpen,
   type = 'food',
@@ -60,7 +63,13 @@ const ModalNutritionDetail: React.FC<ModalNutritionDetailProps> = ({
       </div>
 
       <div className='max-h-[78vh] overflow-y-auto px-6 py-5'>
-        {nutrition && <DetailedNutriTable nutrition={nutrition} type={type} />}
+        {nutrition && (
+          <DetailedNutriTable
+            nutrition={nutrition}
+            type={type}
+            targetNutrition={targetNutrition}
+          />
+        )}
       </div>
     </div>
   </Modal>

@@ -14,6 +14,7 @@ interface CategoryFoodProps {
   isLoading?: boolean;
   isAllCategory?: boolean;
   onViewMore?: () => void;
+  hideActions?: boolean;
 }
 
 const CategoryFood: React.FC<CategoryFoodProps> = ({
@@ -23,6 +24,7 @@ const CategoryFood: React.FC<CategoryFoodProps> = ({
   isLoading = false,
   isAllCategory = false,
   onViewMore,
+  hideActions,
 }) => {
   const displayedFoods = isAllCategory ? foods.slice(0, 5) : foods;
 
@@ -106,7 +108,11 @@ const CategoryFood: React.FC<CategoryFoodProps> = ({
               </div>
               <div className='flex flex-col gap-2'>
                 {groupFoods.map((food) => (
-                  <FoodCardSideAdd key={food._id} food={food} />
+                  <FoodCardSideAdd
+                    key={food._id}
+                    food={food}
+                    hideActions={hideActions}
+                  />
                 ))}
               </div>
             </div>

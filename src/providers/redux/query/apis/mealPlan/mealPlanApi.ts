@@ -1,4 +1,4 @@
-import { AUTO_GENERATE } from '@/constants/endpoints';
+import { AUTO_GENERATE, AUTO_GENERATE_WEEK } from '@/constants/endpoints';
 import { PrimaryDiet } from '@/constants/primaryDiet';
 import { baseApiWithAuth } from '@/redux/query/apis/baseApi';
 import {
@@ -19,6 +19,11 @@ import type {
   UpdateMealPlanQueryArgs,
   UpdateMealPlanResponse,
 } from '@/types/mealPlan';
+import {
+  SwapApplyRequest,
+  SwapOptionsRequest,
+  SwapOptionsResponse,
+} from '@/types/mealSwap';
 import { getDayRangeFromTo, getMealDate, isSameDay } from '@/utils/dateUtils';
 
 export const mealPlanApi = baseApiWithAuth.injectEndpoints({
@@ -139,6 +144,7 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
       ApiResponse<MealPlanDay>,
       {
         date?: string;
+        targetPercentage?: number;
         preferences?: {
           type: PrimaryDiet;
           calories: number;
@@ -167,6 +173,65 @@ export const mealPlanApi = baseApiWithAuth.injectEndpoints({
       },
       invalidatesTags: ['MealPlan'],
     }),
+    autoGenerateMealPlanWeek: builder.mutation<
+      ApiResponse<MealPlanDay[]>,
+      { date?: string }
+    >({
+      query: (params) => ({
+        url: `/planner${AUTO_GENERATE_WEEK}`,
+        method: 'POST',
+        body: params,
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        const { data } = await queryFulfilled;
+        if (data.data) {
+          const mealPlanWithDates = data.data.map((mealPlan) => ({
+            mealDate: mealPlan.mealDate,
+            mealPlanDay: mealPlan,
+          }));
+          dispatch(setViewingMealPlans({ mealPlanWithDates }));
+          dispatch(addCacheMealPlans({ mealPlanWithDates }));
+        }
+      },
+      invalidatesTags: ['MealPlan'],
+    }),
+    searchFoods: builder.query<
+      unknown,
+      { q?: string; allSearch: boolean; filters: string[] }
+    >({
+      query: (params) => {
+        const query = new URLSearchParams({
+          q: params.q || '',
+          allSearch: String(params.allSearch),
+          filters: JSON.stringify(params.filters),
+        }).toString();
+        return `/foods/search?${query}`;
+      },
+    }),
+    getSwapOptions: builder.mutation<
+      SwapOptionsResponse,
+      { mealPlanId: string; payload: SwapOptionsRequest }
+    >({
+      query: ({ mealPlanId, payload }) => ({
+        url: `/planner/${mealPlanId}/swap-options`,
+        method: 'POST',
+        body: payload,
+      }),
+      transformResponse: (response: ApiResponse<SwapOptionsResponse>) =>
+        response.data,
+    }),
+    applySwap: builder.mutation<
+      MealPlanDay,
+      { mealPlanId: string; payload: SwapApplyRequest }
+    >({
+      query: ({ mealPlanId, payload }) => ({
+        url: `/planner/${mealPlanId}/swap`,
+        method: 'PATCH',
+        body: payload,
+      }),
+      transformResponse: (response: ApiResponse<MealPlanDay>) => response.data,
+      invalidatesTags: ['MealPlan'],
+    }),
   }),
 });
 
@@ -180,4 +245,8 @@ export const {
   useRemoveMealPlanMutation,
   useGetGroceriesQuery,
   useAutoGenerateMealPlanMutation,
+  useAutoGenerateMealPlanWeekMutation,
+  useLazySearchFoodsQuery,
+  useGetSwapOptionsMutation,
+  useApplySwapMutation,
 } = mealPlanApi;

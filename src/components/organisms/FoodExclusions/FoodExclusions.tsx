@@ -174,7 +174,7 @@ const FoodExclusions: React.FC<FoodExclusionsProps> = ({
 
         <aside className='lg:col-span-4'>
           <div className='sticky top-10 space-y-6'>
-            <section className='rounded-3xl border border-rose-100/70 bg-white/70 p-5 shadow-[0_18px_48px_-36px_rgba(16,24,40,0.22)] backdrop-blur-2xl'>
+            <section className='rounded-3xl border border-[#e86852]/20 bg-white/70 p-5 shadow-[0_18px_48px_-36px_rgba(16,24,40,0.22)] backdrop-blur-2xl'>
               <h2 className='text-base font-semibold text-gray-900'>
                 Excluded by diet
                 <span className='ml-2 text-sm font-medium text-gray-600'>
@@ -220,7 +220,7 @@ const FoodExclusions: React.FC<FoodExclusionsProps> = ({
 
               <div className='mt-3 h-3 w-full overflow-hidden rounded-full border border-black/5 bg-white'>
                 <motion.div
-                  className='h-full rounded-full bg-[#ef7a66]'
+                  className='h-full rounded-full bg-[#e86852]'
                   initial={{ width: 0 }}
                   animate={{ width: `${excludedPercent}%` }}
                   transition={{ duration: 0.45, ease: 'easeInOut' }}
@@ -230,7 +230,7 @@ const FoodExclusions: React.FC<FoodExclusionsProps> = ({
               <AnimatePresence>
                 {excludedPercent >= 60 && (
                   <motion.div
-                    className='mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-sm text-gray-600 ring-1 ring-rose-100'
+                    className='mt-3 rounded-2xl bg-[#e86852]/5 px-3 py-2 text-sm text-gray-600 ring-1 ring-[#e86852]/20'
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}

@@ -1,6 +1,12 @@
 import React from 'react';
 import { Control, Controller, UseFormSetValue } from 'react-hook-form';
-import { Button, Checkbox, InputNumber, Typography } from 'antd';
+import {
+  Button,
+  Checkbox,
+  ConfigProvider,
+  InputNumber,
+  Typography,
+} from 'antd';
 
 import { TimeField } from '@/constants/recipeForm';
 import { cn } from '@/helpers/helpers';
@@ -36,7 +42,7 @@ const RecipePropertiesSection: React.FC<Props> = ({
         <Button
           className={cn(
             'rounded-md hover:border-transparent',
-            selectedMainDish && 'bg-primary text-white',
+            selectedMainDish && 'bg-secondary-400 text-white',
           )}
           onClick={() => {
             setValue('property.mainDish', true);
@@ -48,7 +54,7 @@ const RecipePropertiesSection: React.FC<Props> = ({
         <Button
           className={cn(
             'rounded-md hover:border-gray-200',
-            !selectedMainDish && 'bg-primary text-white',
+            !selectedMainDish && 'bg-secondary-400 text-white',
           )}
           onClick={() => {
             setValue('property.mainDish', false);
@@ -61,14 +67,22 @@ const RecipePropertiesSection: React.FC<Props> = ({
     </FormRow>
 
     <FormRow label='Works well for' isEnd={true}>
-      <Checkbox.Group
-        options={['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Dessert']}
-        value={selectedMeals}
-        onChange={(checkedValues) =>
-          handleMealChange(checkedValues as string[])
-        }
-        className='grid grid-cols-3 gap-2'
-      />
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#649dad',
+          },
+        }}
+      >
+        <Checkbox.Group
+          options={['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Dessert']}
+          value={selectedMeals}
+          onChange={(checkedValues) =>
+            handleMealChange(checkedValues as string[])
+          }
+          className='grid grid-cols-3 gap-2'
+        />
+      </ConfigProvider>
     </FormRow>
 
     <Title level={3} className='mt-4 font-thin'>
@@ -79,7 +93,7 @@ const RecipePropertiesSection: React.FC<Props> = ({
       <FormRow
         key={index}
         label={field.label}
-        isEnd={index === timeFields.length - 1} 
+        isEnd={index === timeFields.length - 1}
         contentClassName='flex items-center justify-end gap-2'
       >
         {field.key ? (

@@ -1,4 +1,3 @@
-import { DateRange } from 'react-day-picker';
 import {
   addDays,
   addWeeks,
@@ -10,6 +9,10 @@ import {
   startOfDay,
   startOfWeek,
 } from 'date-fns';
+
+import { DateRange } from '@/types/date';
+
+export { startOfDay };
 
 export const getWeekRange = (date: Date, offset: number = 0): DateRange => {
   const from = startOfWeek(addWeeks(date, offset), { weekStartsOn: 1 });

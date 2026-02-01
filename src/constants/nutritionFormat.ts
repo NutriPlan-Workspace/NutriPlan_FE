@@ -1,16 +1,20 @@
 import type { NutritionGoal } from '@/types/user';
 
 export enum NUTRITION_TEXT_COLOR {
-  CARBS = 'text-carbsYellow',
-  FATS = 'text-fatsBlue',
+  CARBS = 'text-carbsBlue',
+  FATS = 'text-fatsYellow',
   PROTEINS = 'text-proteinsPurple',
   DEFAULT = 'text-black',
 }
 
 export enum NUTRITION_HEX_COLOR {
-  CARBS = '#6ac85a',
-  FATS = '#52c0bc',
-  PROTEINS = '#976fe8',
+  CARBS = '#3b82f6', // blue-500
+  FATS = '#eab308', // yellow-500
+  PROTEINS = '#a855f7', // purple-500
+  FIBER = '#22c55e', // green-500
+  SODIUM = '#94a3b8', // slate-400
+  CHOLESTEROL = '#f59e0b', // amber-500 (yellow-orange)
+  CALORIES = '#f97316', // orange-500
 }
 
 export const nutritionFormat = [
@@ -82,18 +86,28 @@ export const nutritionChart = [
 export const nutritionFieldGroup = [
   {
     nutriName: 'general',
-    label1: 'Nutrient',
+    label1: 'Main Nutrients',
     label2: 'Amount',
     label3: 'Target',
+    hasTarget: true,
     field: [
       { key: 'calories', title: 'Calories', unit: '' },
       { key: 'carbs', title: 'Carbs', unit: 'g' },
       { key: 'fats', title: 'Fats', unit: 'g' },
       { key: 'proteins', title: 'Protein', unit: 'g' },
-      { key: 'netCarbs', title: 'Net Carbs', unit: 'g' },
       { key: 'fiber', title: 'Fiber', unit: 'g' },
       { key: 'sodium', title: 'Sodium', unit: 'mg' },
       { key: 'cholesterol', title: 'Cholesterol', unit: 'mg' },
+    ],
+  },
+  {
+    nutriName: 'breakdown',
+    label1: 'Breakdown',
+    label2: 'Amount',
+    label3: '',
+    hasTarget: false,
+    field: [
+      { key: 'netCarbs', title: 'Net Carbs', unit: 'g' },
       { key: 'calcium', title: 'Calcium', unit: 'mg' },
       { key: 'iron', title: 'Iron', unit: 'mg' },
       { key: 'potassium', title: 'Potassium', unit: 'mg' },
@@ -209,14 +223,34 @@ export const nutritionFieldGroup = [
 ];
 
 export const targetKeyMap: Record<
-  'calories' | 'carbs' | 'fats' | 'proteins',
+  | 'calories'
+  | 'carbs'
+  | 'fats'
+  | 'proteins'
+  | 'fiber'
+  | 'sodium'
+  | 'cholesterol',
   keyof NutritionGoal
 > = {
   calories: 'calories',
   carbs: 'carbTarget',
   fats: 'fatTarget',
   proteins: 'proteinTarget',
+  fiber: 'minimumFiber',
+  sodium: 'maxiumSodium',
+  cholesterol: 'maxiumCholesterol',
 };
+
+// Nutrients that have target values (shown in TARGET column)
+export const NUTRIENTS_WITH_TARGETS = [
+  'calories',
+  'carbs',
+  'fats',
+  'proteins',
+  'fiber',
+  'sodium',
+  'cholesterol',
+] as const;
 export const nutritionalValue = [
   {
     label: 'Calories',

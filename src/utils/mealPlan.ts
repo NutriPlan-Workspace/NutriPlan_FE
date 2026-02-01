@@ -21,6 +21,7 @@ export function convertFoodCardToMealPlanFood(food: Food): MealPlanFood {
       _id: food._id,
       name: food.name,
       imgUrls: food.imgUrls,
+      categories: food.categories,
       property: {
         prepTime: food.property.prepTime,
         cookTime: food.property.cookTime,
@@ -44,6 +45,7 @@ export function convertFoodCardToMealPlanFood(food: Food): MealPlanFood {
     },
     amount: 1,
     unit: food.defaultUnit,
+    isEaten: false,
   };
 }
 
@@ -169,16 +171,19 @@ export function getMealPlanDayDatabaseDTOByMealPlanDay(
         foodId: meal.foodId._id,
         amount: meal.amount,
         unit: meal.unit,
+        isEaten: meal.isEaten,
       })),
       lunch: mealPlanDay.mealItems.lunch.map((meal) => ({
         foodId: meal.foodId._id,
         amount: meal.amount,
         unit: meal.unit,
+        isEaten: meal.isEaten,
       })),
       dinner: mealPlanDay.mealItems.dinner.map((meal) => ({
         foodId: meal.foodId._id,
         amount: meal.amount,
         unit: meal.unit,
+        isEaten: meal.isEaten,
       })),
     },
   };

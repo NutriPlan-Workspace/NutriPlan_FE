@@ -6,7 +6,7 @@ import { PATH } from '@/constants/path';
 const Banner: React.FC = () => (
   <div className='flex w-full items-center justify-between gap-5 lg:px-4 xl:px-28'>
     <div className='relative w-1/2'>
-      <h1 className='font-rossanova m-0 w-full text-[56px] leading-[100%] font-bold tracking-[-1.92px] text-[#26272b] not-italic'>
+      <h1 className='entry-title m-0 w-full text-[56px] leading-[100%] font-bold tracking-[-1.92px] text-[#26272b] not-italic'>
         <span className='text-primary'>VietNamese&apos;s Trusted</span>
         <br />
         Nutrition,

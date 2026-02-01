@@ -1,12 +1,16 @@
-import { FOODS_ENDPOINT, SEARCH_FOOD_ENDPOINT } from '@/constants/endpoints';
-import { baseApi } from '@/redux/query/apis/baseApi';
+import {
+  FOOD_VIEW_ENDPOINT,
+  FOODS_ENDPOINT,
+  SEARCH_FOOD_ENDPOINT,
+} from '@/constants/endpoints';
+import { baseApiWithAuth } from '@/redux/query/apis/baseApi';
 import { FoodFormSchema } from '@/schemas/recipeSchema';
 import type { ApiResponse } from '@/types/apiResponse';
 import type { DetailedFoodResponse, Food, FoodCategory } from '@/types/food';
 import type { PostCustomFoodQueryArgs, PostFoodResponse } from '@/types/food';
 import type { FoodFilterQuery } from '@/types/foodFilterQuery';
 
-export const foodsApi = baseApi.injectEndpoints({
+export const foodsApi = baseApiWithAuth.injectEndpoints({
   endpoints: (builder) => ({
     getFoods: builder.query<ApiResponse<Food[]>, FoodFilterQuery>({
       query: (params) => {
@@ -80,6 +84,16 @@ export const foodsApi = baseApi.injectEndpoints({
         method: 'DELETE',
       }),
     }),
+    trackFoodView: builder.mutation<
+      ApiResponse<unknown>,
+      { foodId: string; source?: string }
+    >({
+      query: (body) => ({
+        url: FOOD_VIEW_ENDPOINT,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -93,4 +107,5 @@ export const {
   useCreateCustomFoodMutation,
   useUpdateCustomFoodMutation,
   useRemoveCustomFoodMutation,
+  useTrackFoodViewMutation,
 } = foodsApi;

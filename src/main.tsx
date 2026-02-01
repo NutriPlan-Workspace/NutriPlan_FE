@@ -5,6 +5,7 @@ import { StyleProvider } from '@ant-design/cssinjs';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { ConfigProvider } from 'antd';
 
+import { ChatProvider } from '@/contexts/ChatContext';
 import { DateProvider } from '@/contexts/DateContext';
 import ToastProvider from '@/contexts/ToastContext';
 import { store } from '@/redux/store';
@@ -32,25 +33,27 @@ ReactDOM.createRoot(rootElement).render(
     <StyleProvider layer>
       <Provider store={store}>
         <ToastProvider>
-          <DateProvider>
-            <ScaleProvider>
-              <ScaleProviderIngre>
-                <ConfigProvider
-                  theme={{
-                    token: {
-                      fontFamily: '"TT Norms", sans-serif',
-                      // align Ant Design's default (blue) primary with NutriPlan theme
-                      colorPrimary: '#6fb478',
-                      colorInfo: '#6fb478',
-                      colorLink: '#417d4d',
-                    },
-                  }}
-                >
-                  <RouterProvider router={router} />
-                </ConfigProvider>
-              </ScaleProviderIngre>
-            </ScaleProvider>
-          </DateProvider>
+          <ChatProvider>
+            <DateProvider>
+              <ScaleProvider>
+                <ScaleProviderIngre>
+                  <ConfigProvider
+                    theme={{
+                      token: {
+                        fontFamily: '"TT Norms", sans-serif',
+                        // align Ant Design's default (blue) primary with NutriPlan theme
+                        colorPrimary: '#6fb478',
+                        colorInfo: '#6fb478',
+                        colorLink: '#417d4d',
+                      },
+                    }}
+                  >
+                    <RouterProvider router={router} />
+                  </ConfigProvider>
+                </ScaleProviderIngre>
+              </ScaleProvider>
+            </DateProvider>
+          </ChatProvider>
         </ToastProvider>
       </Provider>
     </StyleProvider>

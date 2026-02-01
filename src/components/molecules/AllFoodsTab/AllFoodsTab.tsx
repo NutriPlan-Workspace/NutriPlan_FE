@@ -16,11 +16,13 @@ const categoryTitles = {
 interface AllFoodsTabProps {
   onViewMore: (categoryKey: string) => void;
   searchText: string;
+  hideActions?: boolean;
 }
 
 const AllFoodsTab: React.FC<AllFoodsTabProps> = ({
   onViewMore,
   searchText,
+  hideActions,
 }) => {
   const { data, isLoading } = useSearchFoodQuery({
     q: searchText,
@@ -38,6 +40,7 @@ const AllFoodsTab: React.FC<AllFoodsTabProps> = ({
             foods={data?.data?.[key]?.foods || []}
             title={categoryTitles[key]}
             onViewMore={() => onViewMore(key)}
+            hideActions={hideActions}
           />
         </div>
       ))}

@@ -2,12 +2,17 @@ import type { Food } from './food';
 
 export interface CollectionDetail {
   _id: string;
-  userId: string;
+  userId: string | { _id: string; fullName: string; email: string };
   title: string;
   img: string;
   description: string;
   foods: CollectionFood[];
   isFavorites: boolean;
+  isExclusions: boolean;
+  isCurated?: boolean;
+  isRecurring?: boolean;
+  recurringFrequency?: 'daily' | 'weekly' | 'monthly';
+  recurringStartDate?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,7 +30,7 @@ export interface CollectionFoodBrief {
 
 export interface Collection {
   _id: string;
-  userId: string;
+  userId: string | { _id: string; fullName: string; email: string };
   title: string;
   img: string;
   description: string;
@@ -34,6 +39,11 @@ export interface Collection {
     date: string;
   }[];
   isFavorites: boolean;
+  isExclusions: boolean;
+  isCurated?: boolean;
+  isRecurring?: boolean;
+  recurringFrequency?: 'daily' | 'weekly' | 'monthly';
+  recurringStartDate?: string;
   createdAt: string;
   updatedAt: string;
 }

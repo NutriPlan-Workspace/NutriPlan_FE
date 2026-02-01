@@ -29,6 +29,10 @@ export interface User {
     maxiumSodium: number;
     maxiumCholesterol: number;
     goalType: NutritionGoals;
+    breakfastRatio?: number;
+    lunchRatio?: number;
+    dinnerRatio?: number;
+    snackRatio?: number;
   };
   primaryDiet: PrimaryDietType;
   excluded: {
@@ -103,6 +107,13 @@ export interface NutritionGoal {
   carbTarget: Range;
   fatTarget: Range;
   goalType: string | undefined;
+  minimumFiber?: number;
+  maxiumSodium?: number;
+  maxiumCholesterol?: number;
+  breakfastRatio?: number;
+  lunchRatio?: number;
+  dinnerRatio?: number;
+  snackRatio?: number;
 }
 
 export interface PrimaryDietArgs {
@@ -117,6 +128,16 @@ export interface PhysicalStat {
   dateOfBirth: string;
   bodyFat: string;
   activityLevel: string;
+}
+
+export interface PhysicalStatUpdate {
+  userId: string;
+  gender?: string;
+  heightRecords?: { height: number }[];
+  weightRecords?: { weight: number }[];
+  dateOfBirth?: string;
+  bodyFat?: string;
+  activityLevel?: string;
 }
 
 export enum Gender {
@@ -163,6 +184,10 @@ export interface NutritionTarget {
   minimumFiber: number;
   maxiumSodium: number;
   maxiumCholesterol: number;
+  breakfastRatio?: number;
+  lunchRatio?: number;
+  dinnerRatio?: number;
+  snackRatio?: number;
 }
 
 export interface UserResponse {

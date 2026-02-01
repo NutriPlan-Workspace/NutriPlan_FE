@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { EmptyMealDay } from '@/molecules/EmptyMealDay';
+import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
 import { MealBox } from '@/organisms/MealBox';
 import type { MealItems } from '@/types/mealPlan';
 import { getMealDate } from '@/utils/dateUtils';
@@ -21,25 +22,34 @@ const DayBoxContent: React.FC<DayBoxContentProps> = ({
   onCopyPreviousDay,
 }) => (
   <div className='flex flex-col gap-2 pt-2'>
-    {mealItems || isLoading ? (
+    {isLoading ? (
+      <div className='space-y-2'>
+        <div className='w-full rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35),_0_2px_4px_rgba(15,23,42,0.06)]'>
+          <MealBoxSkeleton />
+        </div>
+        <div className='w-full rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35),_0_2px_4px_rgba(15,23,42,0.06)]'>
+          <MealBoxSkeleton />
+        </div>
+        <div className='w-full rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_8px_18px_-12px_rgba(15,23,42,0.35),_0_2px_4px_rgba(15,23,42,0.06)]'>
+          <MealBoxSkeleton />
+        </div>
+      </div>
+    ) : mealItems ? (
       <div>
         <MealBox
           mealDate={getMealDate(mealDate)}
           mealType='breakfast'
           mealItems={mealItems?.breakfast ?? []}
-          isLoading={isLoading}
         />
         <MealBox
           mealDate={getMealDate(mealDate)}
           mealType='lunch'
           mealItems={mealItems?.lunch ?? []}
-          isLoading={isLoading}
         />
         <MealBox
           mealDate={getMealDate(mealDate)}
           mealType='dinner'
           mealItems={mealItems?.dinner ?? []}
-          isLoading={isLoading}
         />
       </div>
     ) : (

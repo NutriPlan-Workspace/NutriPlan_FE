@@ -58,7 +58,10 @@ const Ingredient: React.FC<IngredientProps> = ({ ingredientList }) => {
                 >
                   <img
                     className='aspect-square w-full rounded-sm object-cover'
-                    src={item.imgUrls[0] || ''}
+                    src={
+                      item.imgUrls?.[0] ||
+                      'https://res.cloudinary.com/dtwrwvffl/image/upload/v1746510206/whuexhkydv7ubiqh5rxe.jpg'
+                    }
                     alt={item.name}
                   />
                 </Popover>

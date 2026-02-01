@@ -41,7 +41,7 @@ const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
   });
 
   return (
-    <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+    <div className='flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-center sm:justify-between'>
       <Button
         className={cn(
           'flex h-11 items-center gap-2 rounded-2xl border px-4 text-gray-700 shadow-none transition',

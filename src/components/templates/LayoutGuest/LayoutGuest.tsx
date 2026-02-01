@@ -11,7 +11,7 @@ const LayoutGuest: React.FC<{
 
     <main className='flex-grow bg-[#f8f8f8]'>{children}</main>
 
-    <footer className='bg-black px-0 py-6 text-white lg:px-4 xl:px-24'>
+    <footer className='bg-slate-950 px-6 py-10 text-white lg:px-10 xl:px-24'>
       <Footer />
     </footer>
   </div>

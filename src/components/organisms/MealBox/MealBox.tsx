@@ -1,10 +1,16 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from '@tanstack/react-router';
 
+import { useMealPlanSetupStatus } from '@/hooks/useMealPlanSetupStatus';
 import { MealBoxHeader } from '@/molecules/MealBoxHeader';
 import { MealBoxSkeleton } from '@/molecules/MealBoxSkeleton';
 import { MealBoxContent } from '@/organisms/MealBoxContent';
-import { useUpdateMealPlanMutation } from '@/redux/query/apis/mealPlan/mealPlanApi';
+import {
+  useGetSwapOptionsMutation,
+  useUpdateMealPlanMutation,
+} from '@/redux/query/apis/mealPlan/mealPlanApi';
+import { useGetNutritionTargetQuery } from '@/redux/query/apis/user/userApi';
 import {
   closeSwapModal,
   mealPlanSelector,
@@ -13,6 +19,7 @@ import {
   setSwapModalLoading,
   updateViewingMealPlanByDate,
 } from '@/redux/slices/mealPlan';
+import { userSelector } from '@/redux/slices/user/userSelector';
 import type { MealItems, MealPlanDay, MealPlanFood } from '@/types/mealPlan';
 import type { MealType, SwapOptionsResponse } from '@/types/mealSwap';
 import {
@@ -21,7 +28,6 @@ import {
 } from '@/utils/calculateNutrition';
 import { isSameDay } from '@/utils/dateUtils';
 import { getMealPlanDayDatabaseDTOByMealPlanDay } from '@/utils/mealPlan';
-import { fetchSwapOptions } from '@/utils/mealSwapApi';
 import { showToastError } from '@/utils/toastUtils';
 
 interface MealBoxProps {
@@ -38,6 +44,8 @@ const MealBox: React.FC<MealBoxProps> = ({
   mealType,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+  const { canGenerate, nextSetupPath } = useMealPlanSetupStatus();
   const dispatch = useDispatch();
   const [updateMealPlan] = useUpdateMealPlanMutation();
   const viewingMealPlan = useSelector(mealPlanSelector).viewingMealPlans;
@@ -77,7 +85,13 @@ const MealBox: React.FC<MealBoxProps> = ({
     await updateMealPlan({ mealPlan: updatedMealPlanDatabaseDTO });
   };
 
+  const [getSwapOptions] = useGetSwapOptionsMutation();
   const handleOpenSwapOptions = useCallback(async () => {
+    if (!canGenerate) {
+      showToastError('Complete setup to enable meal generation.');
+      router.navigate({ to: nextSetupPath });
+      return;
+    }
     const currentMealPlanDay = viewingMealPlan.find((plan) =>
       isSameDay(new Date(plan.mealDate), new Date(mealDate)),
     )?.mealPlanDay;
@@ -98,12 +112,19 @@ const MealBox: React.FC<MealBoxProps> = ({
     );
     dispatch(setSwapModalLoading({ loading: true }));
     try {
-      const data = await fetchSwapOptions(currentMealPlanDay._id, {
-        swapType: 'meal',
-        mealType: mealType as MealType,
-        limit: 5,
-      });
-      dispatch(setSwapModalData({ data: data as SwapOptionsResponse }));
+      const data = await getSwapOptions({
+        mealPlanId: currentMealPlanDay._id,
+        payload: {
+          swapType: 'meal',
+          mealType: mealType as MealType,
+          limit: 20,
+          generationMode: 'percentage',
+        },
+      }).unwrap();
+      // Handle case where transformResponse doesn't unwrap the API wrapper
+      const swapData =
+        (data as unknown as { data?: SwapOptionsResponse }).data ?? data;
+      dispatch(setSwapModalData({ data: swapData as SwapOptionsResponse }));
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Swap options failed';
@@ -112,7 +133,16 @@ const MealBox: React.FC<MealBoxProps> = ({
     } finally {
       dispatch(setSwapModalLoading({ loading: false }));
     }
-  }, [dispatch, mealDate, mealType, viewingMealPlan]);
+  }, [
+    canGenerate,
+    dispatch,
+    getSwapOptions,
+    mealDate,
+    mealType,
+    nextSetupPath,
+    router,
+    viewingMealPlan,
+  ]);
 
   const isGeneratingThisMeal =
     swapModal.open &&
@@ -120,6 +150,12 @@ const MealBox: React.FC<MealBoxProps> = ({
     swapModal.swapType === 'meal' &&
     swapModal.mealDate === mealDate &&
     swapModal.mealType === (mealType as MealType);
+
+  const userState = useSelector(userSelector);
+  const { data: nutritionTargetData } = useGetNutritionTargetQuery(
+    { userId: userState?.user?.id ?? '' },
+    { skip: !userState?.user?.id },
+  );
 
   return (
     <div
@@ -137,11 +173,14 @@ const MealBox: React.FC<MealBoxProps> = ({
             }
             mealType={mealType}
             calories={totalCalories}
+            dailyTarget={nutritionTargetData?.data?.calories}
             nutritionData={totalNutrition}
             mealItems={mealItems}
             isHovered={isHovered}
             onGenerateOptions={handleOpenSwapOptions}
             isGenerating={isGeneratingThisMeal}
+            canGenerate={canGenerate}
+            onOpenSetup={() => router.navigate({ to: nextSetupPath })}
           />
           <div className='rounded-xl bg-white/70'>
             <MealBoxContent
