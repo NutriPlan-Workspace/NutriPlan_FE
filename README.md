@@ -125,10 +125,6 @@ We employ a hybrid state management approach:
 *   **TypeScript (5.7.3)**: Strict mode is enabled. We don't do `any`.
 *   **TanStack Router**: Delivers 100% type-safe routing. If you typo a URL or forget a parameter, the build fails.
 
-<div align="center">
-  <img src="https://via.placeholder.com/800x200?text=Tech+Stack+Architecture+Diagram" alt="Tech Stack Diagram" width="100%" />
-</div>
-
 ---
 
 ## ✨ Key Features

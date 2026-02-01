@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   createRootRoute,
   Outlet,
@@ -57,25 +57,48 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     getLayoutKey(pathname),
   );
 
+  const currentLayoutKeyRef = useRef(currentLayoutKey);
+  const delayLayoutChangeRef = useRef<number | null>(null);
+  const hideOverlayRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    currentLayoutKeyRef.current = currentLayoutKey;
+  }, [currentLayoutKey]);
+
   useEffect(() => {
     const nextLayoutKey = getLayoutKey(pathname);
-    if (nextLayoutKey !== currentLayoutKey) {
+    if (nextLayoutKey !== currentLayoutKeyRef.current) {
       setIsTransitioning(true);
 
-      const delayLayoutChange = setTimeout(() => {
+      if (delayLayoutChangeRef.current) {
+        clearTimeout(delayLayoutChangeRef.current);
+        delayLayoutChangeRef.current = null;
+      }
+      if (hideOverlayRef.current) {
+        clearTimeout(hideOverlayRef.current);
+        hideOverlayRef.current = null;
+      }
+
+      delayLayoutChangeRef.current = window.setTimeout(() => {
         setCurrentLayoutKey(nextLayoutKey);
       }, 500);
 
-      const hideOverlay = setTimeout(() => {
+      hideOverlayRef.current = window.setTimeout(() => {
         setIsTransitioning(false);
       }, 1000);
 
       return () => {
-        clearTimeout(delayLayoutChange);
-        clearTimeout(hideOverlay);
+        if (delayLayoutChangeRef.current) {
+          clearTimeout(delayLayoutChangeRef.current);
+          delayLayoutChangeRef.current = null;
+        }
+        if (hideOverlayRef.current) {
+          clearTimeout(hideOverlayRef.current);
+          hideOverlayRef.current = null;
+        }
       };
     }
-  }, [pathname, currentLayoutKey]);
+  }, [pathname]);
 
   let LayoutComponent: React.FC<{ children: React.ReactNode }>;
   if (currentLayoutKey === 'auth') {
